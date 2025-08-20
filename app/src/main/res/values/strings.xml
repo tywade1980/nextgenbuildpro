@@ -1,0 +1,102 @@
+<resources>
+    <string name="app_name">nextgenbuildpro</string>
+
+    <!-- TopBar -->
+    <string name="search_leads">Search Leads</string>
+
+    <!-- Filter Row -->
+    <string name="filter_stages">Stages</string>
+    <string name="filter_owners">Owners</string>
+    <string name="filter_active">Active</string>
+    <string name="filter_all_messages">All Messages</string>
+
+    <!-- Lead Cards -->
+    <string name="lead_status_new">New</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_leads">Leads</string>
+    <string name="nav_create">Create</string>
+    <string name="nav_projects">Projects</string>
+    <string name="nav_more">More</string>
+
+    <!-- Floating Action Button -->
+    <string name="create_new">Create new</string>
+
+    <!-- Home Screen -->
+    <string name="create_new_section">Create New</string>
+    <string name="take_photo">Take a Photo</string>
+    <string name="room_scan">3D Room Scan</string>
+    <string name="message">Message</string>
+    <string name="estimate">Estimate</string>
+    <string name="lead">Lead</string>
+    <string name="file">File</string>
+    <string name="note">Note</string>
+    <string name="leads_section">Leads</string>
+    <string name="estimates_section">Estimates</string>
+
+    <!-- Lead Detail Screen -->
+    <string name="lead_detail_status">Status: %1$s</string>
+    <string name="lead_detail_menu">Menu</string>
+    <string name="lead_detail_messages">Messages</string>
+    <string name="lead_detail_files">Files</string>
+    <string name="lead_detail_chat">Chat</string>
+    <string name="lead_detail_call">Call</string>
+    <string name="lead_detail_location">Location</string>
+    <string name="lead_detail_team">Team (%1$d)</string>
+    <string name="lead_detail_files_count">Files (%1$d)</string>
+    <string name="lead_detail_add_files_prompt">Add photos, videos, or scan files</string>
+    <string name="lead_detail_add_photo">Add Photo</string>
+    <string name="lead_detail_floor_plans">3D Floor Plans (%1$d)</string>
+    <string name="lead_detail_scan_room">Scan Your Room</string>
+    <string name="lead_detail_estimates_count">Estimates (%1$d)</string>
+    <string name="lead_detail_estimate_title">Built-in Office Estimates</string>
+    <string name="lead_detail_estimate_price">$18,000.00</string>
+    <string name="lead_detail_estimate_status_draft">Draft</string>
+    <string name="lead_detail_notes_count">Notes (%1$d)</string>
+    <string name="lead_detail_create_note">Create a New Note</string>
+    <string name="lead_detail_create_fab">+ Create</string>
+    <string name="lead_detail_create_file">File</string>
+    <string name="lead_detail_create_estimate">Estimate</string>
+    <string name="lead_detail_create_note_option">Note</string>
+    <string name="lead_detail_create_scan">3D Scan</string>
+
+    <!-- Estimate Detail Screen -->
+    <string name="estimate_detail_title">Estimate Details</string>
+    <string name="estimate_detail_preview_send">Preview and Send</string>
+    <string name="estimate_detail_payments_options">Payments and Options</string>
+    <string name="estimate_detail_material">Material</string>
+    <string name="estimate_detail_labor">Labor</string>
+    <string name="estimate_detail_total">Total: %1$s</string>
+
+    <!-- Estimate Actions Modal -->
+    <string name="estimate_actions_document_status">Document Status</string>
+    <string name="estimate_actions_collect_signature">Collect Signature</string>
+    <string name="estimate_actions_mark_approved">Mark as Approved</string>
+    <string name="estimate_actions_mark_declined">Mark as Declined</string>
+    <string name="estimate_actions_document_actions">Document Actions</string>
+    <string name="estimate_actions_duplicate">Duplicate</string>
+    <string name="estimate_actions_view_activity">View Activity Stream</string>
+    <string name="estimate_actions_archive">Archive</string>
+    <string name="estimate_actions_download_pdf">Download as PDF</string>
+
+    <!-- Estimate Item Editor -->
+    <string name="estimate_item_editor_title">Edit Item</string>
+    <string name="estimate_item_editor_save">Save</string>
+    <string name="estimate_item_editor_name">Name</string>
+    <string name="estimate_item_editor_name_hint">Basement Electrical Rough-in Labor</string>
+    <string name="estimate_item_editor_description">Description</string>
+    <string name="estimate_item_editor_description_hint">Enter description</string>
+    <string name="estimate_item_editor_cost_type">Cost Type</string>
+    <string name="estimate_item_editor_cost_type_labor">Labor</string>
+    <string name="estimate_item_editor_cost_type_material">Material</string>
+    <string name="estimate_item_editor_cost_type_equipment">Equipment</string>
+    <string name="estimate_item_editor_cost_type_other">Other</string>
+    <string name="estimate_item_editor_quantity">Quantity</string>
+    <string name="estimate_item_editor_unit_cost">Unit Cost</string>
+    <string name="estimate_item_editor_tax">Tax</string>
+    <string name="estimate_item_editor_tax_non_taxable">Non-Taxable</string>
+    <string name="estimate_item_editor_tax_taxable">Taxable</string>
+    <string name="estimate_item_editor_tax_custom">Custom %</string>
+    <string name="estimate_item_editor_voice_input">Voice Input</string>
+</resources>

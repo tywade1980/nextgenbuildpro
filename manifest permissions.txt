@@ -1,0 +1,37 @@
+# NextGenBuildPro Manifest Permissions
+
+This document outlines the Android manifest permissions required for the NextGenBuildPro application.
+
+## Core Permissions
+- `android.permission.INTERNET`: Required for network communication
+- `android.permission.ACCESS_NETWORK_STATE`: Required to check network connectivity
+
+## Location Permissions
+- `android.permission.ACCESS_FINE_LOCATION`: Required for precise location tracking
+- `android.permission.ACCESS_COARSE_LOCATION`: Required for approximate location tracking
+- `android.permission.ACCESS_BACKGROUND_LOCATION`: Required for location tracking when app is in background
+
+## Communication Permissions
+- `android.permission.SEND_SMS`: Required for sending SMS messages to clients
+- `android.permission.RECEIVE_SMS`: Required for receiving SMS messages from clients
+- `android.permission.READ_SMS`: Required for reading SMS messages from clients
+- `android.permission.CALL_PHONE`: Required for making phone calls to clients
+- `android.permission.READ_PHONE_STATE`: Required for monitoring phone call state
+- `android.permission.READ_CALL_LOG`: Required for reading call logs
+- `android.permission.WRITE_CALL_LOG`: Required for writing call logs
+
+## Camera and Storage Permissions
+- `android.permission.CAMERA`: Required for taking photos of projects and scanning documents
+- `android.permission.READ_EXTERNAL_STORAGE`: Required for reading files from storage
+- `android.permission.WRITE_EXTERNAL_STORAGE`: Required for saving files to storage
+
+## BMS Module Permissions
+- `android.permission.BLUETOOTH`: Required for connecting to IoT sensors for building monitoring
+- `android.permission.BLUETOOTH_ADMIN`: Required for discovering and pairing with Bluetooth devices
+- `android.permission.BLUETOOTH_CONNECT`: Required for connecting to Bluetooth devices (Android 12+)
+- `android.permission.BLUETOOTH_SCAN`: Required for scanning for Bluetooth devices (Android 12+)
+
+## Implementation Notes
+1. All dangerous permissions must be requested at runtime using the PermissionManager
+2. Background location permission must be requested separately after foreground location permissions are granted
+3. Bluetooth permissions should be requested only when the BMS module is active and needs to connect to IoT sensors
