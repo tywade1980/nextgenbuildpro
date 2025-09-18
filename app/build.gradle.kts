@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.gms.google-services")
 }
 
