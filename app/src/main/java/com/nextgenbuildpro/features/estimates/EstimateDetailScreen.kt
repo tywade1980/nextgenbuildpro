@@ -193,8 +193,9 @@ fun EstimateDetailScreen(navController: NavController, estimateId: String) {
                 },
                 onDownloadPdf = { 
                     showActionsDialog = false
-                    // TODO: Implement PDF generation
-                    // For now, show a toast or navigation to PDF viewer
+                    // Implement PDF generation functionality
+                    val pdfService = pmComponents.pdfGenerationService
+                    pdfService.generateEstimatePdf(estimate)
                     navController.navigate("estimate_pdf/${estimate.id}")
                 }
             )

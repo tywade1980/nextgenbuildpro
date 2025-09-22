@@ -8,6 +8,7 @@ import com.nextgenbuildpro.pm.data.repository.EstimateRepository
 import com.nextgenbuildpro.pm.data.repository.ProjectRepository
 import com.nextgenbuildpro.pm.data.repository.TaskRepository
 import com.nextgenbuildpro.pm.service.DailyLogService
+import com.nextgenbuildpro.pm.service.PdfGenerationService
 import com.nextgenbuildpro.pm.viewmodel.EstimatesViewModel
 import com.nextgenbuildpro.pm.viewmodel.ProjectsViewModel
 
@@ -27,6 +28,7 @@ object PmModule {
     private lateinit var projectRepository: ProjectRepository
     private lateinit var estimateRepository: EstimateRepository
     private lateinit var taskRepository: TaskRepository
+    private lateinit var pdfGenerationService: PdfGenerationService
 
     /**
      * Check if the module is already initialized
@@ -45,6 +47,7 @@ object PmModule {
         projectRepository = ProjectRepository()
         estimateRepository = EstimateRepository(context)
         taskRepository = TaskRepository(context)
+        pdfGenerationService = PdfGenerationService(context)
 
         // Temporarily disabled daily log service until context is clarified
         // DailyLogService.startService(context)
@@ -74,6 +77,14 @@ object PmModule {
     fun getTaskRepository(): TaskRepository {
         checkInitialized()
         return taskRepository
+    }
+
+    /**
+     * Get the PDF generation service
+     */
+    fun getPdfGenerationService(): PdfGenerationService {
+        checkInitialized()
+        return pdfGenerationService
     }
 
     /**
@@ -141,7 +152,8 @@ fun rememberPmComponents(): PmComponents {
         estimateRepository = PmModule.getEstimateRepository(),
         taskRepository = PmModule.getTaskRepository(),
         projectsViewModel = projectsViewModel,
-        estimatesViewModel = estimatesViewModel
+        estimatesViewModel = estimatesViewModel,
+        pdfGenerationService = PmModule.getPdfGenerationService()
     )
 }
 
@@ -153,5 +165,6 @@ data class PmComponents(
     val estimateRepository: EstimateRepository,
     val taskRepository: TaskRepository,
     val projectsViewModel: ProjectsViewModel,
-    val estimatesViewModel: EstimatesViewModel
+    val estimatesViewModel: EstimatesViewModel,
+    val pdfGenerationService: PdfGenerationService
 )
