@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.nextgenbuildpro.core.DateUtils
 import com.nextgenbuildpro.pm.data.model.Estimate
 import com.nextgenbuildpro.pm.data.model.EstimateItem
 import com.nextgenbuildpro.pm.data.model.EstimateStatus
@@ -132,8 +133,15 @@ fun EstimateDetailScreen(navController: NavController, estimateId: String) {
             // Action buttons
             item {
                 ActionButtons(
-                    onPreviewClick = { /* Handle preview */ },
-                    onSendClick = { /* Handle send */ }
+                    onPreviewClick = { 
+                        // Navigate to estimate preview screen
+                        navController.navigate("estimate_preview/${estimate.id}")
+                    },
+                    onSendClick = { 
+                        // Update estimate status to sent and navigate to send options
+                        viewModel.updateEstimateStatus(estimate.id, EstimateStatus.SENT)
+                        navController.navigate("estimate_send/${estimate.id}")
+                    }
                 )
             }
 
@@ -147,13 +155,48 @@ fun EstimateDetailScreen(navController: NavController, estimateId: String) {
         if (showActionsDialog) {
             EstimateActionsDialog(
                 onDismiss = { showActionsDialog = false },
-                onCollectSignature = { /* Handle collect signature */ },
-                onMarkApproved = { /* Handle mark approved */ },
-                onMarkDeclined = { /* Handle mark declined */ },
-                onDuplicate = { /* Handle duplicate */ },
-                onViewActivity = { /* Handle view activity */ },
-                onArchive = { /* Handle archive */ },
-                onDownloadPdf = { /* Handle download PDF */ }
+                onCollectSignature = { 
+                    showActionsDialog = false
+                    // Navigate to digital signature screen
+                    navController.navigate("digital_signature/${estimate.id}")
+                },
+                onMarkApproved = { 
+                    showActionsDialog = false
+                    viewModel.updateEstimateStatus(estimate.id, EstimateStatus.APPROVED)
+                },
+                onMarkDeclined = { 
+                    showActionsDialog = false
+                    viewModel.updateEstimateStatus(estimate.id, EstimateStatus.DECLINED)
+                },
+                onDuplicate = { 
+                    showActionsDialog = false
+                    // Create a copy of the current estimate
+                    val duplicatedEstimate = estimate.copy(
+                        id = UUID.randomUUID().toString(),
+                        title = "${estimate.title} (Copy)",
+                        status = EstimateStatus.DRAFT.name,
+                        createdAt = DateUtils.getCurrentDateString(),
+                        updatedAt = DateUtils.getCurrentDateString()
+                    )
+                    viewModel.createEstimate(duplicatedEstimate)
+                    navController.navigate("estimate_detail/${duplicatedEstimate.id}")
+                },
+                onViewActivity = { 
+                    showActionsDialog = false
+                    // Navigate to activity history screen
+                    navController.navigate("estimate_activity/${estimate.id}")
+                },
+                onArchive = { 
+                    showActionsDialog = false
+                    // Mark estimate as archived (update status)
+                    viewModel.updateEstimateStatus(estimate.id, EstimateStatus.EXPIRED)
+                },
+                onDownloadPdf = { 
+                    showActionsDialog = false
+                    // TODO: Implement PDF generation
+                    // For now, show a toast or navigation to PDF viewer
+                    navController.navigate("estimate_pdf/${estimate.id}")
+                }
             )
         }
     }
