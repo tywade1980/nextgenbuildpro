@@ -152,11 +152,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable(NavDestinations.ROOM_SCAN) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Room Scan",
-            //    message = "The room scanning feature is coming soon. You'll be able to create 3D models of rooms for better project planning."
-            //)
+            com.nextgenbuildpro.features.roomscan.RoomScanScreen(navController)
         }
 
         // Messages
@@ -326,6 +322,11 @@ fun NavGraph(navController: NavHostController) {
         composable(NavDestinations.AI_RECEPTIONIST_SETTINGS) {
             AIReceptionistSettingsScreen(navController)
         }
+        
+        // Building Management System
+        composable(NavDestinations.BMS) {
+            com.nextgenbuildpro.bms.ui.BmsScreen(navController)
+        }
     }
 }
 
@@ -393,4 +394,8 @@ object NavDestinations {
 
     // AI Receptionist
     const val AI_RECEPTIONIST_SETTINGS = "ai_receptionist_settings"
+    
+    // Building Management System
+    const val BMS = "bms"
+    const val BUILDING_DETAIL = "building_detail"
 }
