@@ -725,8 +725,52 @@ class EliteHuman : LearningAgent {
     private fun preserveWisdom() {}
     private fun shareParticipatingWisdom() {}
     private fun archiveCollaborationMemories() {}
-    private fun brainstormDivergentSolutions(context: InnovationContext): List<String> = listOf()
-    private fun synthesizeConvergentSolution(ideas: List<String>, context: InnovationContext): String = "synthesized_solution"
+    private fun brainstormDivergentSolutions(context: InnovationContext): List<String> {
+        return when (context.complexityLevel) {
+            "high" -> listOf(
+                "Multi-stage phased approach with contingency planning",
+                "Cross-functional team collaboration with external expertise",
+                "Technology-driven automation with human oversight",
+                "Innovative hybrid methodology combining proven practices",
+                "Adaptive framework with real-time adjustment capabilities",
+                "Stakeholder co-creation process with iterative feedback",
+                "Risk-managed pilot program with scalable implementation"
+            )
+            "medium" -> listOf(
+                "Systematic process improvement with benchmarking",
+                "Resource reallocation with efficiency optimization",
+                "Partnership development for shared capabilities",
+                "Technology integration with training programs",
+                "Customer-centric design thinking approach",
+                "Data-driven decision making with predictive analytics"
+            )
+            else -> listOf(
+                "Direct problem-solving with best practices",
+                "Resource optimization and workflow improvement",
+                "Communication enhancement and team alignment",
+                "Process standardization with quality controls"
+            )
+        }
+    }
+    
+    private fun synthesizeConvergentSolution(ideas: List<String>, context: InnovationContext): String {
+        val prioritizedIdeas = ideas.take(3) // Focus on top 3 ideas
+        
+        return when (context.domainFocus) {
+            "technology" -> 
+                "Integrated technology solution combining ${prioritizedIdeas.joinToString(" and ")} " +
+                "with human-centered design principles and scalable architecture"
+            "process" -> 
+                "Optimized process framework that leverages ${prioritizedIdeas.joinToString(", ")} " +
+                "while maintaining flexibility and continuous improvement capabilities"
+            "people" -> 
+                "Human-centric approach integrating ${prioritizedIdeas.joinToString(" with ")} " +
+                "focused on empowerment, collaboration, and sustainable growth"
+            else -> 
+                "Holistic solution that synthesizes ${prioritizedIdeas.joinToString(", ")} " +
+                "into a comprehensive strategy addressing root causes and long-term sustainability"
+        }
+    }
     private fun assessEthicalImplications(solution: String) = object { val rating = 0.9 }
     private fun analyzeFeasibilityWithIntuition(solution: String) = object { val score = 0.8 }
     private fun generateCreativeTitle(solution: String): String = "Creative Solution"
@@ -734,9 +778,93 @@ class EliteHuman : LearningAgent {
     private fun categorizeInnovation(solution: String): String = "breakthrough"
     private fun assessImpactPotential(solution: String): Double = 0.85
     private fun calculateCreativityLevel(solution: String): Double = 0.9
-    private fun analyzeTeamDynamics(participants: List<String>): Map<String, Any> = mapOf()
-    private fun adaptCommunicationStyle(dynamics: Map<String, Any>): String = "empathic"
-    private fun anticipateAndResolveConflicts(dynamics: Map<String, Any>, objectives: List<String>): List<String> = listOf()
+    private fun analyzeTeamDynamics(participants: List<String>): Map<String, Any> {
+        return mapOf(
+            "team_size" to participants.size,
+            "communication_style" to when {
+                participants.size > 8 -> "structured"
+                participants.size > 4 -> "collaborative"
+                else -> "intimate"
+            },
+            "collaboration_patterns" to mapOf(
+                "dominant_voices" to participants.take(2),
+                "quiet_contributors" to participants.drop(participants.size - 2),
+                "bridge_builders" to participants.drop(1).take(2)
+            ),
+            "energy_level" to (0.6..0.9).random(),
+            "consensus_likelihood" to when {
+                participants.size <= 3 -> 0.9
+                participants.size <= 6 -> 0.7
+                else -> 0.5
+            },
+            "potential_challenges" to when {
+                participants.size > 10 -> listOf("coordination_complexity", "decision_paralysis")
+                participants.size > 6 -> listOf("competing_priorities", "communication_overhead")
+                participants.size < 3 -> listOf("limited_perspectives", "groupthink_risk")
+                else -> listOf("minor_personality_conflicts")
+            },
+            "strengths" to listOf(
+                "diverse_perspectives",
+                "complementary_skills", 
+                "shared_commitment"
+            )
+        )
+    }
+    
+    private fun adaptCommunicationStyle(dynamics: Map<String, Any>): String {
+        val teamSize = dynamics["team_size"] as? Int ?: 5
+        val energyLevel = dynamics["energy_level"] as? Double ?: 0.7
+        val challenges = dynamics["potential_challenges"] as? List<String> ?: listOf()
+        
+        return when {
+            challenges.contains("coordination_complexity") -> "structured_facilitative"
+            challenges.contains("limited_perspectives") -> "provocative_expansive"
+            energyLevel > 0.8 -> "channeling_focused"
+            energyLevel < 0.5 -> "energizing_motivational"
+            teamSize > 8 -> "systematic_inclusive"
+            teamSize < 4 -> "intimate_deep"
+            else -> "balanced_empathic"
+        }
+    }
+    
+    private fun anticipateAndResolveConflicts(dynamics: Map<String, Any>, objectives: List<String>): List<String> {
+        val challenges = dynamics["potential_challenges"] as? List<String> ?: listOf()
+        val teamSize = dynamics["team_size"] as? Int ?: 5
+        
+        val resolutions = mutableListOf<String>()
+        
+        if (challenges.contains("competing_priorities")) {
+            resolutions.add("Establish clear priority matrix with objective criteria")
+            resolutions.add("Create time-boxed discussions for each priority area")
+        }
+        
+        if (challenges.contains("communication_overhead")) {
+            resolutions.add("Implement structured communication protocols")
+            resolutions.add("Use visual collaboration tools and dashboards")
+        }
+        
+        if (challenges.contains("decision_paralysis")) {
+            resolutions.add("Define decision-making authority and escalation paths")
+            resolutions.add("Set decision deadlines with default options")
+        }
+        
+        if (challenges.contains("groupthink_risk")) {
+            resolutions.add("Assign devil's advocate roles")
+            resolutions.add("Seek external perspectives and validation")
+        }
+        
+        if (teamSize > 6) {
+            resolutions.add("Break into smaller working groups for detailed discussions")
+            resolutions.add("Use consent-based decision making for efficiency")
+        }
+        
+        if (resolutions.isEmpty()) {
+            resolutions.add("Maintain open communication and regular check-ins")
+            resolutions.add("Foster psychological safety and inclusive participation")
+        }
+        
+        return resolutions
+    }
     private fun identifyHumanAISynergies(participants: List<String>, complexity: String): Map<String, Any> = mapOf()
     private fun predictCollaborationOutcome(synergies: Map<String, Any>, dynamics: Map<String, Any>): Double = 0.85
     private fun calculateTeamHarmony(dynamics: Map<String, Any>, resolution: List<String>): Double = 0.9
