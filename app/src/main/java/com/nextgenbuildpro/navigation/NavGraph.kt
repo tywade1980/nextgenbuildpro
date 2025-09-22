@@ -148,11 +148,7 @@ fun NavGraph(navController: NavHostController) {
 
         // Camera & Room Scan
         composable(NavDestinations.CAMERA) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Camera",
-            //    message = "The camera feature is coming soon. You'll be able to take photos directly within the app."
-            //)
+            com.nextgenbuildpro.features.camera.CameraScreen(navController)
         }
 
         composable(NavDestinations.ROOM_SCAN) {
@@ -186,11 +182,7 @@ fun NavGraph(navController: NavHostController) {
 
         // File Upload
         composable(NavDestinations.FILE_UPLOAD) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "File Upload",
-            //    message = "The file upload feature is coming soon. You'll be able to upload and manage documents related to your projects."
-            //)
+            com.nextgenbuildpro.features.files.FileUploadScreen(navController)
         }
 
         // Notes
@@ -204,28 +196,16 @@ fun NavGraph(navController: NavHostController) {
 
         // Settings
         composable(NavDestinations.ACCOUNT_SETTINGS) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Account Settings",
-            //    message = "The account settings feature is coming soon. You'll be able to manage your account preferences."
-            //)
+            com.nextgenbuildpro.features.settings.AccountSettingsScreen(navController)
         }
 
         composable(NavDestinations.PERMISSIONS) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Permissions",
-            //    message = "The permissions management feature is coming soon. You'll be able to control app permissions."
-            //)
+            com.nextgenbuildpro.features.settings.PermissionsScreen(navController)
         }
 
         // Notifications
         composable(NavDestinations.NOTIFICATIONS) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Notifications",
-            //    message = "The notifications feature is coming soon. You'll be able to view and manage your notifications."
-            //)
+            com.nextgenbuildpro.features.settings.NotificationsScreen(navController)
         }
 
         // Tasks
