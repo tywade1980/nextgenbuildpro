@@ -24,6 +24,7 @@ class AutoFillService(private val context: Context) : NextGenService {
     
     private val dataSourceRegistry = DataSourceRegistry()
     private val autoFillCache = mutableMapOf<String, AutoFillData>()
+    private val validationService = DataValidationService()
     
     override suspend fun start(): Result<Unit> = try {
         Log.d(TAG, "Starting AutoFillService...")
@@ -101,13 +102,16 @@ class AutoFillService(private val context: Context) : NextGenService {
                 .sortedByDescending { it.confidence * it.relevance }
                 .take(MAX_SUGGESTIONS)
             
+            // Validate and resolve conflicts
+            val validatedSuggestions = validationService.validateAndResolveSuggestions(fieldType, sortedSuggestions)
+            
             // Cache the results
             autoFillCache[cacheKey] = AutoFillData(
-                suggestions = sortedSuggestions,
+                suggestions = validatedSuggestions,
                 timestamp = LocalDateTime.now()
             )
             
-            return sortedSuggestions
+            return validatedSuggestions
             
         } catch (e: Exception) {
             Log.e(TAG, "Failed to get auto-fill suggestions for $fieldType", e)
@@ -162,6 +166,21 @@ class AutoFillService(private val context: Context) : NextGenService {
     fun registerDataSource(dataSource: DataSource) {
         dataSourceRegistry.register(dataSource)
         Log.d(TAG, "Registered data source: ${dataSource.name}")
+    }
+    
+    /**
+     * Validate a field value
+     */
+    fun validateFieldValue(fieldType: FormFieldType, value: Any?): ValidationResult {
+        return if (validationService.isValidForFieldType(fieldType, value)) {
+            ValidationResult(isValid = true)
+        } else {
+            ValidationResult(
+                isValid = false,
+                errorMessage = "Invalid value for ${fieldType.name.lowercase().replace('_', ' ')}",
+                validationDetails = mapOf("fieldType" to fieldType.name, "value" to value.toString())
+            )
+        }
     }
     
     /**
