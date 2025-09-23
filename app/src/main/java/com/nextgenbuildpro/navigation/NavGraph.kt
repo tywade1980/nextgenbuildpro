@@ -17,6 +17,7 @@ import com.nextgenbuildpro.features.calendar.CalendarEventEditorScreen
 import com.nextgenbuildpro.features.estimates.EstimateItemEditorScreen
 import com.nextgenbuildpro.features.estimates.AssemblySearchAndSelectionScreen
 import com.nextgenbuildpro.features.estimates.EnhancedEstimateEditorScreen
+import com.nextgenbuildpro.features.estimates.AssemblyIntegrationDemoScreen
 //import com.nextgenbuildpro.fieldtools.ui.ArVisualizationScreen
 //import com.nextgenbuildpro.fieldtools.ui.VoiceToTextScreen
 //import com.nextgenbuildpro.fieldtools.ui.OfflineModeScreen
@@ -116,6 +117,11 @@ fun NavGraph(navController: NavHostController) {
         // Assembly Search and Selection
         composable(NavDestinations.ASSEMBLY_SEARCH) {
             AssemblySearchAndSelectionScreen(navController)
+        }
+
+        // Assembly Integration Demo
+        composable(NavDestinations.ASSEMBLY_INTEGRATION_DEMO) {
+            AssemblyIntegrationDemoScreen(navController)
         }
 
         composable(
@@ -391,6 +397,7 @@ object NavDestinations {
     const val ESTIMATE_ITEM_EDITOR = "estimate_item_editor"
     const val ASSEMBLY_SEARCH = "assembly_search"
     const val ENHANCED_ESTIMATE_EDITOR = "enhanced_estimate_editor"
+    const val ASSEMBLY_INTEGRATION_DEMO = "assembly_integration_demo"
 
     // Projects
     const val PROJECT_DETAIL = "project_detail"
