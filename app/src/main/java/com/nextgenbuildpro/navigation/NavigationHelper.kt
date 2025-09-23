@@ -38,6 +38,7 @@ class NavigationHelper(private val context: Context) {
         NavDestinations.CLIENT_PORTAL,
         NavDestinations.PROGRESS_UPDATES,
         NavDestinations.DIGITAL_SIGNATURE,
+        NavDestinations.WORKFLOW_AUTOMATION,
         "tasks" // Direct route for tasks screen
     )
 

@@ -25,6 +25,7 @@ import com.nextgenbuildpro.receptionist.ui.AIReceptionistSettingsScreen
 import com.nextgenbuildpro.timeclock.ui.TimeClockScreen
 //import com.nextgenbuildpro.ui.PlaceholderScreen
 import com.nextgenbuildpro.crm.ui.MessagesScreen
+import com.nextgenbuildpro.features.automation.WorkflowAutomationScreen
 import androidx.compose.runtime.remember
 import com.nextgenbuildpro.crm.rememberCrmComponents
 
@@ -346,6 +347,11 @@ fun NavGraph(navController: NavHostController) {
         composable(NavDestinations.AI_RECEPTIONIST_SETTINGS) {
             AIReceptionistSettingsScreen(navController)
         }
+        
+        // Workflow Automation
+        composable(NavDestinations.WORKFLOW_AUTOMATION) {
+            WorkflowAutomationScreen(navController)
+        }
     }
 }
 
@@ -413,4 +419,7 @@ object NavDestinations {
 
     // AI Receptionist
     const val AI_RECEPTIONIST_SETTINGS = "ai_receptionist_settings"
+    
+    // Automation
+    const val WORKFLOW_AUTOMATION = "workflow_automation"
 }
