@@ -220,3 +220,44 @@ class TemplateEstimateGenerator {
         }
     }
 }
+
+/**
+ * Represents a template estimate result
+ */
+data class TemplateEstimate(
+    val id: String = UUID.randomUUID().toString(),
+    val projectId: String,
+    val contextMode: ContextMode,
+    val assemblies: List<TemplateAssembly>,
+    val subtotalLabor: Double,
+    val subtotalMaterial: Double,
+    val markupTotal: Double,
+    val grandTotal: Double,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val status: EstimateStatus = EstimateStatus.DRAFT
+)
+
+/**
+ * Represents a template assembly in an estimate
+ */
+data class TemplateAssembly(
+    val id: String = UUID.randomUUID().toString(),
+    val assemblyTemplate: AssemblyTemplate,
+    val quantity: Double,
+    val resolvedTasks: List<ResolvedTask>,
+    val subtotalLabor: Double,
+    val subtotalMaterial: Double,
+    val markupTotal: Double,
+    val totalCost: Double
+)
+
+/**
+ * Estimate status enum
+ */
+enum class EstimateStatus {
+    DRAFT,
+    PENDING_REVIEW,
+    APPROVED,
+    REJECTED,
+    FINAL
+}
