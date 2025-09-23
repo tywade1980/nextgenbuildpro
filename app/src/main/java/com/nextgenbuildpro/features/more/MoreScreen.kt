@@ -200,6 +200,12 @@ fun getSettingsItems(): List<SettingsItemData> {
 fun getToolsItems(): List<SettingsItemData> {
     return listOf(
         SettingsItemData(
+            icon = Icons.Default.Business,
+            title = "Building Management",
+            description = "Manage building information and compliance",
+            destination = NavDestinations.BMS
+        ),
+        SettingsItemData(
             icon = Icons.Default.CloudUpload,
             title = "File Upload",
             description = "Upload and manage files",

@@ -149,19 +149,11 @@ fun NavGraph(navController: NavHostController) {
 
         // Camera & Room Scan
         composable(NavDestinations.CAMERA) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Camera",
-            //    message = "The camera feature is coming soon. You'll be able to take photos directly within the app."
-            //)
+            com.nextgenbuildpro.features.camera.CameraScreen(navController)
         }
 
         composable(NavDestinations.ROOM_SCAN) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Room Scan",
-            //    message = "The room scanning feature is coming soon. You'll be able to create 3D models of rooms for better project planning."
-            //)
+            com.nextgenbuildpro.features.roomscan.RoomScanScreen(navController)
         }
 
         // Messages
@@ -187,11 +179,7 @@ fun NavGraph(navController: NavHostController) {
 
         // File Upload
         composable(NavDestinations.FILE_UPLOAD) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "File Upload",
-            //    message = "The file upload feature is coming soon. You'll be able to upload and manage documents related to your projects."
-            //)
+            com.nextgenbuildpro.features.files.FileUploadScreen(navController)
         }
 
         // Notes
@@ -205,28 +193,16 @@ fun NavGraph(navController: NavHostController) {
 
         // Settings
         composable(NavDestinations.ACCOUNT_SETTINGS) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Account Settings",
-            //    message = "The account settings feature is coming soon. You'll be able to manage your account preferences."
-            //)
+            com.nextgenbuildpro.features.settings.AccountSettingsScreen(navController)
         }
 
         composable(NavDestinations.PERMISSIONS) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Permissions",
-            //    message = "The permissions management feature is coming soon. You'll be able to control app permissions."
-            //)
+            com.nextgenbuildpro.features.settings.PermissionsScreen(navController)
         }
 
         // Notifications
         composable(NavDestinations.NOTIFICATIONS) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Notifications",
-            //    message = "The notifications feature is coming soon. You'll be able to view and manage your notifications."
-            //)
+            com.nextgenbuildpro.features.settings.NotificationsScreen(navController)
         }
 
         // Tasks
@@ -348,9 +324,16 @@ fun NavGraph(navController: NavHostController) {
             AIReceptionistSettingsScreen(navController)
         }
         
+
+        // Building Management System
+        composable(NavDestinations.BMS) {
+            com.nextgenbuildpro.bms.ui.BmsScreen(navController)
+
+
         // Workflow Automation
         composable(NavDestinations.WORKFLOW_AUTOMATION) {
             WorkflowAutomationScreen(navController)
+ master
         }
     }
 }
@@ -420,6 +403,12 @@ object NavDestinations {
     // AI Receptionist
     const val AI_RECEPTIONIST_SETTINGS = "ai_receptionist_settings"
     
+
+    // Building Management System
+    const val BMS = "bms"
+    const val BUILDING_DETAIL = "building_detail"
+
     // Automation
     const val WORKFLOW_AUTOMATION = "workflow_automation"
+
 }
