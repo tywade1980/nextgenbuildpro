@@ -14,6 +14,11 @@ import com.nextgenbuildpro.pm.data.model.TradeTemplate
 import com.nextgenbuildpro.pm.data.model.TemplateLibrary
 import com.nextgenbuildpro.pm.data.model.EstimateStatus
 import com.nextgenbuildpro.pm.data.model.HomeLifecyclePhase
+import com.nextgenbuildpro.pm.service.CalculationEngineService
+import com.nextgenbuildpro.pm.service.TaxSettings
+import com.nextgenbuildpro.pm.service.MarkupSettings
+import com.nextgenbuildpro.pm.service.TaxType
+import com.nextgenbuildpro.pm.service.MarkupType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +30,7 @@ import java.util.UUID
 
 /**
  * Repository for managing template-based estimates in the PM module
+ * Enhanced with calculation engine integration and catalogue services
  */
 class TemplateEstimateRepository(private val context: Context) : Repository<TemplateEstimate> {
     private val TAG = "TemplateEstimateRepo"
@@ -34,6 +40,9 @@ class TemplateEstimateRepository(private val context: Context) : Repository<Temp
     // Template library data
     private val _templateLibrary = MutableStateFlow<TemplateLibrary?>(null)
     val templateLibrary: StateFlow<TemplateLibrary?> = _templateLibrary.asStateFlow()
+    
+    // Calculation engine for enhanced calculations
+    private val calculationEngine = CalculationEngineService()
 
     init {
         // Load sample template data
@@ -224,13 +233,18 @@ class TemplateEstimateRepository(private val context: Context) : Repository<Temp
     }
 
     /**
-     * Recalculate estimate totals
+     * Recalculate estimate totals with enhanced calculation engine
      */
     private fun recalculateEstimateTotals(estimate: TemplateEstimate): TemplateEstimate {
-        val subtotalLabor = estimate.assemblies.sumOf { it.subtotalLabor as Double }
-        val subtotalMaterial = estimate.assemblies.sumOf { it.subtotalMaterial as Double }
-        val markupTotal = estimate.assemblies.sumOf { it.subtotalMarkup as Double }
-        val grandTotal = subtotalLabor + subtotalMaterial + markupTotal
+        // Calculate assembly totals using the calculation engine
+        val assemblyCalculations = estimate.assemblies.map { assembly ->
+            calculationEngine.calculateTemplateAssemblyTotals(assembly)
+        }
+        
+        val subtotalLabor = assemblyCalculations.sumOf { it.laborTotal }
+        val subtotalMaterial = assemblyCalculations.sumOf { it.materialTotal }
+        val markupTotal = assemblyCalculations.sumOf { it.markupTotal }
+        val grandTotal = assemblyCalculations.sumOf { it.total }
 
         return estimate.copy(
             subtotalLabor = subtotalLabor,
@@ -238,6 +252,153 @@ class TemplateEstimateRepository(private val context: Context) : Repository<Temp
             markupTotal = markupTotal,
             grandTotal = grandTotal
         )
+    }
+
+    /**
+     * Apply tax and markup to estimate with calculation engine
+     */
+    suspend fun applyTaxAndMarkup(
+        estimateId: String,
+        taxSettings: TaxSettings,
+        markupSettings: MarkupSettings
+    ): Boolean {
+        try {
+            val estimate = getById(estimateId) ?: return false
+            
+            // Calculate current totals
+            val currentTotal = estimate.grandTotal
+            
+            // Apply markup
+            val markupCalculation = calculationEngine.applyMarkupCalculations(currentTotal, markupSettings)
+            
+            // Apply tax
+            val taxCalculation = calculationEngine.applyTaxCalculations(
+                markupCalculation.totalWithMarkup, 
+                taxSettings
+            )
+            
+            // Update estimate with final totals
+            val updatedEstimate = estimate.copy(
+                markupTotal = estimate.markupTotal + markupCalculation.markupAmount,
+                grandTotal = taxCalculation.totalWithTax
+            )
+            
+            return update(updatedEstimate)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error applying tax and markup: ${e.message}")
+            return false
+        }
+    }
+
+    /**
+     * Bulk add assemblies to estimate from catalogue
+     */
+    suspend fun bulkAddAssembliesToEstimate(
+        estimateId: String,
+        assemblyTemplates: List<Pair<AssemblyTemplate, Double>>
+    ): Boolean {
+        try {
+            val estimate = getById(estimateId) ?: return false
+            val updatedAssemblies = estimate.assemblies.toMutableList()
+            
+            assemblyTemplates.forEach { (assemblyTemplate, quantity) ->
+                // Resolve tasks for the assembly
+                val resolvedTasks = resolveTasksForAssembly(assemblyTemplate, quantity)
+                
+                // Calculate subtotals
+                val subtotalLabor = resolvedTasks.sumOf { it.laborCost as Double }
+                val subtotalMaterial = resolvedTasks.sumOf { it.materialCost as Double }
+                val subtotalMarkup = resolvedTasks.sumOf { it.markupCost as Double }
+                val total = subtotalLabor + subtotalMaterial + subtotalMarkup
+                
+                // Create assembly
+                val assembly = TemplateAssembly(
+                    id = UUID.randomUUID().toString(),
+                    templateId = assemblyTemplate.id,
+                    name = assemblyTemplate.name,
+                    category = assemblyTemplate.category,
+                    description = assemblyTemplate.description,
+                    quantityUnit = assemblyTemplate.defaultQuantityUnit,
+                    quantity = quantity,
+                    tasks = resolvedTasks,
+                    subtotalLabor = subtotalLabor,
+                    subtotalMaterial = subtotalMaterial,
+                    subtotalMarkup = subtotalMarkup,
+                    total = total
+                )
+                
+                updatedAssemblies.add(assembly)
+            }
+            
+            // Recalculate estimate totals
+            val updatedEstimate = recalculateEstimateTotals(estimate.copy(assemblies = updatedAssemblies))
+            
+            return update(updatedEstimate)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error bulk adding assemblies: ${e.message}")
+            return false
+        }
+    }
+
+    /**
+     * Generate estimate from project context and recommended assemblies
+     */
+    suspend fun generateEstimateFromContext(
+        projectId: String,
+        contextMode: ContextMode,
+        projectPhase: HomeLifecyclePhase,
+        recommendedAssemblies: List<AssemblyTemplate> = emptyList()
+    ): TemplateEstimate? {
+        try {
+            // Create base estimate
+            val estimate = createEstimate(projectId, contextMode)
+            
+            // Get assemblies for the project phase if none provided
+            val assembliesToAdd = recommendedAssemblies.ifEmpty {
+                getAssemblyTemplatesByContextMode(contextMode).filter { 
+                    it.lifecyclePhase == projectPhase 
+                }
+            }
+            
+            // Add recommended assemblies
+            if (assembliesToAdd.isNotEmpty()) {
+                val assemblyPairs = assembliesToAdd.map { it to it.baseQuantity }
+                bulkAddAssembliesToEstimate(estimate.id, assemblyPairs)
+            }
+            
+            return getById(estimate.id)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error generating estimate from context: ${e.message}")
+            return null
+        }
+    }
+
+    /**
+     * Get cost breakdown for an estimate
+     */
+    suspend fun getEstimateCostBreakdown(estimateId: String): Map<String, Double>? {
+        try {
+            val estimate = getById(estimateId) ?: return null
+            
+            val breakdown = mutableMapOf<String, Double>()
+            
+            // Group by trade category
+            val tradeBreakdown = estimate.assemblies.groupBy { it.category }
+            tradeBreakdown.forEach { (trade, assemblies) ->
+                breakdown[trade] = assemblies.sumOf { it.total }
+            }
+            
+            // Add summary totals
+            breakdown["Total Labor"] = estimate.subtotalLabor
+            breakdown["Total Material"] = estimate.subtotalMaterial
+            breakdown["Total Markup"] = estimate.markupTotal
+            breakdown["Grand Total"] = estimate.grandTotal
+            
+            return breakdown
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting cost breakdown: ${e.message}")
+            return null
+        }
     }
 
     /**

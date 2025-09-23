@@ -15,6 +15,8 @@ import com.nextgenbuildpro.features.tasks.TasksScreen
 import com.nextgenbuildpro.features.calendar.CalendarScreen
 import com.nextgenbuildpro.features.calendar.CalendarEventEditorScreen
 import com.nextgenbuildpro.features.estimates.EstimateItemEditorScreen
+import com.nextgenbuildpro.features.estimates.AssemblySearchAndSelectionScreen
+import com.nextgenbuildpro.features.estimates.EnhancedEstimateEditorScreen
 //import com.nextgenbuildpro.fieldtools.ui.ArVisualizationScreen
 //import com.nextgenbuildpro.fieldtools.ui.VoiceToTextScreen
 //import com.nextgenbuildpro.fieldtools.ui.OfflineModeScreen
@@ -84,6 +86,36 @@ fun NavGraph(navController: NavHostController) {
 
         composable(NavDestinations.ESTIMATE_EDITOR) {
             com.nextgenbuildpro.features.estimates.TemplateEstimateEditorScreen(navController)
+        }
+
+        // Enhanced Estimate Editor with Assembly Integration
+        composable(
+            route = "${NavDestinations.ENHANCED_ESTIMATE_EDITOR}?estimateId={estimateId}&projectId={projectId}",
+            arguments = listOf(
+                navArgument("estimateId") { 
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+                navArgument("projectId") { 
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) { backStackEntry ->
+            val estimateId = backStackEntry.arguments?.getString("estimateId")
+            val projectId = backStackEntry.arguments?.getString("projectId")
+            EnhancedEstimateEditorScreen(
+                navController = navController,
+                estimateId = estimateId,
+                projectId = projectId
+            )
+        }
+
+        // Assembly Search and Selection
+        composable(NavDestinations.ASSEMBLY_SEARCH) {
+            AssemblySearchAndSelectionScreen(navController)
         }
 
         composable(
@@ -357,6 +389,8 @@ object NavDestinations {
     const val ESTIMATE_DETAIL = "estimate_detail"
     const val ESTIMATE_EDITOR = "estimate_editor"
     const val ESTIMATE_ITEM_EDITOR = "estimate_item_editor"
+    const val ASSEMBLY_SEARCH = "assembly_search"
+    const val ENHANCED_ESTIMATE_EDITOR = "enhanced_estimate_editor"
 
     // Projects
     const val PROJECT_DETAIL = "project_detail"
