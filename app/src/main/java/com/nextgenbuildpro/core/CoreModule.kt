@@ -1,5 +1,10 @@
 package com.nextgenbuildpro.core
 
+import android.content.Context
+import android.util.Log
+import com.nextgenbuildpro.core.services.AutoFillService
+import com.nextgenbuildpro.core.services.WorkflowAutomationEngine
+
 /**
  * Core module for NextGenBuildPro
  * 
@@ -9,11 +14,60 @@ package com.nextgenbuildpro.core
  * - Utility functions
  * - Shared UI components
  * - Base classes for repositories and view models
+ * - Auto-fill and workflow automation services
  */
 object CoreModule {
-    // Module initialization
-    fun initialize() {
-        // Initialize any core components
+    private var initialized = false
+    private lateinit var context: Context
+    private lateinit var autoFillService: AutoFillService
+    private lateinit var workflowAutomationEngine: WorkflowAutomationEngine
+    
+    /**
+     * Initialize the core module with automation services
+     */
+    fun initialize(appContext: Context? = null) {
+        if (initialized && appContext == null) return
+        
+        appContext?.let { 
+            context = it
+            
+            // Initialize automation services
+            autoFillService = AutoFillService(context)
+            workflowAutomationEngine = WorkflowAutomationEngine(context)
+            
+            Log.d("CoreModule", "Core module initialized with automation services")
+        }
+        
+        initialized = true
+    }
+    
+    /**
+     * Get the auto-fill service instance
+     */
+    fun getAutoFillService(): AutoFillService {
+        checkInitialized()
+        return autoFillService
+    }
+    
+    /**
+     * Get the workflow automation engine instance
+     */
+    fun getWorkflowAutomationEngine(): WorkflowAutomationEngine {
+        checkInitialized()
+        return workflowAutomationEngine
+    }
+    
+    /**
+     * Check if the module is initialized
+     */
+    fun isInitialized(): Boolean {
+        return initialized
+    }
+    
+    private fun checkInitialized() {
+        if (!initialized || !::context.isInitialized) {
+            throw IllegalStateException("CoreModule is not initialized. Call initialize(context) first.")
+        }
     }
 }
 

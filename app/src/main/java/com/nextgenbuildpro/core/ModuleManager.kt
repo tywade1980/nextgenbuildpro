@@ -35,8 +35,8 @@ object ModuleManager {
     fun initialize(context: Context) {
         if (initialized) return
 
-        // Initialize core module first
-        CoreModule.initialize()
+        // Initialize core module first with context for automation services
+        CoreModule.initialize(context)
         coreModule = CoreModule
 
         // Initialize service module next as other modules might depend on it
