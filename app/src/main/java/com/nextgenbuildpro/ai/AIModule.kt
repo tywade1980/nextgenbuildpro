@@ -2,6 +2,11 @@ package com.nextgenbuildpro.ai
 
 import android.content.Context
 import com.nextgenbuildpro.core.AIAssistant
+import com.nextgenbuildpro.ai.llm.LLMService
+import com.nextgenbuildpro.ai.llm.LLMServiceImpl
+import com.nextgenbuildpro.core.api.impl.FirestoreServiceImpl
+import com.nextgenbuildpro.core.api.impl.ConfigurationServiceImpl
+import com.nextgenbuildpro.core.api.impl.ApiUsageRegistryImpl
 
 /**
  * AI Module for NextGenBuildPro
@@ -11,6 +16,7 @@ import com.nextgenbuildpro.core.AIAssistant
  * - Manages AI assistant instances
  * - Handles AI-related configuration
  * - Provides shared management between user and main agent manager
+ * - Integrates LLM service for multi-agent coordination
  */
 object AIModule {
     private var initialized = false
@@ -22,6 +28,9 @@ object AIModule {
     private var architectAgent: ArchitectAI? = null
     private var interiorDesignAgent: InteriorDesignAI? = null
     private var mainAgentManager: AgentManager? = null
+    
+    // LLM service instance
+    private var llmService: LLMService? = null
 
     /**
      * Initialize the AI module
@@ -31,6 +40,9 @@ object AIModule {
 
         this.context = context
 
+        // Initialize LLM service with Firestore integration
+        initializeLLMService(context)
+
         // Initialize AI agents
         crmAgent = CrmAIImpl()
         pmAgent = ProjectManagerAIImpl()
@@ -39,6 +51,21 @@ object AIModule {
         mainAgentManager = AgentManagerImpl()
 
         initialized = true
+    }
+    
+    /**
+     * Initialize LLM service with cloud database integration
+     */
+    private fun initializeLLMService(context: Context) {
+        try {
+            val configService = ConfigurationServiceImpl(context)
+            val apiUsageRegistry = ApiUsageRegistryImpl(context)
+            val firestoreService = FirestoreServiceImpl(configService, apiUsageRegistry)
+            
+            llmService = LLMServiceImpl(firestoreService)
+        } catch (e: Exception) {
+            android.util.Log.e("AIModule", "Failed to initialize LLM service", e)
+        }
     }
 
     /**
@@ -71,6 +98,14 @@ object AIModule {
     fun getInteriorDesignAgent(): InteriorDesignAI {
         checkInitialized()
         return interiorDesignAgent!!
+    }
+    
+    /**
+     * Get the LLM service for multi-agent coordination
+     */
+    fun getLLMService(): LLMService? {
+        checkInitialized()
+        return llmService
     }
 
     /**
