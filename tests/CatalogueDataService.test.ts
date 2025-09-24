@@ -4,45 +4,43 @@
  */
 
 import { CatalogueDataService } from '../services/CatalogueDataService';
-import { Category, Trade, Scope, Assembly, Task, Material } from '../models/CatalogueSchema';
 
 // Mock Firebase
-jest.mock('../firebase', () => ({
-  firestore: {
-    collection: jest.fn(() => ({
-      doc: jest.fn(() => ({
-        set: jest.fn(),
-        get: jest.fn(() => ({
-          exists: true,
-          data: jest.fn(() => mockData)
-        })),
-        update: jest.fn()
-      })),
-      where: jest.fn(() => ({
-        orderBy: jest.fn(() => ({
-          get: jest.fn(() => ({
-            docs: [{ data: () => mockData }]
-          }))
-        })),
-        where: jest.fn(() => ({
-          orderBy: jest.fn(() => ({
-            get: jest.fn(() => ({
-              docs: [{ data: () => mockData }]
-            }))
-          }))
-        })),
-        limit: jest.fn(() => ({
-          get: jest.fn(() => ({
-            docs: [{ data: () => mockData }]
-          }))
-        })),
-        get: jest.fn(() => ({
-          docs: [{ data: () => mockData }]
-        }))
-      }))
-    }))
-  }
+jest.mock('../firebase', () => {
+  const mockFirestore = {
+    collection: jest.fn(),
+    doc: jest.fn()
+  };
+  return {
+    firestore: mockFirestore
+  };
+});
+
+// Mock Firebase Firestore functions
+jest.mock('firebase/firestore', () => ({
+  collection: jest.fn(() => mockCollectionRef),
+  doc: jest.fn(() => mockDocRef),
+  setDoc: jest.fn(() => Promise.resolve()),
+  getDoc: jest.fn(() => Promise.resolve(mockDocSnap)),
+  getDocs: jest.fn(() => Promise.resolve(mockQuerySnapshot)),
+  updateDoc: jest.fn(() => Promise.resolve()),
+  query: jest.fn(() => mockQuery),
+  where: jest.fn(() => mockQuery),
+  orderBy: jest.fn(() => mockQuery),
+  limit: jest.fn(() => mockQuery)
 }));
+
+const mockDocRef = { id: 'test-id' };
+const mockCollectionRef = { doc: jest.fn(() => mockDocRef) };
+const mockQuery = {};
+const mockDocSnap = {
+  exists: () => true,
+  data: () => mockData,
+  id: 'test-id'
+};
+const mockQuerySnapshot = {
+  docs: [mockDocSnap]
+};
 
 let mockData: any;
 let catalogueService: CatalogueDataService;
@@ -55,6 +53,7 @@ beforeEach(() => {
     description: 'Test Description',
     sequence: 1,
     isActive: true,
+    tags: ['test', 'mock'],
     createdAt: new Date(),
     updatedAt: new Date()
   };
