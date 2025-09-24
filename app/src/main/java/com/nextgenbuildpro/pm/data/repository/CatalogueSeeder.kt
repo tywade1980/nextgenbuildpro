@@ -28,6 +28,7 @@ class CatalogueSeeder(private val catalogueService: EnhancedCatalogueDataService
             val categoryList = categories.getOrThrow()
             
             // Create trades, scopes, assemblies for each category
+            createStructural(categoryList.find { it.name == "Structural" }?.id!!)
             createInteriorFinishes(categoryList.find { it.name == "Interior Finishes" }?.id!!)
             createPlumbing(categoryList.find { it.name == "Plumbing" }?.id!!)
             createElectrical(categoryList.find { it.name == "Electrical" }?.id!!)
@@ -128,6 +129,127 @@ class CatalogueSeeder(private val catalogueService: EnhancedCatalogueDataService
         }
         
         return Result.success(categories)
+    }
+    
+    /**
+     * Create structural category data
+     */
+    private suspend fun createStructural(categoryId: String) {
+        Log.d(TAG, "Creating Structural category data...")
+        
+        // Create Framing trade
+        val framingResult = catalogueService.createTrade(
+            categoryId = categoryId,
+            name = "Framing",
+            description = "Wood and steel framing systems",
+            sequence = 1,
+            imageUrl = null
+        )
+        val framingTrade = framingResult.getOrThrow()
+        
+        // Create Wall Framing scope
+        val wallFramingResult = catalogueService.createScope(
+            tradeId = framingTrade.id,
+            name = "Wall Framing",
+            description = "Interior and exterior wall framing systems",
+            sequence = 1,
+            imageUrl = null
+        )
+        val wallFramingScope = wallFramingResult.getOrThrow()
+        
+        // Create Framing Assembly
+        catalogueService.createCompleteAssembly(
+            assemblyData = mapOf(
+                "scopeId" to wallFramingScope.id,
+                "name" to "Framing Assembly",
+                "description" to "Standard wall framing with studs",
+                "sequence" to 1,
+                "unit" to "LF",
+                "laborHours" to 3.0,
+                "materialCost" to 90.0,  // 60% of $150
+                "laborCost" to 45.0,     // $45 for 3 hours at $15/hour
+                "equipmentCost" to 15.0,  // 10% of $150
+                "subcontractorCost" to 0.0,
+                "otherCost" to 0.0,
+                "totalCost" to 150.0,
+                "markupPercentage" to 0.15,
+                "notes" to "Standard 16\" OC wall framing with 2x4 or 2x6 studs",
+                "tags" to listOf("framing", "walls", "structural", "studs"),
+                "isActive" to true
+            ),
+            taskDataList = listOf(
+                mapOf(
+                    "name" to "Layout wall",
+                    "description" to "Mark stud locations and openings",
+                    "sequence" to 1,
+                    "laborHours" to 0.5,
+                    "materialCost" to 5.0,
+                    "laborCost" to 7.50,
+                    "equipmentCost" to 2.50,
+                    "notes" to "Use chalk line and square for accuracy",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "Cut studs",
+                    "description" to "Cut studs to proper length",
+                    "sequence" to 2,
+                    "laborHours" to 1.0,
+                    "materialCost" to 40.0,
+                    "laborCost" to 15.0,
+                    "equipmentCost" to 7.50,
+                    "notes" to "Account for plates and header height",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "Install framing",
+                    "description" to "Install plates, studs, and headers",
+                    "sequence" to 3,
+                    "laborHours" to 1.5,
+                    "materialCost" to 45.0,
+                    "laborCost" to 22.50,
+                    "equipmentCost" to 5.0,
+                    "notes" to "Use proper fasteners and check for plumb",
+                    "isActive" to true
+                )
+            ),
+            materialDataList = listOf(
+                mapOf(
+                    "name" to "2x4 Studs",
+                    "description" to "Standard construction grade 2x4 studs",
+                    "quantity" to 6.0,
+                    "unit" to "each",
+                    "unitCost" to 8.0,
+                    "totalCost" to 48.0,
+                    "waste" to 0.1,
+                    "notes" to "8 foot lengths for standard ceiling height",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "Top/Bottom Plates",
+                    "description" to "2x4 lumber for top and bottom plates",
+                    "quantity" to 2.0,
+                    "unit" to "each",
+                    "unitCost" to 8.0,
+                    "totalCost" to 16.0,
+                    "waste" to 0.05,
+                    "notes" to "Use treated lumber for bottom plate on concrete",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "Fasteners",
+                    "description" to "Nails and screws for framing",
+                    "quantity" to 5.0,
+                    "unit" to "lbs",
+                    "unitCost" to 5.20,
+                    "totalCost" to 26.0,
+                    "waste" to 0.0,
+                    "notes" to "16d common nails and 3\" construction screws",
+                    "isActive" to true
+                )
+            )
+        )
+        
+        Log.d(TAG, "Created Structural data")
     }
     
     /**
@@ -336,6 +458,118 @@ class CatalogueSeeder(private val catalogueService: EnhancedCatalogueDataService
             )
         )
         
+        // Create Rough Plumbing trade
+        val roughPlumbingResult = catalogueService.createTrade(
+            categoryId = categoryId,
+            name = "Rough Plumbing",
+            description = "Plumbing rough-in and supply line installation",
+            sequence = 2,
+            imageUrl = null
+        )
+        val roughPlumbingTrade = roughPlumbingResult.getOrThrow()
+        
+        // Create Plumbing Rough-in scope
+        val plumbingRoughInResult = catalogueService.createScope(
+            tradeId = roughPlumbingTrade.id,
+            name = "Plumbing Rough-in",
+            description = "Standard plumbing rough-in installation including supply and drain lines",
+            sequence = 1,
+            imageUrl = null
+        )
+        val plumbingRoughInScope = plumbingRoughInResult.getOrThrow()
+        
+        // Create Plumbing Rough-in assembly
+        catalogueService.createCompleteAssembly(
+            assemblyData = mapOf(
+                "scopeId" to plumbingRoughInScope.id,
+                "name" to "Plumbing Rough-in",
+                "description" to "Standard plumbing rough-in",
+                "sequence" to 1,
+                "unit" to "bathroom",
+                "laborHours" to 6.0,
+                "materialCost" to 180.0,  // 60% of $300
+                "laborCost" to 90.0,      // 6 hours at $15/hour
+                "equipmentCost" to 30.0,  // 10% of $300
+                "subcontractorCost" to 0.0,
+                "otherCost" to 0.0,
+                "totalCost" to 300.0,
+                "markupPercentage" to 0.15,
+                "notes" to "Includes supply lines, drain lines, and vent installation for standard bathroom",
+                "tags" to listOf("plumbing", "rough-in", "supply", "drain", "vent"),
+                "isActive" to true
+            ),
+            taskDataList = listOf(
+                mapOf(
+                    "name" to "Install supply lines",
+                    "description" to "Run hot and cold water supply lines",
+                    "sequence" to 1,
+                    "laborHours" to 2.0,
+                    "materialCost" to 60.0,
+                    "laborCost" to 30.0,
+                    "equipmentCost" to 10.0,
+                    "notes" to "Use PEX or copper tubing with proper fittings",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "Install drain lines",
+                    "description" to "Install waste and drain piping",
+                    "sequence" to 2,
+                    "laborHours" to 3.0,
+                    "materialCost" to 80.0,
+                    "laborCost" to 45.0,
+                    "equipmentCost" to 15.0,
+                    "notes" to "Use PVC drain pipe with proper slope",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "Install vent lines",
+                    "description" to "Install plumbing vent system",
+                    "sequence" to 3,
+                    "laborHours" to 1.0,
+                    "materialCost" to 40.0,
+                    "laborCost" to 15.0,
+                    "equipmentCost" to 5.0,
+                    "notes" to "Connect to main vent stack or install separate vent",
+                    "isActive" to true
+                )
+            ),
+            materialDataList = listOf(
+                mapOf(
+                    "name" to "PEX Supply Tubing",
+                    "description" to "1/2\" and 3/4\" PEX tubing for water supply",
+                    "quantity" to 100.0,
+                    "unit" to "feet",
+                    "unitCost" to 0.75,
+                    "totalCost" to 75.0,
+                    "waste" to 0.15,
+                    "notes" to "Red for hot, blue for cold water lines",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "PVC Drain Pipe",
+                    "description" to "3\" and 4\" PVC drain pipe and fittings",
+                    "quantity" to 30.0,
+                    "unit" to "feet",
+                    "unitCost" to 2.50,
+                    "totalCost" to 75.0,
+                    "waste" to 0.1,
+                    "notes" to "Includes elbows, tees, and couplings",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "Plumbing Fittings",
+                    "description" to "PEX fittings, valves, and connections",
+                    "quantity" to 15.0,
+                    "unit" to "each",
+                    "unitCost" to 2.00,
+                    "totalCost" to 30.0,
+                    "waste" to 0.1,
+                    "notes" to "SharkBite or crimp fittings for PEX connections",
+                    "isActive" to true
+                )
+            )
+        )
+        
         Log.d(TAG, "Created Plumbing data")
     }
     
@@ -430,6 +664,118 @@ class CatalogueSeeder(private val catalogueService: EnhancedCatalogueDataService
                     "totalCost" to 21.0,
                     "waste" to 0.0,
                     "notes" to "White, decora style",
+                    "isActive" to true
+                )
+            )
+        )
+        
+        // Create Rough Electrical trade
+        val roughElectricalResult = catalogueService.createTrade(
+            categoryId = categoryId,
+            name = "Rough Electrical",
+            description = "Electrical rough-in and wiring installation",
+            sequence = 2,
+            imageUrl = null
+        )
+        val roughElectricalTrade = roughElectricalResult.getOrThrow()
+        
+        // Create Rough-in Installation scope
+        val roughInResult = catalogueService.createScope(
+            tradeId = roughElectricalTrade.id,
+            name = "Rough-in Installation",
+            description = "Basic electrical rough-in work including wiring and boxes",
+            sequence = 1,
+            imageUrl = null
+        )
+        val roughInScope = roughInResult.getOrThrow()
+        
+        // Create Electrical Rough-in assembly
+        catalogueService.createCompleteAssembly(
+            assemblyData = mapOf(
+                "scopeId" to roughInScope.id,
+                "name" to "Electrical Rough-in",
+                "description" to "Basic electrical rough-in work",
+                "sequence" to 1,
+                "unit" to "room",
+                "laborHours" to 4.0,
+                "materialCost" to 120.0,  // 60% of $200
+                "laborCost" to 60.0,      // 4 hours at $15/hour
+                "equipmentCost" to 20.0,  // 10% of $200
+                "subcontractorCost" to 0.0,
+                "otherCost" to 0.0,
+                "totalCost" to 200.0,
+                "markupPercentage" to 0.15,
+                "notes" to "Includes wiring, boxes, and basic rough-in electrical work",
+                "tags" to listOf("electrical", "rough-in", "wiring", "boxes"),
+                "isActive" to true
+            ),
+            taskDataList = listOf(
+                mapOf(
+                    "name" to "Install electrical boxes",
+                    "description" to "Install outlet and switch boxes",
+                    "sequence" to 1,
+                    "laborHours" to 1.5,
+                    "materialCost" to 30.0,
+                    "laborCost" to 22.50,
+                    "equipmentCost" to 7.50,
+                    "notes" to "Position boxes at proper height and secure to studs",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "Run electrical wire",
+                    "description" to "Pull 12 and 14 AWG wire through walls",
+                    "sequence" to 2,
+                    "laborHours" to 2.0,
+                    "materialCost" to 60.0,
+                    "laborCost" to 30.0,
+                    "equipmentCost" to 10.0,
+                    "notes" to "Use appropriate wire gauge for circuit amperage",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "Connect to panel",
+                    "description" to "Make connections at electrical panel",
+                    "sequence" to 3,
+                    "laborHours" to 0.5,
+                    "materialCost" to 30.0,
+                    "laborCost" to 7.50,
+                    "equipmentCost" to 2.50,
+                    "notes" to "Install appropriate breakers and label circuits",
+                    "isActive" to true
+                )
+            ),
+            materialDataList = listOf(
+                mapOf(
+                    "name" to "Electrical Boxes",
+                    "description" to "Standard outlet and switch boxes",
+                    "quantity" to 8.0,
+                    "unit" to "each",
+                    "unitCost" to 2.50,
+                    "totalCost" to 20.0,
+                    "waste" to 0.1,
+                    "notes" to "Single gang and double gang boxes",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "Electrical Wire",
+                    "description" to "12 AWG and 14 AWG THHN wire",
+                    "quantity" to 150.0,
+                    "unit" to "feet",
+                    "unitCost" to 0.50,
+                    "totalCost" to 75.0,
+                    "waste" to 0.15,
+                    "notes" to "Mix of 12 AWG for 20A circuits and 14 AWG for 15A circuits",
+                    "isActive" to true
+                ),
+                mapOf(
+                    "name" to "Circuit Breakers",
+                    "description" to "15A and 20A circuit breakers",
+                    "quantity" to 3.0,
+                    "unit" to "each",
+                    "unitCost" to 8.33,
+                    "totalCost" to 25.0,
+                    "waste" to 0.0,
+                    "notes" to "Single pole breakers for 120V circuits",
                     "isActive" to true
                 )
             )
