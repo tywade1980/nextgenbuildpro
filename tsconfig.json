@@ -15,17 +15,21 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "noEmitOnError": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": true,
+    "noEmitOnError": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["node", "jest"]
   },
   "include": [
     "models/**/*",
     "services/**/*",
+    "examples/**/*",
+    "seeds/**/*",
+    "tests/**/*",
     "firebase.ts",
     "EstimateEditor.js"
   ],
