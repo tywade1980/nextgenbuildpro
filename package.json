@@ -7,7 +7,9 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "lint": "eslint . --ext .ts,.js,.tsx,.jsx",
-    "test": "jest"
+    "test": "jest",
+    "seed:catalogue": "npx ts-node seeds/seedCatalogue.ts",
+    "seed:run": "node seeds/runSeeder.js"
   },
   "dependencies": {
     "firebase": "^10.0.0",
@@ -24,6 +26,7 @@
     "eslint": "^8.0.0",
     "jest": "^29.0.0",
     "ts-jest": "^29.4.4",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   },
   "keywords": [
