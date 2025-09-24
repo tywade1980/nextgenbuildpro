@@ -9,7 +9,13 @@
     "lint": "eslint . --ext .ts,.js,.tsx,.jsx",
     "test": "jest",
     "seed:catalogue": "npx ts-node seeds/seedCatalogue.ts",
-    "seed:run": "node seeds/runSeeder.js"
+
+    "seed:run": "node seeds/runSeeder.js",
+    "seed:verify": "npx ts-node seeds/verifyCatalogue.ts",
+    "seed:demo": "npx ts-node seeds/demo.ts"
+
+  
+
   },
   "dependencies": {
     "firebase": "^10.0.0",
@@ -18,10 +24,17 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
- copilot/fix-e51fd02c-7998-4e88-9d07-1ae44ea4e338
+
+
     "@types/jest": "^30.0.0",
 
+
+
+
+
+
   
+
     "@types/node": "^20.19.17",
 
     "@types/react": "^18.0.0",
@@ -35,8 +48,12 @@
 
     "ts-jest": "^29.4.4",
 
+    
+
+
 
     "ts-node": "^10.9.2",
+
 
     "typescript": "^5.9.2"
   },
