@@ -4,7 +4,6 @@
  */
 
 import { CatalogueDataService } from '../services/CatalogueDataService';
-import { Category, Trade, Scope, Assembly, Task, Material } from '../models/CatalogueSchema';
 
 // Mock Firebase
 jest.mock('../firebase', () => ({
