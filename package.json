@@ -9,7 +9,9 @@
     "lint": "eslint . --ext .ts,.js,.tsx,.jsx",
     "test": "jest",
     "seed:catalogue": "npx ts-node seeds/seedCatalogue.ts",
-    "seed:run": "node seeds/runSeeder.js"
+    "seed:run": "node seeds/runSeeder.js",
+    "seed:verify": "npx ts-node seeds/verifyCatalogue.ts",
+    "seed:demo": "npx ts-node seeds/demo.ts"
   },
   "dependencies": {
     "firebase": "^10.0.0",

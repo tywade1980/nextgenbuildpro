@@ -14,6 +14,7 @@ The seeding script creates a comprehensive construction catalogue with:
 ## Files
 
 - `seedCatalogue.ts` - Main TypeScript seeding script
+- `verifyCatalogue.ts` - Verification script to check seeded data
 - `runSeeder.js` - Node.js runner script  
 - `README.md` - This documentation
 
@@ -41,6 +42,20 @@ npm run seed:run
 ```bash
 npx ts-node seeds/seedCatalogue.ts
 ```
+
+### Verifying the Seeded Data
+
+After running the seeder, verify the data was created correctly:
+
+```bash
+npm run seed:verify
+```
+
+This will check for:
+- All 10 expected categories
+- Sample trades (Finish Carpentry, Finish Plumbing, Finish Electrical)
+- Sample assemblies (Standard Staircase, Toilet Installation, Bedroom Electrical Devices)
+- Tasks and materials counts
 
 ## What Gets Created
 
