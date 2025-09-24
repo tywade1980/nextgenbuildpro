@@ -348,10 +348,11 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     private suspend fun initializeAgents() {
         Log.d("MainOrchestrator", "Initializing AI agents...")
         
-        // Create and initialize agents
+        // Create and initialize agents with LLM service integration
+        val llmService = com.nextgenbuildpro.ai.AIModule.getLLMService()
         val agentInstances = mapOf(
             AgentType.MRM to MRM(),
-            AgentType.HERMES_BRAIN to HermesBrain(),
+            AgentType.HERMES_BRAIN to HermesBrain(llmService),
             AgentType.BIG_DADDY to BigDaddyAgent(),
             AgentType.HRM_MODEL to HRMModel(),
             AgentType.ELITE_HUMAN to EliteHuman()

@@ -1,6 +1,7 @@
 package com.nextgenbuildpro.agents
 
 import com.nextgenbuildpro.shared.*
+import com.nextgenbuildpro.ai.llm.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,8 +17,12 @@ import java.util.UUID
  * The HermesBrain agent serves as the communication and coordination hub for the
  * NextGen AI OS. It handles message routing, protocol translation, and intelligent
  * communication patterns between all system components.
+ * 
+ * Enhanced with LLM integration for intelligent multi-agent coordination.
  */
-class HermesBrain : LearningAgent {
+class HermesBrain(
+    private val llmService: LLMService? = null
+) : LearningAgent {
     
     override val agentType: AgentType = AgentType.HERMES_BRAIN
     
@@ -30,6 +35,10 @@ class HermesBrain : LearningAgent {
     private val routingTable = mutableMapOf<AgentType, AgentRoute>()
     private val communicationHistory = mutableListOf<CommunicationRecord>()
     private val protocolHandlers = mutableMapOf<String, ProtocolHandler>()
+    
+    // LLM-specific properties
+    private val activeConversations = mutableMapOf<String, LLMConversation>()
+    private val coordinationRequests = mutableListOf<MultiAgentCoordinationRequest>()
     
     override val capabilities = listOf(
         AgentCapability(
@@ -65,6 +74,20 @@ class HermesBrain : LearningAgent {
             description = "Processing and understanding of natural language communications",
             inputTypes = listOf("TextMessage", "VoiceInput"),
             outputTypes = listOf("Intent", "EntityExtraction", "Response"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "LLM Coordination",
+            description = "Large Language Model powered multi-agent coordination and planning",
+            inputTypes = listOf("CoordinationRequest", "LLMContext"),
+            outputTypes = listOf("CoordinationPlan", "AgentAssignments"),
+            skillLevel = SkillLevel.MASTER
+        ),
+        AgentCapability(
+            name = "Intelligent Decision Making",
+            description = "AI-powered decision making for complex multi-agent scenarios",
+            inputTypes = listOf("DecisionContext", "AgentStates"),
+            outputTypes = listOf("Decision", "Reasoning"),
             skillLevel = SkillLevel.EXPERT
         )
     )
@@ -660,6 +683,223 @@ class HermesBrain : LearningAgent {
     private fun penalizeRoute(routingDecision: Map<String, Any>) {}
     private fun adaptCommunicationParameters(context: Map<String, Any>, adaptation: Double) {}
     private fun updateCommunicationKnowledge(data: LearningData) {}
+    
+    // === LLM COORDINATION METHODS ===
+    
+    /**
+     * Coordinate multiple agents using LLM-powered planning
+     */
+    suspend fun coordinateAgents(
+        requestingAgent: AgentType,
+        targetAgents: List<AgentType>,
+        task: String,
+        context: String = ""
+    ): Result<MultiAgentCoordinationResponse> {
+        return llmService?.let { service ->
+            Log.d("HermesBrain", "Coordinating agents using LLM: $targetAgents")
+            
+            val request = MultiAgentCoordinationRequest(
+                requestingAgent = requestingAgent,
+                targetAgents = targetAgents,
+                task = task,
+                context = context
+            )
+            
+            // Store the request for tracking
+            coordinationRequests.add(request)
+            
+            service.generateCoordinationResponse(request)
+        } ?: run {
+            Log.w("HermesBrain", "LLM service not available for coordination")
+            Result.failure(Exception("LLM service not available"))
+        }
+    }
+    
+    /**
+     * Start an LLM-powered conversation between agents
+     */
+    suspend fun startLLMConversation(
+        participants: List<AgentType>,
+        initialPrompt: String,
+        context: Map<String, Any> = emptyMap()
+    ): Result<String> {
+        return llmService?.let { service ->
+            Log.d("HermesBrain", "Starting LLM conversation with: $participants")
+            
+            val conversationId = UUID.randomUUID().toString()
+            val llmContext = LLMContext(
+                conversationId = conversationId,
+                systemPrompt = "You are facilitating a multi-agent conversation between: ${participants.joinToString(", ")}",
+                metadata = context
+            )
+            
+            val response = service.generateResponse(
+                prompt = initialPrompt,
+                context = llmContext,
+                agentType = agentType
+            )
+            
+            response.fold(
+                onSuccess = { llmResponse ->
+                    // Create and store the conversation
+                    val conversation = LLMConversation(
+                        id = conversationId,
+                        participants = participants,
+                        messages = listOf(
+                            LLMMessage("user", initialPrompt),
+                            LLMMessage("assistant", llmResponse.content)
+                        ),
+                        startTime = LocalDateTime.now(),
+                        lastUpdate = LocalDateTime.now()
+                    )
+                    
+                    activeConversations[conversationId] = conversation
+                    service.storeConversation(conversation)
+                    
+                    Result.success(conversationId)
+                },
+                onFailure = { error ->
+                    Log.e("HermesBrain", "Failed to start LLM conversation", error)
+                    Result.failure(error)
+                }
+            )
+        } ?: run {
+            Log.w("HermesBrain", "LLM service not available for conversation")
+            Result.failure(Exception("LLM service not available"))
+        }
+    }
+    
+    /**
+     * Continue an LLM conversation with a new message
+     */
+    suspend fun continueLLMConversation(
+        conversationId: String,
+        message: String,
+        agentType: AgentType
+    ): Result<String> {
+        return llmService?.let { service ->
+            Log.d("HermesBrain", "Continuing LLM conversation: $conversationId")
+            
+            val conversation = activeConversations[conversationId] 
+                ?: return Result.failure(Exception("Conversation not found: $conversationId"))
+            
+            val llmContext = LLMContext(
+                conversationId = conversationId,
+                systemPrompt = "You are facilitating a multi-agent conversation",
+                previousMessages = conversation.messages
+            )
+            
+            val response = service.generateResponse(
+                prompt = message,
+                context = llmContext,
+                agentType = agentType
+            )
+            
+            response.fold(
+                onSuccess = { llmResponse ->
+                    // Update the conversation
+                    val updatedConversation = conversation.copy(
+                        messages = conversation.messages + listOf(
+                            LLMMessage("user", message, agentType = agentType),
+                            LLMMessage("assistant", llmResponse.content)
+                        ),
+                        lastUpdate = LocalDateTime.now()
+                    )
+                    
+                    activeConversations[conversationId] = updatedConversation
+                    service.storeConversation(updatedConversation)
+                    
+                    Result.success(llmResponse.content)
+                },
+                onFailure = { error ->
+                    Log.e("HermesBrain", "Failed to continue LLM conversation", error)
+                    Result.failure(error)
+                }
+            )
+        } ?: Result.failure(Exception("LLM service not available"))
+    }
+    
+    /**
+     * Get intelligent routing suggestions using LLM
+     */
+    suspend fun getIntelligentRoutingSuggestion(
+        message: AgentMessage,
+        availableAgents: List<AgentType>
+    ): Result<AgentType> {
+        return llmService?.let { service ->
+            Log.d("HermesBrain", "Getting intelligent routing suggestion")
+            
+            val prompt = """
+                Analyze this message and suggest the best agent to handle it:
+                Message Type: ${message.messageType}
+                Content: ${message.content}
+                Priority: ${message.priority}
+                Available Agents: ${availableAgents.joinToString(", ")}
+                
+                Consider each agent's capabilities and current load. Respond with just the agent name.
+            """.trimIndent()
+            
+            val response = service.generateResponse(
+                prompt = prompt,
+                agentType = agentType
+            )
+            
+            response.fold(
+                onSuccess = { llmResponse ->
+                    // Parse the agent suggestion from LLM response
+                    val suggestedAgent = availableAgents.find { agent ->
+                        llmResponse.content.contains(agent.name, ignoreCase = true)
+                    } ?: availableAgents.first() // Fallback to first available agent
+                    
+                    Result.success(suggestedAgent)
+                },
+                onFailure = { error ->
+                    Log.e("HermesBrain", "Failed to get routing suggestion", error)
+                    Result.failure(error)
+                }
+            )
+        } ?: Result.failure(Exception("LLM service not available"))
+    }
+    
+    /**
+     * Get conversation analytics using LLM
+     */
+    suspend fun analyzeCommunicationPatterns(): Result<String> {
+        return llmService?.let { service ->
+            Log.d("HermesBrain", "Analyzing communication patterns")
+            
+            val recentHistory = communicationHistory.takeLast(50)
+            val prompt = """
+                Analyze these recent communication patterns and provide insights:
+                
+                Total messages: ${recentHistory.size}
+                Agent interactions: ${recentHistory.groupBy { "${it.fromAgent}->${it.toAgent}" }.keys}
+                
+                Provide insights on:
+                1. Communication efficiency
+                2. Bottlenecks or overloaded agents
+                3. Optimization recommendations
+                
+                Keep the analysis concise and actionable.
+            """.trimIndent()
+            
+            val response = service.generateResponse(
+                prompt = prompt,
+                agentType = agentType
+            )
+            
+            response.fold(
+                onSuccess = { llmResponse ->
+                    Result.success(llmResponse.content)
+                },
+                onFailure = { error ->
+                    Log.e("HermesBrain", "Failed to analyze patterns", error)
+                    Result.failure(error)
+                }
+            )
+        } ?: Result.failure(Exception("LLM service not available"))
+    }
+    
     private fun createAcknowledgmentResponse(message: AgentMessage, content: String): AgentMessage? = null
     private fun createErrorResponse(message: AgentMessage, error: String): AgentMessage? = null
     private fun createGenericResponse(message: AgentMessage, content: String): AgentMessage? = null
