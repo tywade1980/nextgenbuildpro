@@ -633,4 +633,118 @@ class EnhancedCatalogueDataService(private val context: Context) {
         
         Log.d(TAG, "Sample data loaded successfully")
     }
+    
+    /**
+     * Overloaded createCompleteAssembly method for easier seeding
+     * Similar to the JavaScript interface in the seedCatalogue script
+     */
+    suspend fun createCompleteAssembly(
+        assemblyData: Map<String, Any>,
+        taskDataList: List<Map<String, Any>>,
+        materialDataList: List<Map<String, Any>>
+    ): Result<AssemblyWithChildren> {
+        return try {
+            // Create the assembly first
+            val assembly = EnhancedAssembly(
+                scopeId = assemblyData["scopeId"] as String,
+                name = assemblyData["name"] as String,
+                description = assemblyData["description"] as String,
+                sequence = assemblyData["sequence"] as Int,
+                unit = assemblyData["unit"] as String,
+                laborHours = assemblyData["laborHours"] as Double,
+                materialCost = assemblyData["materialCost"] as Double,
+                laborCost = assemblyData["laborCost"] as Double,
+                equipmentCost = (assemblyData["equipmentCost"] as? Double) ?: 0.0,
+                subcontractorCost = (assemblyData["subcontractorCost"] as? Double) ?: 0.0,
+                otherCost = (assemblyData["otherCost"] as? Double) ?: 0.0,
+                totalCost = assemblyData["totalCost"] as Double,
+                markupPercentage = (assemblyData["markupPercentage"] as? Double) ?: 0.2,
+                notes = (assemblyData["notes"] as? String) ?: "",
+                tags = (assemblyData["tags"] as? List<String>) ?: emptyList(),
+                imageUrl = assemblyData["imageUrl"] as? String
+            )
+            
+            val currentAssemblies = _assemblies.value.toMutableList()
+            currentAssemblies.add(assembly)
+            _assemblies.value = currentAssemblies
+            
+            // Create tasks
+            val createdTasks = mutableListOf<TaskWithMaterials>()
+            for (taskData in taskDataList) {
+                val task = Task(
+                    assemblyId = assembly.id,
+                    name = taskData["name"] as String,
+                    description = taskData["description"] as String,
+                    sequence = taskData["sequence"] as Int,
+                    laborHours = taskData["laborHours"] as Double,
+                    materialCost = taskData["materialCost"] as Double,
+                    laborCost = taskData["laborCost"] as Double,
+                    equipmentCost = (taskData["equipmentCost"] as? Double) ?: 0.0,
+                    notes = (taskData["notes"] as? String) ?: "",
+                    isActive = (taskData["isActive"] as? Boolean) ?: true
+                )
+                
+                val currentTasks = _tasks.value.toMutableList()
+                currentTasks.add(task)
+                _tasks.value = currentTasks
+                
+                // Find materials for this task (materials with no taskId or matching taskId)
+                val taskMaterials = materialDataList.filter { materialData ->
+                    val taskIdFromMaterial = materialData["taskId"] as? String
+                    taskIdFromMaterial == null || taskIdFromMaterial == task.id
+                }.map { materialData ->
+                    Material(
+                        assemblyId = assembly.id,
+                        taskId = task.id,
+                        name = materialData["name"] as String,
+                        description = materialData["description"] as String,
+                        quantity = materialData["quantity"] as Double,
+                        unit = materialData["unit"] as String,
+                        unitCost = materialData["unitCost"] as Double,
+                        totalCost = materialData["totalCost"] as Double,
+                        waste = (materialData["waste"] as? Double) ?: 0.0,
+                        notes = (materialData["notes"] as? String) ?: "",
+                        isActive = (materialData["isActive"] as? Boolean) ?: true
+                    )
+                }
+                
+                val currentMaterials = _materials.value.toMutableList()
+                currentMaterials.addAll(taskMaterials)
+                _materials.value = currentMaterials
+                
+                createdTasks.add(TaskWithMaterials(task, taskMaterials))
+            }
+            
+            // Create direct assembly materials (materials with no specific task)
+            val directMaterials = materialDataList.filter { materialData ->
+                materialData["taskId"] == null
+            }.map { materialData ->
+                Material(
+                    assemblyId = assembly.id,
+                    taskId = null,
+                    name = materialData["name"] as String,
+                    description = materialData["description"] as String,
+                    quantity = materialData["quantity"] as Double,
+                    unit = materialData["unit"] as String,
+                    unitCost = materialData["unitCost"] as Double,
+                    totalCost = materialData["totalCost"] as Double,
+                    waste = (materialData["waste"] as? Double) ?: 0.0,
+                    notes = (materialData["notes"] as? String) ?: "",
+                    isActive = (materialData["isActive"] as? Boolean) ?: true
+                )
+            }
+            
+            val currentMaterials = _materials.value.toMutableList()
+            currentMaterials.addAll(directMaterials)
+            _materials.value = currentMaterials
+            
+            val assemblyWithChildren = AssemblyWithChildren(assembly, createdTasks, directMaterials)
+            
+            Log.d(TAG, "Created complete assembly: ${assembly.name}")
+            Result.success(assemblyWithChildren)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error creating complete assembly: ${e.message}")
+            Result.failure(e)
+        }
+    }
 }
