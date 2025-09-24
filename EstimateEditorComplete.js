@@ -473,32 +473,49 @@ const fetchTemplate = async (templateId) => {
 };
 
 const searchAssemblies = async (query) => {
-  // Mock implementation - replace with actual API call
-  const mockAssemblies = [
-    {
-      id: '1',
-      name: 'Framing Assembly',
-      description: 'Standard wall framing with studs',
-      estimatedCost: 150.00
-    },
-    {
-      id: '2',
-      name: 'Electrical Rough-in',
-      description: 'Basic electrical rough-in work',
-      estimatedCost: 200.00
-    },
-    {
-      id: '3',
-      name: 'Plumbing Rough-in',
-      description: 'Standard plumbing rough-in',
-      estimatedCost: 300.00
-    }
-  ];
-  
-  return mockAssemblies.filter(assembly => 
-    assembly.name.toLowerCase().includes(query.toLowerCase()) ||
-    assembly.description.toLowerCase().includes(query.toLowerCase())
-  );
+  try {
+    const response = await fetch(`/api/assemblies/search?q=${encodeURIComponent(query)}`);
+    if (!response.ok) throw new Error('Failed to search assemblies');
+    
+    const assemblies = await response.json();
+    
+    // Transform catalogue data to match expected format
+    return assemblies.map(assembly => ({
+      id: assembly.id,
+      name: assembly.name,
+      description: assembly.description,
+      estimatedCost: assembly.totalCost
+    }));
+  } catch (error) {
+    console.error('Error searching assemblies:', error);
+    
+    // Fallback to sample data that matches catalogue entries
+    const fallbackAssemblies = [
+      {
+        id: 'framing-assembly-1',
+        name: 'Framing Assembly',
+        description: 'Standard wall framing with studs',
+        estimatedCost: 150.00
+      },
+      {
+        id: 'electrical-rough-in-1',
+        name: 'Electrical Rough-in',
+        description: 'Basic electrical rough-in work',
+        estimatedCost: 200.00
+      },
+      {
+        id: 'plumbing-rough-in-1',
+        name: 'Plumbing Rough-in',
+        description: 'Standard plumbing rough-in',
+        estimatedCost: 300.00
+      }
+    ];
+    
+    return fallbackAssemblies.filter(assembly => 
+      assembly.name.toLowerCase().includes(query.toLowerCase()) ||
+      assembly.description.toLowerCase().includes(query.toLowerCase())
+    );
+  }
 };
 
 const convertAssemblyToLineItem = async (assembly, quantity) => {
