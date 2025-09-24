@@ -520,50 +520,128 @@ const EstimateEditor = ({
 
 const fetchClients = async () => {
   // Equivalent to client repository operations
-  // Implementation would call your backend API
-  return [];
+  try {
+    const response = await fetch('/api/clients');
+    if (!response.ok) throw new Error('Failed to fetch clients');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching clients:', error);
+    return [];
+  }
 };
 
 const fetchEstimate = async (estimateId) => {
   // Equivalent to TemplateEstimateRepository.getById()
-  // Implementation would call your backend API
-  return null;
+  try {
+    const response = await fetch(`/api/estimates/${estimateId}`);
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error('Failed to fetch estimate');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching estimate:', error);
+    return null;
+  }
 };
 
 const fetchTemplate = async (templateId) => {
   // Equivalent to template system operations
-  // Implementation would call your backend API
-  return null;
+  try {
+    const response = await fetch(`/api/templates/${templateId}`);
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error('Failed to fetch template');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching template:', error);
+    return null;
+  }
 };
 
 const searchAssemblies = async (query) => {
   // Equivalent to AssemblyCatalogueService.searchAssemblies()
-  // Implementation would call your backend API
-  return [];
+  try {
+    const response = await fetch(`/api/assemblies/search?q=${encodeURIComponent(query)}`);
+    if (!response.ok) throw new Error('Failed to search assemblies');
+    return await response.json();
+  } catch (error) {
+    console.error('Error searching assemblies:', error);
+    return [];
+  }
 };
 
 const convertAssemblyToLineItem = async (assembly, quantity) => {
   // Equivalent to AssemblyCatalogueService.convertTemplateToAssembly()
-  // Implementation would call your backend API
-  return null;
+  try {
+    const response = await fetch('/api/assemblies/convert-to-line-item', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ assembly, quantity }),
+    });
+    if (!response.ok) throw new Error('Failed to convert assembly to line item');
+    return await response.json();
+  } catch (error) {
+    console.error('Error converting assembly to line item:', error);
+    return null;
+  }
 };
 
 const createEstimate = async (estimateData) => {
   // Equivalent to TemplateEstimateRepository.create()
-  // Implementation would call your backend API
-  return null;
+  try {
+    const response = await fetch('/api/estimates', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(estimateData),
+    });
+    if (!response.ok) throw new Error('Failed to create estimate');
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating estimate:', error);
+    throw error;
+  }
 };
 
 const updateEstimate = async (estimateId, estimateData) => {
   // Equivalent to TemplateEstimateRepository.update()
-  // Implementation would call your backend API
-  return null;
+  try {
+    const response = await fetch(`/api/estimates/${estimateId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(estimateData),
+    });
+    if (!response.ok) throw new Error('Failed to update estimate');
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating estimate:', error);
+    throw error;
+  }
 };
 
 const applyTaxAndMarkup = async (estimateId, taxSettings, markupSettings) => {
   // Equivalent to TemplateEstimateRepository.applyTaxAndMarkup()
-  // Implementation would call your backend API
-  return false;
+  try {
+    const response = await fetch(`/api/estimates/${estimateId}/apply-tax-markup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ taxSettings, markupSettings }),
+    });
+    if (!response.ok) throw new Error('Failed to apply tax and markup');
+    return true;
+  } catch (error) {
+    console.error('Error applying tax and markup:', error);
+    return false;
+  }
 };
 
 const styles = StyleSheet.create({
