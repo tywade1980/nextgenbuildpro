@@ -1,0 +1,262 @@
+{
+  "mcpVersion": "2024-11-05",
+  "name": "NextGen BuildPro MCP Configuration",
+  "description": "Model Context Protocol configuration for NextGen BuildPro - AI-powered construction management platform",
+  "version": "1.0.0",
+  "repository": {
+    "type": "hybrid",
+    "primaryLanguages": ["kotlin", "typescript", "javascript"],
+    "framework": "android",
+    "architecture": "multi-agent-ai",
+    "domain": "construction-management"
+  },
+  "contextWindow": {
+    "maxTokens": 128000,
+    "reserveTokens": 4000,
+    "priorityFiles": 50,
+    "summaryLength": 1000
+  },
+  "filePatterns": {
+    "include": [
+      "**/*.kt",
+      "**/*.ts",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.tsx",
+      "**/*.json",
+      "**/*.md",
+      "**/*.yml",
+      "**/*.yaml",
+      "**/*.xml",
+      "**/*.gradle",
+      "**/*.gradle.kts",
+      "**/*.properties",
+      "README*",
+      "CHANGELOG*",
+      "LICENSE*",
+      "**/build.gradle*",
+      "**/settings.gradle*",
+      "**/AndroidManifest.xml",
+      "**/proguard-rules.pro"
+    ],
+    "exclude": [
+      "**/node_modules/**",
+      "**/build/**",
+      "**/dist/**",
+      "**/.gradle/**",
+      "**/.idea/**",
+      "**/.kotlin/**",
+      "**/target/**",
+      "**/.git/**",
+      "**/*.class",
+      "**/*.dex",
+      "**/*.apk",
+      "**/*.ap_",
+      "**/*.aab",
+      "**/*.log",
+      "**/*.tmp",
+      "**/*.temp",
+      "**/.DS_Store",
+      "**/Thumbs.db",
+      "**/caroline/**",
+      "**/research/**",
+      "**/examples/generated/**"
+    ],
+    "priorityPatterns": [
+      "app/src/main/java/com/nextgenbuildpro/shared/Types.kt",
+      "app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt",
+      "app/src/main/java/com/nextgenbuildpro/agents/*.kt",
+      "app/src/main/java/com/nextgenbuildpro/env/LivingEnv.kt",
+      "app/src/main/java/com/nextgenbuildpro/MainActivity.kt",
+      "app/src/main/java/com/nextgenbuildpro/NextGenBuildProApplication.kt",
+      "models/CatalogueSchema.ts",
+      "services/CatalogueDataService.ts",
+      "firebase.ts",
+      "package.json",
+      "build.gradle.kts",
+      "settings.gradle.kts",
+      "app/src/main/AndroidManifest.xml",
+      "README.md"
+    ]
+  },
+  "projectStructure": {
+    "android": {
+      "sourceDir": "app/src/main/java/com/nextgenbuildpro",
+      "manifestPath": "app/src/main/AndroidManifest.xml",
+      "buildFile": "app/build.gradle.kts",
+      "resourcesDir": "app/src/main/res"
+    },
+    "frontend": {
+      "sourceDir": ".",
+      "configFiles": ["package.json", "tsconfig.json"],
+      "modelsDir": "models",
+      "servicesDir": "services",
+      "seedsDir": "seeds",
+      "testsDir": "tests"
+    },
+    "keyDirectories": [
+      "app/src/main/java/com/nextgenbuildpro/agents",
+      "app/src/main/java/com/nextgenbuildpro/core",
+      "app/src/main/java/com/nextgenbuildpro/ai",
+      "app/src/main/java/com/nextgenbuildpro/shared",
+      "app/src/main/java/com/nextgenbuildpro/env",
+      "models",
+      "services",
+      "seeds"
+    ]
+  },
+  "semanticRules": {
+    "agentFiles": {
+      "pattern": "**/agents/*.kt",
+      "description": "AI agent implementations with learning capabilities",
+      "keywords": ["agent", "learning", "ai", "intelligence", "orchestration"]
+    },
+    "coreFiles": {
+      "pattern": "**/core/*.kt",
+      "description": "Core system functionality and orchestration",
+      "keywords": ["orchestrator", "service", "api", "configuration", "firebase"]
+    },
+    "catalogueFiles": {
+      "pattern": "**/pm/**/*.kt",
+      "description": "Project management and catalogue system",
+      "keywords": ["catalogue", "assembly", "trade", "material", "construction"]
+    },
+    "frontendFiles": {
+      "pattern": "**/{models,services,seeds}/**/*.{ts,js}",
+      "description": "TypeScript/JavaScript frontend and seeding logic",
+      "keywords": ["catalogue", "firebase", "seeding", "schema", "data"]
+    },
+    "configFiles": {
+      "pattern": "**/{package.json,tsconfig.json,build.gradle*,settings.gradle*}",
+      "description": "Project configuration and build files",
+      "keywords": ["config", "build", "dependencies", "gradle", "npm"]
+    }
+  },
+  "intelligenceContext": {
+    "aiAgents": [
+      {
+        "name": "MRM",
+        "type": "Master Resource Manager",
+        "file": "app/src/main/java/com/nextgenbuildpro/agents/MRM.kt",
+        "capabilities": ["resource allocation", "optimization", "predictive analytics"]
+      },
+      {
+        "name": "HermesBrain",
+        "type": "Communication Hub",
+        "file": "app/src/main/java/com/nextgenbuildpro/agents/HermesBrain.kt",
+        "capabilities": ["communication", "coordination", "protocol translation"]
+      },
+      {
+        "name": "BigDaddyAgent",
+        "type": "Executive Intelligence",
+        "file": "app/src/main/java/com/nextgenbuildpro/agents/BigDaddyAgent.kt",
+        "capabilities": ["strategic decisions", "crisis management", "oversight"]
+      },
+      {
+        "name": "HRMModel",
+        "type": "Human Resource Manager",
+        "file": "app/src/main/java/com/nextgenbuildpro/agents/HRMModel.kt",
+        "capabilities": ["workforce analytics", "talent management", "human-ai collaboration"]
+      },
+      {
+        "name": "EliteHuman",
+        "type": "Human Excellence Framework",
+        "file": "app/src/main/java/com/nextgenbuildpro/agents/EliteHuman.kt",
+        "capabilities": ["creativity amplification", "emotional intelligence", "ethical leadership"]
+      }
+    ],
+    "orchestration": {
+      "main": "app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt",
+      "environment": "app/src/main/java/com/nextgenbuildpro/env/LivingEnv.kt",
+      "types": "app/src/main/java/com/nextgenbuildpro/shared/Types.kt"
+    },
+    "dataLayer": {
+      "firebase": "firebase.ts",
+      "schema": "models/CatalogueSchema.ts",
+      "services": "services/CatalogueDataService.ts",
+      "seeding": "seeds/seedCatalogue.ts"
+    }
+  },
+  "buildSystem": {
+    "android": {
+      "tool": "gradle",
+      "version": "8.11.1",
+      "kotlinVersion": "1.9.20",
+      "targetSdk": 34,
+      "minSdk": 26
+    },
+    "frontend": {
+      "tool": "npm",
+      "typescript": "^5.9.2",
+      "nodeVersion": ">=18.0.0"
+    },
+    "commands": {
+      "androidBuild": "./gradlew build",
+      "androidTest": "./gradlew test",
+      "frontendBuild": "npm run build",
+      "frontendTest": "npm test",
+      "seed": "npm run seed:catalogue",
+      "lint": "npm run lint"
+    }
+  },
+  "integrations": {
+    "firebase": {
+      "projectId": "nextgenbuildpro",
+      "storageBucket": "gs://nextgenbuildpro.firebasestorage.app",
+      "configFile": "google-services.json",
+      "webConfig": "firebase.ts"
+    },
+    "ai": {
+      "framework": "custom-multi-agent",
+      "learningCapability": true,
+      "orchestrated": true
+    }
+  },
+  "codebaseInsights": {
+    "mainFeatures": [
+      "Multi-agent AI system with 5 specialized agents",
+      "Android construction management platform",
+      "Firebase backend integration",
+      "TypeScript frontend with seeding capabilities",
+      "Living Environment Mesh for agent coordination",
+      "Construction catalogue and project management",
+      "CRM integration with AI assistance"
+    ],
+    "architecturalPatterns": [
+      "Multi-agent system",
+      "Event-driven architecture",
+      "Repository pattern",
+      "Service layer architecture",
+      "MVVM for Android UI"
+    ],
+    "keyInterfaces": [
+      "LearningAgent",
+      "NextGenService",
+      "AgentCapability",
+      "Category, Trade, Scope, Assembly, Task, Material"
+    ]
+  },
+  "contextualHints": {
+    "whenModifyingAgents": "Consider impact on MainOrchestrator coordination and Living Environment Mesh",
+    "whenModifyingCore": "Ensure compatibility with all AI agents and Firebase integration",
+    "whenModifyingCatalogue": "Update both Kotlin models and TypeScript schemas consistently",
+    "whenModifyingBuild": "Test both Android gradle build and npm frontend build",
+    "whenAddingDependencies": "Update both build.gradle.kts and package.json as needed"
+  },
+  "testingStrategy": {
+    "android": {
+      "unitTests": "app/src/test/",
+      "integrationTests": "app/src/androidTest/",
+      "aiAgentTests": "app/src/main/java/com/nextgenbuildpro/pm/test/"
+    },
+    "frontend": {
+      "unitTests": "tests/",
+      "seedingTests": "seeds/verifyCatalogue.ts"
+    },
+    "commands": {
+      "runAndroidTests": "./gradlew test",
+      "runFrontendTests": "npm test",
+      "verifyCatalogueSeeding": "npm run seed:verify"
+    }
+  }
+}

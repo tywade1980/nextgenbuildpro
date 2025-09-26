@@ -1,0 +1,171 @@
+{
+  "categories": [
+    {
+      "id": "cat-001",
+      "name": "Structure",
+      "description": "Structural components and foundations",
+      "sequence": 1,
+      "imageUrl": null,
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "cat-002", 
+      "name": "Finishes",
+      "description": "Interior and exterior finishing work",
+      "sequence": 2,
+      "imageUrl": null,
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "trades": [
+    {
+      "id": "trade-001",
+      "categoryId": "cat-001",
+      "name": "Concrete",
+      "description": "Concrete work and finishing",
+      "sequence": 1,
+      "imageUrl": null,
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "trade-002",
+      "categoryId": "cat-002",
+      "name": "Flooring",
+      "description": "Floor installation and finishing",
+      "sequence": 1,
+      "imageUrl": null,
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "scopes": [
+    {
+      "id": "scope-001",
+      "tradeId": "trade-001",
+      "name": "Foundation",
+      "description": "Foundation concrete work",
+      "sequence": 1,
+      "imageUrl": null,
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "scope-002",
+      "tradeId": "trade-002",
+      "name": "Hardwood Floors",
+      "description": "Hardwood floor installation",
+      "sequence": 1,
+      "imageUrl": null,
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "assemblies": [
+    {
+      "id": "assembly-001",
+      "scopeId": "scope-001",
+      "name": "Concrete Foundation Wall",
+      "description": "8\" thick concrete foundation wall",
+      "sequence": 1,
+      "imageUrl": null,
+      "unit": "LF",
+      "laborHours": 2.5,
+      "materialCost": 15.75,
+      "laborCost": 35.50,
+      "totalCost": 51.25,
+      "tags": ["foundation", "concrete", "wall"],
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "assembly-002",
+      "scopeId": "scope-002",
+      "name": "Oak Hardwood Flooring",
+      "description": "3/4\" solid oak hardwood flooring with finish",
+      "sequence": 1,
+      "imageUrl": null,
+      "unit": "SF",
+      "laborHours": 0.75,
+      "materialCost": 8.50,
+      "laborCost": 12.25,
+      "totalCost": 20.75,
+      "tags": ["hardwood", "oak", "flooring"],
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-001",
+      "assemblyId": "assembly-001",
+      "name": "Form and Pour Foundation",
+      "description": "Set forms and pour concrete",
+      "sequence": 1,
+      "estimatedHours": 2.0,
+      "laborRate": 25.00,
+      "laborCost": 50.00,
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "task-002",
+      "assemblyId": "assembly-002",
+      "name": "Install Hardwood Flooring",
+      "description": "Install and finish hardwood planks",
+      "sequence": 1,
+      "estimatedHours": 0.6,
+      "laborRate": 30.00,
+      "laborCost": 18.00,
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "materials": [
+    {
+      "id": "material-001",
+      "assemblyId": "assembly-001",
+      "name": "Concrete Mix",
+      "description": "3000 PSI concrete mix",
+      "quantity": 0.33,
+      "unit": "CY",
+      "unitCost": 120.00,
+      "totalCost": 39.60,
+      "supplier": "ABC Concrete Supply",
+      "partNumber": "CONC-3000",
+      "waste": 5.0,
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "material-002",
+      "assemblyId": "assembly-002",
+      "name": "Oak Hardwood Planks",
+      "description": "3/4\" solid oak flooring planks",
+      "quantity": 1.1,
+      "unit": "SF",
+      "unitCost": 6.50,
+      "totalCost": 7.15,
+      "supplier": "Hardwood Depot",
+      "partNumber": "OAK-34-SOLID",
+      "waste": 10.0,
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "exportDate": "2024-01-15T15:30:00.000Z"
+}

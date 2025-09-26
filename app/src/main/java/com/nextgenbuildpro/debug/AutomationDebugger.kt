@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.nextgenbuildpro.core.CoreModule
 import com.nextgenbuildpro.core.services.*
+import com.nextgenbuildpro.pm.test.FoundationCatalogueValidation
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -63,6 +64,9 @@ class AutomationDebugger(private val context: Context) {
                 
                 // Test 5: Integration test
                 testEndToEndIntegration()
+                
+                // Test 6: Foundation catalogue validation
+                testFoundationCatalogueValidation()
                 
                 Log.i(TAG, "All automation tests completed successfully!")
                 
@@ -323,5 +327,24 @@ class AutomationDebugger(private val context: Context) {
                 appendLine("Error generating report: ${e.message}")
             }
         }
+    }
+
+=======
+    
+    private suspend fun testFoundationCatalogueValidation() {
+        Log.d(TAG, "Testing Foundation & Basement catalogue enhancements...")
+        
+        try {
+            val foundationValidator = FoundationCatalogueValidation(context)
+            foundationValidator.validateFoundationEnhancements()
+            Log.d(TAG, "✅ Foundation catalogue validation passed")
+        } catch (e: Exception) {
+            Log.e(TAG, "❌ Foundation catalogue validation failed: ${e.message}", e)
+            throw e
+        }
+    }
+    
+    companion object {
+        private const val TAG = "AutomationDebugger"
     }
 }
