@@ -28,7 +28,7 @@ class CatalogueSeeder(private val catalogueService: EnhancedCatalogueDataService
             val categoryList = categories.getOrThrow()
             
             // Create trades, scopes, assemblies for each category
-            createFoundation(categoryList.find { it.name == "Foundation" }?.id!!)<<<<<<< copilot/fix-56bf7bae-5bc6-474c-ba67-52a68c0b803c
+            createFoundation(categoryList.find { it.name == "Foundation" }?.id!!)
 
             createStructural(categoryList.find { it.name == "Structural" }?.id!!)
 

@@ -420,7 +420,7 @@ class HermesBrain(
     private suspend fun optimizeCommunicationPatterns(task: NextGenTask): NextGenTask {
         Log.d("HermesBrain", "Optimizing communication patterns...")
         
-        val patterns = analyzeCommunicationPatterns()
+        val patterns = analyzeBasicCommunicationPatterns()
         val optimizations = identifyOptimizations(patterns)
         applyOptimizations(optimizations)
         
@@ -678,7 +678,7 @@ class HermesBrain(
     private fun createCommunicationStatsResponse(message: AgentMessage): AgentMessage? = null
     private fun createMessageHistoryResponse(message: AgentMessage): AgentMessage? = null
     private fun createProtocolSupportResponse(message: AgentMessage): AgentMessage? = null
-    private fun analyzeCommunicationPatterns(): List<String> = listOf()
+    private fun analyzeBasicCommunicationPatterns(): List<String> = listOf()
     private fun identifyOptimizations(patterns: List<String>): List<String> = listOf()
     private fun applyOptimizations(optimizations: List<String>) {}
     private fun createOrUpdateConversation(id: String, participants: List<AgentType>): String = "active"
