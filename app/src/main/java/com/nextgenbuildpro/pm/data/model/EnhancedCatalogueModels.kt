@@ -177,9 +177,9 @@ data class TaskWithMaterials(
 )
 
 /**
- * Search criteria for catalogue search operations
+ * Search criteria for enhanced catalogue search operations
  */
-data class CatalogueSearchCriteria(
+data class EnhancedCatalogueSearchCriteria(
     val query: String? = null,
     val categoryId: String? = null,
     val tradeId: String? = null,

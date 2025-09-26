@@ -17,7 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nextgenbuildpro.pm.data.model.*
 import com.nextgenbuildpro.pm.data.repository.EnhancedCatalogueDataService
-import com.nextgenbuildpro.pm.data.repository.HierarchicalCatalogueRepository
+import com.nextgenbuildpro.pm.service.EnhancedAssemblyCatalogueService
+import com.nextgenbuildpro.pm.service.AssemblyCreationData
+import com.nextgenbuildpro.pm.service.TaskCreationData
+import com.nextgenbuildpro.pm.service.MaterialCreationData
 import com.nextgenbuildpro.pm.data.repository.AssemblyRepository
 import com.nextgenbuildpro.pm.service.EnhancedAssemblyCatalogueService
 import kotlinx.coroutines.launch
