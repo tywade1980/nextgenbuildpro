@@ -102,6 +102,28 @@ fun MoreScreen(navController: NavController) {
                     }
                 )
             }
+
+            // Header
+            item {
+                Text(
+                    text = "Call Features",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                )
+            }
+
+            // Call features items
+            items(getCallItems()) { item ->
+                SettingsItem(
+                    icon = item.icon,
+                    title = item.title,
+                    description = item.description,
+                    onClick = {
+                        navController.navigateSafely(item.destination)
+                    }
+                )
+            }
         }
     }
 }
@@ -254,6 +276,20 @@ fun getAIItems(): List<SettingsItemData> {
             title = "Progress Updates",
             description = "Configure automated progress updates",
             destination = NavDestinations.PROGRESS_UPDATES
+        )
+    )
+}
+
+/**
+ * Get call features items
+ */
+fun getCallItems(): List<SettingsItemData> {
+    return listOf(
+        SettingsItemData(
+            icon = Icons.Default.Call,
+            title = "Call Screen",
+            description = "Screen and manage incoming calls",
+            destination = NavDestinations.CALL_SCREEN
         )
     )
 }

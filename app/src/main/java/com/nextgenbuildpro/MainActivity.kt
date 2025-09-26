@@ -6,18 +6,22 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
 import com.nextgenbuildpro.core.ModuleManager
 import com.nextgenbuildpro.debug.AutomationDebugger
+import com.nextgenbuildpro.debug.DeadCodeDetector
+import com.nextgenbuildpro.debug.WorkflowAnalyzer
+import com.nextgenbuildpro.navigation.NavigationStackTracker
 import com.nextgenbuildpro.receptionist.service.registerDialerRoleLauncher
 import com.nextgenbuildpro.receptionist.service.requestDialerRole
+import com.nextgenbuildpro.ui.FeatureCompletionTracker
 import com.nextgenbuildpro.ui.NextGenBuildProApp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.nextgenbuildpro.util.ErrorLogger
+import com.nextgenbuildpro.LocationService
+import com.nextgenbuildpro.PermissionManager
+import com.nextgenbuildpro.CrmAgent
+import kotlinx.coroutines.*
+
+private const val TAG = "MainActivity"
 
 /**
  * Main Activity for NextGenBuildPro
@@ -33,6 +37,17 @@ class MainActivity : ComponentActivity() {
     // Automation debugger
     private lateinit var automationDebugger: AutomationDebugger
 
+    // Navigation stack tracker
+    private lateinit var navigationStackTracker: NavigationStackTracker
+
+    // Services and managers
+    private lateinit var locationService: LocationService
+    private lateinit var permissionManager: PermissionManager
+    private lateinit var crmAgent: CrmAgent
+
+    // Flag to determine if we're in debug mode
+    private val isDebugBuild = true // Hardcoded for now instead of using BuildConfig.DEBUG
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -42,6 +57,11 @@ class MainActivity : ComponentActivity() {
         // Initialize the ModuleManager with automation services
         ModuleManager.initialize(applicationContext)
         
+        // Initialize required services and managers
+        locationService = LocationService(this)
+        permissionManager = PermissionManager(this)
+        crmAgent = CrmAgent(this)
+
         // Initialize automation debugger
         automationDebugger = AutomationDebugger(applicationContext)
         
@@ -49,69 +69,77 @@ class MainActivity : ComponentActivity() {
         initializeAutomationSystem()
 
         // Request dialer role if needed
-        // requestDialerRoleIfNeeded()
+        requestDialerRole(applicationContext, this, dialerRoleLauncher)
 
-        // Get required services from the ServiceModule
-        val serviceModule = ModuleManager.getServiceModule()
-        val locationService = serviceModule.getLocationService()
-        val permissionManager = serviceModule.getPermissionManager()
-        val crmAgent = serviceModule.getCrmAgent()
+        // Initialize error logging system
+        initializeErrorLogging()
+
+        // Enable dead code detection in debug builds
+        if (isDebugBuild) {
+            DeadCodeDetector.setEnabled(true)
+            Log.d(TAG, "Dead code detection enabled")
+            WorkflowAnalyzer.reset()
+            FeatureCompletionTracker.reset()
+        }
 
         setContent {
-            MaterialTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    // Use the NextGenBuildProApp composable from MainApp.kt
-                    NextGenBuildProApp(
-                        locationService = locationService,
-                        permissionManager = permissionManager,
-                        crmAgent = crmAgent
-                    )
-                }
-            }
+            NextGenBuildProApp(
+                locationService = locationService,
+                permissionManager = permissionManager,
+                crmAgent = crmAgent
+            )
         }
     }
     
     /**
-     * Initialize the automation system in the background
+     * Initialize the automation system in a background thread
      */
     private fun initializeAutomationSystem() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                Log.i(TAG, "Initializing automation system...")
-                
-                // Run automation tests to ensure everything is working
-                try {
-                    automationDebugger.runAutomationTests()
-                    
-                    // Generate and log test report
-                    val report = automationDebugger.generateTestReport()
-                    Log.i(TAG, "Automation Test Report:\n$report")
-                } catch (e: Exception) {
-                    Log.w(TAG, "Automation tests failed, but continuing with initialization", e)
+                Log.d(TAG, "Initializing automation system")
+                withContext(Dispatchers.Main) {
+                    automationDebugger.initialize()
                 }
-                
-                Log.i(TAG, "Automation system initialized successfully")
-                
+                Log.d(TAG, "Automation system initialized successfully")
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to initialize automation system", e)
+                ErrorLogger.logError(TAG, "Failed to initialize automation system", e)
             }
         }
     }
 
     /**
-     * Request the dialer role if needed
-     * 
-     * This method uses the ActivityResultLauncher to request the dialer role,
-     * which is the recommended approach for Android 11+ (API level 30+)
+     * Initialize the error logging system
      */
-    fun requestDialerRoleIfNeeded() {
-        requestDialerRole(applicationContext, this, dialerRoleLauncher)
+    private fun initializeErrorLogging() {
+        try {
+            // Log startup info
+            val deviceInfo = mapOf(
+                "device" to android.os.Build.MODEL,
+                "os" to "Android ${android.os.Build.VERSION.RELEASE}",
+                "appVersion" to "1.0.0" // Hardcoded for now instead of using BuildConfig.VERSION_NAME
+            )
+
+            ErrorLogger.logError(TAG, "Application started", null, deviceInfo)
+            Log.d(TAG, "Error logging system initialized")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize error logging", e)
+        }
     }
-    
-    companion object {
-        private const val TAG = "MainActivity"
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (::navigationStackTracker.isInitialized) {
+            navigationStackTracker.stopTracking(this)
+        }
+
+        // Log navigation and button statistics before shutdown
+        if (isDebugBuild) {
+            DeadCodeDetector.logReport()
+            Log.d(TAG, navigationStackTracker.getNavigationReport())
+            FeatureCompletionTracker.logReport()
+            WorkflowAnalyzer.logReport()
+        }
     }
 }

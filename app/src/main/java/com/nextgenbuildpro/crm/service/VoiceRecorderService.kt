@@ -22,9 +22,10 @@ class VoiceRecorderService(private val context: Context) {
 
     /**
      * Start recording
+     * @param fileName Optional custom filename for the recording
      * @return The output file path if recording started successfully, null otherwise
      */
-    fun startRecording(): String? {
+    fun startRecording(fileName: String? = null): String? {
         if (isRecording) {
             Log.d(TAG, "Already recording")
             return null
@@ -42,7 +43,8 @@ class VoiceRecorderService(private val context: Context) {
 
             // Generate a unique filename
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-            outputFile = File(voiceNotesDir, "voice_note_$timestamp.3gp")
+            val safeFileName = fileName ?: "voice_note_$timestamp.3gp"
+            outputFile = File(voiceNotesDir, safeFileName)
 
             // Initialize recorder
             recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

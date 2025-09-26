@@ -62,7 +62,7 @@ class AutoFillService(private val context: Context) : NextGenService {
     override suspend fun getHealthStatus(): ServiceHealth {
         return ServiceHealth(
             isHealthy = _isRunning.value,
-            lastCheckTime = LocalDateTime.now(),
+            lastCheckTime = System.currentTimeMillis(),
             issues = if (!_isRunning.value) listOf("Service not running") else emptyList(),
             metrics = mapOf(
                 "cached_entries" to autoFillCache.size.toDouble(),

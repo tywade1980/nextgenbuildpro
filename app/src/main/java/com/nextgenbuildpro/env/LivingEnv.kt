@@ -12,7 +12,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import android.util.Log
-import java.time.LocalDateTime
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -189,7 +188,7 @@ class LivingEnv : EnvironmentMesh {
     
     // === ENVIRONMENT INTELLIGENCE METHODS ===
     
-    suspend fun optimizeEnvironment(): EnvironmentOptimization {
+    suspend fun optimizeEnvironment(): Map<String, Any> {
         return try {
             Log.d("LivingEnv", "Optimizing living environment...")
             
@@ -198,32 +197,42 @@ class LivingEnv : EnvironmentMesh {
             val optimizations = generateOptimizations(bottlenecks)
             val adaptations = applyAdaptations(optimizations)
             
-            EnvironmentOptimization(
+            val optimization = EnvironmentOptimization(
                 metricsAnalyzed = currentMetrics,
                 bottlenecksIdentified = bottlenecks,
                 optimizationsApplied = optimizations,
                 adaptationsExecuted = adaptations,
                 performanceImprovement = calculatePerformanceImprovement(currentMetrics, adaptations),
-                timestamp = LocalDateTime.now()
+                timestamp = System.currentTimeMillis()
+            )
+
+            // Convert to public-facing Map<String, Any>
+            mapOf(
+                "metricsAnalyzed" to optimization.metricsAnalyzed,
+                "bottlenecksIdentified" to optimization.bottlenecksIdentified,
+                "optimizationsApplied" to optimization.optimizationsApplied,
+                "adaptationsExecuted" to optimization.adaptationsExecuted,
+                "performanceImprovement" to optimization.performanceImprovement,
+                "timestamp" to optimization.timestamp
             )
         } catch (e: Exception) {
             Log.e("LivingEnv", "Error optimizing environment", e)
-            EnvironmentOptimization(mapOf(), listOf(), listOf(), listOf(), 0.0, LocalDateTime.now())
+            mapOf(
+                "error" to e.message.toString(),
+                "timestamp" to System.currentTimeMillis()
+            )
         }
     }
     
     suspend fun monitorNetworkHealth(): NetworkHealthReport {
         return try {
             Log.d("LivingEnv", "Monitoring network health...")
-            
             val latency = networkMonitor.measureAverageLatency()
             val throughput = networkMonitor.measureThroughput()
             val errorRate = networkMonitor.calculateErrorRate()
             val congestionLevel = networkMonitor.assessCongestion()
-            
             val healthScore = calculateNetworkHealthScore(latency, throughput, errorRate, congestionLevel)
             val recommendations = generateNetworkRecommendations(healthScore, latency, throughput, errorRate)
-            
             NetworkHealthReport(
                 overallHealth = healthScore,
                 averageLatency = latency,
@@ -232,18 +241,36 @@ class LivingEnv : EnvironmentMesh {
                 congestionLevel = congestionLevel,
                 activeConnections = registeredAgents.size,
                 recommendations = recommendations,
-                timestamp = LocalDateTime.now()
+                timestampMillis = System.currentTimeMillis()
             )
         } catch (e: Exception) {
             Log.e("LivingEnv", "Error monitoring network health", e)
-            NetworkHealthReport(0.0, 0.0, 0.0, 1.0, "high", 0, listOf(), LocalDateTime.now())
+            NetworkHealthReport(
+                overallHealth = 0.0,
+                averageLatency = 0.0,
+                throughput = 0.0,
+                errorRate = 0.0,
+                congestionLevel = "unknown",
+                activeConnections = registeredAgents.size,
+                recommendations = listOf("Error: ${e.message}"),
+                timestampMillis = System.currentTimeMillis()
+            )
         }
     }
     
-    suspend fun adaptToLoadChanges(loadMetrics: LoadMetrics): AdaptationResult {
+    suspend fun adaptToLoadChanges(metrics: Map<String, Any>): Map<String, Any> {
         return try {
             Log.d("LivingEnv", "Adapting to load changes...")
             
+            // Convert from public-facing Map to internal LoadMetrics
+            val loadMetrics = LoadMetrics(
+                cpuUsage = metrics["cpuUsage"] as? Double ?: 0.0,
+                memoryUsage = metrics["memoryUsage"] as? Double ?: 0.0,
+                networkUtilization = metrics["networkUtilization"] as? Double ?: 0.0,
+                messageQueueSize = metrics["messageQueueSize"] as? Int ?: 0,
+                responseTime = metrics["responseTime"] as? Double ?: 0.0
+            )
+
             val adaptationStrategy = adaptationEngine.analyzeLoadChanges(loadMetrics)
             val recommendations = adaptationEngine.generateAdaptations(adaptationStrategy)
             val results = adaptationEngine.executeAdaptations(recommendations)
@@ -251,40 +278,58 @@ class LivingEnv : EnvironmentMesh {
             // Update environment configuration based on adaptations
             updateEnvironmentConfiguration(results)
             
-            AdaptationResult(
-                strategy = adaptationStrategy,
-                adaptationsApplied = recommendations,
-                results = results,
-                effectivenessScore = calculateAdaptationEffectiveness(results),
-                timestamp = LocalDateTime.now()
+            mapOf(
+                "strategy" to adaptationStrategy,
+                "adaptationsApplied" to recommendations,
+                "results" to results,
+                "effectivenessScore" to calculateAdaptationEffectiveness(results),
+                "timestamp" to System.currentTimeMillis()
             )
         } catch (e: Exception) {
             Log.e("LivingEnv", "Error adapting to load changes", e)
-            AdaptationResult("fallback", listOf(), mapOf(), 0.0, LocalDateTime.now())
+            mapOf(
+                "strategy" to "fallback",
+                "error" to e.message.toString(),
+                "timestamp" to System.currentTimeMillis()
+            )
         }
     }
     
-    suspend fun facilitateAgentCollaboration(collaborationRequest: AgentCollaborationRequest): CollaborationFacilitation {
+    suspend fun facilitateAgentCollaboration(request: Map<String, Any>): Map<String, Any> {
         return try {
             Log.d("LivingEnv", "Facilitating agent collaboration...")
             
+            // Convert from public Map to internal CollaborationRequest
+            @Suppress("UNCHECKED_CAST")
+            val collaborationRequest = AgentCollaborationRequest(
+                id = request["id"] as? String ?: UUID.randomUUID().toString(),
+                participantTypes = (request["participantTypes"] as? List<String>)?.map { AgentType.valueOf(it) } ?: listOf(),
+                objective = request["objective"] as? String ?: "Collaborate on task",
+                timeframe = request["timeframe"] as? String ?: "unspecified",
+                constraints = request["constraints"] as? List<String> ?: emptyList()
+            )
+
             val participatingAgents = collaborationRequest.participantTypes.mapNotNull { registeredAgents[it] }
             val collaborationContext = createCollaborationContext(collaborationRequest, participatingAgents)
             val communicationPlan = designCommunicationPlan(collaborationContext)
             val coordination = coordinateCollaboration(participatingAgents, communicationPlan)
-            
-            CollaborationFacilitation(
-                requestId = collaborationRequest.id,
-                participantsCount = participatingAgents.size,
-                collaborationContext = collaborationContext,
-                communicationPlan = communicationPlan,
-                coordinationResult = coordination,
-                expectedOutcome = predictCollaborationOutcome(coordination),
-                timestamp = LocalDateTime.now()
+            val outcome = predictCollaborationOutcome(coordination)
+
+            mapOf(
+                "requestId" to collaborationRequest.id,
+                "participantsCount" to participatingAgents.size,
+                "collaborationContext" to collaborationContext,
+                "communicationPlan" to communicationPlan,
+                "coordinationResult" to coordination,
+                "predictedOutcome" to outcome,
+                "timestamp" to System.currentTimeMillis()
             )
         } catch (e: Exception) {
-            Log.e("LivingEnv", "Error facilitating collaboration", e)
-            CollaborationFacilitation("error", 0, mapOf(), listOf(), "failed", "unsuccessful", LocalDateTime.now())
+            Log.e("LivingEnv", "Error facilitating agent collaboration", e)
+            mapOf(
+                "error" to e.message.toString(),
+                "timestamp" to System.currentTimeMillis()
+            )
         }
     }
     
@@ -310,7 +355,7 @@ class LivingEnv : EnvironmentMesh {
             currentTasks = emptyList(),
             systemLoad = 0.0f,
             networkQuality = NetworkQuality.GOOD,
-            timestamp = LocalDateTime.now()
+            timestamp = java.time.LocalDateTime.now()
         )
     }
     
@@ -359,7 +404,7 @@ class LivingEnv : EnvironmentMesh {
             activeAgents = registeredAgents.keys.toSet(),
             systemLoad = calculateSystemLoad(),
             networkQuality = assessNetworkQuality(),
-            timestamp = LocalDateTime.now()
+            timestamp = java.time.LocalDateTime.now()
         )
         
         _environmentContext.value = updatedContext
@@ -396,7 +441,7 @@ class LivingEnv : EnvironmentMesh {
             toAgent = message.toAgent,
             messageType = message.messageType,
             success = success,
-            timestamp = LocalDateTime.now(),
+            timestamp = System.currentTimeMillis(),
             latency = 0.0 // Would be measured in real implementation
         )
         
@@ -417,7 +462,7 @@ class LivingEnv : EnvironmentMesh {
                     "from_agent" to message.fromAgent.name,
                     "to_agent" to message.toAgent.name
                 ),
-                timestamp = LocalDateTime.now()
+                timestamp = System.currentTimeMillis()
             )
             
             adaptationEngine.processAdaptationTrigger(adaptationTrigger)
@@ -467,9 +512,9 @@ class LivingEnv : EnvironmentMesh {
             while (true) {
                 try {
                     kotlinx.coroutines.delay(30000) // 30 seconds
-                    val metrics = gatherEnvironmentMetrics()
+                    gatherEnvironmentMetrics()
                     environmentMetrics.add(EnvironmentMetrics(
-                        timestamp = LocalDateTime.now(),
+                        timestamp = System.currentTimeMillis(),
                         activeAgents = registeredAgents.size,
                         messagesPerSecond = calculateMessagesPerSecond(),
                         averageLatency = calculateAverageLatency(),
@@ -505,12 +550,12 @@ class LivingEnv : EnvironmentMesh {
         val toAgent: AgentType,
         val messageType: MessageType,
         val success: Boolean,
-        val timestamp: LocalDateTime,
+        val timestamp: Long,
         val latency: Double
     )
     
     private data class EnvironmentMetrics(
-        val timestamp: LocalDateTime,
+        val timestamp: Long,
         val activeAgents: Int,
         val messagesPerSecond: Double,
         val averageLatency: Double,
@@ -524,10 +569,10 @@ class LivingEnv : EnvironmentMesh {
         val optimizationsApplied: List<String>,
         val adaptationsExecuted: List<String>,
         val performanceImprovement: Double,
-        val timestamp: LocalDateTime
+        val timestamp: Long
     )
     
-    private data class NetworkHealthReport(
+    data class NetworkHealthReport(
         val overallHealth: Double,
         val averageLatency: Double,
         val throughput: Double,
@@ -535,10 +580,10 @@ class LivingEnv : EnvironmentMesh {
         val congestionLevel: String,
         val activeConnections: Int,
         val recommendations: List<String>,
-        val timestamp: LocalDateTime
+        val timestampMillis: Long
     )
     
-    private data class LoadMetrics(
+    data class LoadMetrics(
         val cpuUsage: Double,
         val memoryUsage: Double,
         val networkUtilization: Double,
@@ -546,34 +591,35 @@ class LivingEnv : EnvironmentMesh {
         val responseTime: Double
     )
     
-    private data class AdaptationResult(
-        val strategy: String,
-        val adaptationsApplied: List<String>,
-        val results: Map<String, Any>,
-        val effectivenessScore: Double,
-        val timestamp: LocalDateTime
-    )
-    
-    private data class AdaptationTrigger(
-        val trigger: String,
-        val context: Map<String, Any>,
-        val timestamp: LocalDateTime
-    )
-    
-    private data class AdaptationRecord(
-        val trigger: AdaptationTrigger,
-        val result: AdaptationResult,
-        val timestamp: LocalDateTime
-    )
-    
-    private data class AgentCollaborationRequest(
+    data class AgentCollaborationRequest(
         val id: String,
         val participantTypes: List<AgentType>,
         val objective: String,
         val timeframe: String,
         val constraints: List<String>
     )
+
+    private data class AdaptationResult(
+        val strategy: String,
+        val adaptationsApplied: List<String>,
+        val results: Map<String, Any>,
+        val effectivenessScore: Double,
+        val timestamp: Long
+    )
     
+    private data class AdaptationTrigger(
+        val trigger: String,
+        val context: Map<String, Any>,
+        val timestamp: Long
+    )
+    
+    private data class AdaptationRecord(
+        val trigger: AdaptationTrigger,
+        val result: AdaptationResult,
+        val timestamp: Long
+    )
+    
+
     private data class CollaborationFacilitation(
         val requestId: String,
         val participantsCount: Int,
@@ -581,31 +627,31 @@ class LivingEnv : EnvironmentMesh {
         val communicationPlan: List<String>,
         val coordinationResult: String,
         val expectedOutcome: String,
-        val timestamp: LocalDateTime
+        val timestamp: Long
     )
     
     // Helper classes for environment intelligence
     
-    private inner class MessageRouter {
+    private class MessageRouter {
         fun optimizeMessage(message: AgentMessage): AgentMessage {
             // Apply message optimization logic
             return message.copy(
                 metadata = message.metadata + mapOf(
-                    "route_timestamp" to LocalDateTime.now().toString(),
+                    "route_timestamp" to System.currentTimeMillis().toString(),
                     "optimization_applied" to true
                 )
             )
         }
     }
     
-    private inner class ContextManager {
+    private class ContextManager {
         fun processContextUpdate(context: EnvironmentContext) {
             // Process context updates and trigger necessary adaptations
             Log.d("LivingEnv", "Processing context update for environment: ${context.environmentType}")
         }
     }
     
-    private inner class AdaptationEngine {
+    private class AdaptationEngine {
         fun analyzeLoadChanges(loadMetrics: LoadMetrics): String {
             return when {
                 loadMetrics.cpuUsage > 0.8 -> "scale_up"
@@ -649,7 +695,7 @@ class LivingEnv : EnvironmentMesh {
         }
     }
     
-    private inner class NetworkMonitor {
+    private class NetworkMonitor {
         fun measureAverageLatency(): Double = 50.0 // Placeholder
         fun measureThroughput(): Double = 1000.0 // Placeholder
         fun calculateErrorRate(): Double = 0.01 // Placeholder

@@ -9,6 +9,7 @@ import kotlinx.coroutines.sync.withLock
 import android.util.Log
 import java.time.LocalDateTime
 import java.util.UUID
+import kotlin.random.Random
 
 /**
  * EliteHuman Agent
@@ -240,7 +241,7 @@ class EliteHuman : LearningAgent {
     
     // === HUMAN EXCELLENCE METHODS ===
     
-    suspend fun generateBreakthroughIdea(context: InnovationContext): InnovationIdea {
+    private fun generateBreakthroughIdea(context: InnovationContext): InnovationIdea {
         return try {
             Log.d("EliteHuman", "Generating breakthrough idea with human creativity...")
             
@@ -253,7 +254,7 @@ class EliteHuman : LearningAgent {
             val idea = InnovationIdea(
                 id = UUID.randomUUID().toString(),
                 title = generateCreativeTitle(convergentSolution),
-                description = articulate솔ution(convergentSolution),
+                description = articulateSolution(convergentSolution),
                 category = categorizeInnovation(convergentSolution),
                 impactPotential = assessImpactPotential(convergentSolution),
                 feasibilityScore = feasibilityAnalysis.score,
@@ -270,7 +271,7 @@ class EliteHuman : LearningAgent {
         }
     }
     
-    suspend fun facilitateHumanAICollaboration(session: CollaborationRequest): CollaborationResult {
+    private fun facilitateHumanAICollaboration(session: CollaborationRequest): CollaborationResult {
         return try {
             Log.d("EliteHuman", "Facilitating human-AI collaboration with emotional intelligence...")
             
@@ -298,7 +299,7 @@ class EliteHuman : LearningAgent {
         }
     }
     
-    suspend fun provideEthicalGuidance(dilemma: EthicalDilemma): EthicalGuidance {
+    private fun provideEthicalGuidance(dilemma: EthicalDilemma): EthicalGuidance {
         return try {
             Log.d("EliteHuman", "Providing ethical guidance with moral wisdom...")
             
@@ -310,7 +311,7 @@ class EliteHuman : LearningAgent {
             EthicalGuidance(
                 dilemmaId = dilemma.id,
                 recommendedAction = moralFramework.recommendedAction,
-                ethicalJustification = articulate안니Justification(moralFramework),
+                ethicalJustification = articulateEthicalJustification(moralFramework),
                 alternativeActions = generateEthicalAlternatives(moralFramework),
                 stakeholderConsiderations = stakeholderAnalysis.considerations,
                 riskMitigation = developRiskMitigation(consequenceAnalysis),
@@ -375,7 +376,7 @@ class EliteHuman : LearningAgent {
         )
     }
     
-    private suspend fun handleCreativeQuery(message: AgentMessage, context: EmotionalContext): AgentMessage? {
+    private fun handleCreativeQuery(message: AgentMessage, context: EmotionalContext): AgentMessage? {
         val query = message.content.lowercase()
         
         return when {
@@ -387,7 +388,7 @@ class EliteHuman : LearningAgent {
         }
     }
     
-    private suspend fun handleInnovativeCommand(message: AgentMessage, context: EmotionalContext): AgentMessage? {
+    private fun handleInnovativeCommand(message: AgentMessage, context: EmotionalContext): AgentMessage? {
         val command = message.content.lowercase()
         
         return when {
@@ -409,7 +410,7 @@ class EliteHuman : LearningAgent {
         }
     }
     
-    private suspend fun solveCreativeProblem(task: NextGenTask): NextGenTask {
+    private fun solveCreativeProblem(task: NextGenTask): NextGenTask {
         Log.d("EliteHuman", "Solving creative problem with human innovation...")
         
         val problem = parseCreativeProblem(task.metadata)
@@ -427,7 +428,7 @@ class EliteHuman : LearningAgent {
         )
     }
     
-    private suspend fun innovateSolution(task: NextGenTask): NextGenTask {
+    private fun innovateSolution(task: NextGenTask): NextGenTask {
         Log.d("EliteHuman", "Innovating solution with breakthrough thinking...")
         
         val context = parseInnovationContext(task.metadata)
@@ -445,7 +446,7 @@ class EliteHuman : LearningAgent {
         )
     }
     
-    private suspend fun leadTeamWithEmpathy(task: NextGenTask): NextGenTask {
+    private fun leadTeamWithEmpathy(task: NextGenTask): NextGenTask {
         Log.d("EliteHuman", "Leading team with empathy and emotional intelligence...")
         
         val teamContext = parseTeamContext(task.metadata)
@@ -463,7 +464,7 @@ class EliteHuman : LearningAgent {
         )
     }
     
-    private suspend fun makeEthicalDecision(task: NextGenTask): NextGenTask {
+    private fun makeEthicalDecision(task: NextGenTask): NextGenTask {
         Log.d("EliteHuman", "Making ethical decision with moral wisdom...")
         
         val dilemma = parseEthicalDilemma(task.metadata)
@@ -481,7 +482,7 @@ class EliteHuman : LearningAgent {
         )
     }
     
-    private suspend fun negotiateAgreement(task: NextGenTask): NextGenTask {
+    private fun negotiateAgreement(task: NextGenTask): NextGenTask {
         Log.d("EliteHuman", "Negotiating agreement with human diplomacy...")
         
         val negotiationContext = parseNegotiationContext(task.metadata)
@@ -499,7 +500,7 @@ class EliteHuman : LearningAgent {
         )
     }
     
-    private suspend fun inspireVision(task: NextGenTask): NextGenTask {
+    private fun inspireVision(task: NextGenTask): NextGenTask {
         Log.d("EliteHuman", "Inspiring vision with human charisma...")
         
         val visionContext = parseVisionContext(task.metadata)
@@ -517,7 +518,7 @@ class EliteHuman : LearningAgent {
         )
     }
     
-    private suspend fun mentorDevelopment(task: NextGenTask): NextGenTask {
+    private fun mentorDevelopment(task: NextGenTask): NextGenTask {
         Log.d("EliteHuman", "Mentoring development with wisdom and care...")
         
         val menteeProfile = parseMenteeProfile(task.metadata)
@@ -535,7 +536,7 @@ class EliteHuman : LearningAgent {
         )
     }
     
-    private suspend fun synthesizeInsights(task: NextGenTask): NextGenTask {
+    private fun synthesizeInsights(task: NextGenTask): NextGenTask {
         Log.d("EliteHuman", "Synthesizing insights with human wisdom...")
         
         val dataPoints = parseInsightData(task.metadata)
@@ -553,7 +554,7 @@ class EliteHuman : LearningAgent {
         )
     }
     
-    private suspend fun executeWithHumanTouch(task: NextGenTask): NextGenTask {
+    private fun executeWithHumanTouch(task: NextGenTask): NextGenTask {
         Log.d("EliteHuman", "Executing with human touch: ${task.title}")
         
         val humanApproach = applyHumanTouchToTask(task)
@@ -726,7 +727,12 @@ class EliteHuman : LearningAgent {
     private fun shareParticipatingWisdom() {}
     private fun archiveCollaborationMemories() {}
     private fun brainstormDivergentSolutions(context: InnovationContext): List<String> {
-        return when (context.complexityLevel) {
+        val complexityLevel = when {
+            context.constraints.size > 5 -> "high"
+            context.constraints.size > 2 -> "medium"
+            else -> "low"
+        }
+        return when (complexityLevel) {
             "high" -> listOf(
                 "Multi-stage phased approach with contingency planning",
                 "Cross-functional team collaboration with external expertise",
@@ -756,8 +762,8 @@ class EliteHuman : LearningAgent {
     private fun synthesizeConvergentSolution(ideas: List<String>, context: InnovationContext): String {
         val prioritizedIdeas = ideas.take(3) // Focus on top 3 ideas
         
-        return when (context.domainFocus) {
-            "technology" -> 
+        return when (context.domain) {
+            "technology" ->
                 "Integrated technology solution combining ${prioritizedIdeas.joinToString(" and ")} " +
                 "with human-centered design principles and scalable architecture"
             "process" -> 
@@ -774,33 +780,34 @@ class EliteHuman : LearningAgent {
     private fun assessEthicalImplications(solution: String) = object { val rating = 0.9 }
     private fun analyzeFeasibilityWithIntuition(solution: String) = object { val score = 0.8 }
     private fun generateCreativeTitle(solution: String): String = "Creative Solution"
-    private fun articulate솔ution(solution: String): String = "Articulated solution"
+    private fun articulateSolution(solution: String): String = "Articulated solution"
     private fun categorizeInnovation(solution: String): String = "breakthrough"
     private fun assessImpactPotential(solution: String): Double = 0.85
     private fun calculateCreativityLevel(solution: String): Double = 0.9
     private fun analyzeTeamDynamics(participants: List<String>): Map<String, Any> {
+        val teamSize = participants.size
         return mapOf(
-            "team_size" to participants.size,
+            "team_size" to teamSize,
             "communication_style" to when {
-                participants.size > 8 -> "structured"
-                participants.size > 4 -> "collaborative"
+                teamSize > 8 -> "structured"
+                teamSize > 4 -> "collaborative"
                 else -> "intimate"
             },
             "collaboration_patterns" to mapOf(
                 "dominant_voices" to participants.take(2),
-                "quiet_contributors" to participants.drop(participants.size - 2),
-                "bridge_builders" to participants.drop(1).take(2)
+                "quiet_contributors" to if (teamSize > 2) participants.drop(teamSize - 2) else emptyList(),
+                "bridge_builders" to if (teamSize > 2) participants.drop(1).take(2) else emptyList()
             ),
-            "energy_level" to (0.6..0.9).random(),
+            "energy_level" to Random.nextDouble(0.6, 0.9),
             "consensus_likelihood" to when {
-                participants.size <= 3 -> 0.9
-                participants.size <= 6 -> 0.7
+                teamSize <= 3 -> 0.9
+                teamSize <= 6 -> 0.7
                 else -> 0.5
             },
             "potential_challenges" to when {
-                participants.size > 10 -> listOf("coordination_complexity", "decision_paralysis")
-                participants.size > 6 -> listOf("competing_priorities", "communication_overhead")
-                participants.size < 3 -> listOf("limited_perspectives", "groupthink_risk")
+                teamSize > 10 -> listOf("coordination_complexity", "decision_paralysis")
+                teamSize > 6 -> listOf("competing_priorities", "communication_overhead")
+                teamSize < 3 -> listOf("limited_perspectives", "groupthink_risk")
                 else -> listOf("minor_personality_conflicts")
             },
             "strengths" to listOf(
@@ -877,7 +884,7 @@ class EliteHuman : LearningAgent {
     private fun identifyValueConflicts(dilemma: EthicalDilemma, analysis: Any): List<String> = listOf()
     private fun applyMoralFramework(dilemma: EthicalDilemma, conflicts: List<String>) = object { val recommendedAction = "ethical_action" }
     private fun analyzeLongTermConsequences(dilemma: EthicalDilemma, framework: Any): Map<String, Any> = mapOf()
-    private fun articulate안니Justification(framework: Any): String = "Ethical justification"
+    private fun articulateEthicalJustification(framework: Any): String = "Ethical justification"
     private fun generateEthicalAlternatives(framework: Any): List<String> = listOf()
     private fun developRiskMitigation(analysis: Map<String, Any>): List<String> = listOf()
     private fun calculateEthicalConfidence(framework: Any, analysis: Map<String, Any>): Double = 0.9

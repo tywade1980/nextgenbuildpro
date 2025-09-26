@@ -1,12 +1,11 @@
 package com.nextgenbuildpro.navigation
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavOptions
+
+private const val TAG = "NavigationHelper"
 
 /**
  * Helper class for navigation with safety checks
@@ -14,23 +13,39 @@ import androidx.navigation.NavOptions
  * This class provides methods to safely navigate to destinations,
  * with error handling for unimplemented screens.
  */
-class NavigationHelper(private val context: Context) {
+class NavigationHelper private constructor(private val context: Context) {
+
+    companion object {
+        @Volatile private var instance: NavigationHelper? = null
+
+        /**
+         * Create or return an existing instance of NavigationHelper
+         *
+         * @param context The application context
+         * @return The NavigationHelper instance
+         */
+        fun create(context: Context): NavigationHelper {
+            return instance ?: synchronized(this) {
+                instance ?: NavigationHelper(context.applicationContext).also { instance = it }
+            }
+        }
+    }
 
     // Set of implemented destinations
     private val implementedDestinations = setOf(
         NavDestinations.HOME,
         NavDestinations.LEADS,
         NavDestinations.LEAD_DETAIL,
-        NavDestinations.LEAD_EDITOR,  // Add this line
-        NavDestinations.NOTE_EDITOR,  // Add this line
+        NavDestinations.LEAD_EDITOR,
+        NavDestinations.NOTE_EDITOR,
         NavDestinations.ESTIMATES,
         NavDestinations.ESTIMATE_DETAIL,
         NavDestinations.CALENDAR,
-        NavDestinations.CALENDAR_EVENT_EDITOR, // Moved from placeholders
-        NavDestinations.CALENDAR_TIMELINE, // Moved from placeholders
-        NavDestinations.MESSAGES, // Moved from placeholders
-        NavDestinations.MORE, // Moved from placeholders
-        NavDestinations.NOTIFICATIONS, // Moved from placeholders
+        NavDestinations.CALENDAR_EVENT_EDITOR,
+        NavDestinations.CALENDAR_TIMELINE,
+        NavDestinations.MESSAGES,
+        NavDestinations.MORE,
+        NavDestinations.NOTIFICATIONS,
         NavDestinations.AR_VISUALIZATION,
         NavDestinations.VOICE_TO_TEXT,
         NavDestinations.OFFLINE_MODE,
@@ -39,18 +54,18 @@ class NavigationHelper(private val context: Context) {
         NavDestinations.PROGRESS_UPDATES,
         NavDestinations.DIGITAL_SIGNATURE,
         NavDestinations.WORKFLOW_AUTOMATION,
+        NavDestinations.PROJECTS,
+        NavDestinations.ESTIMATE_EDITOR,
+        NavDestinations.ESTIMATE_ITEM_EDITOR,
         "tasks" // Direct route for tasks screen
     )
 
     // Set of partially implemented destinations (have a placeholder)
-    private val placeholderDestinations = emptySet<String>()
-    // All destinations have been moved to implementedDestinations
-    // NavDestinations.PROJECTS // Moved to implemented destinations
-    // NavDestinations.MESSAGES, // Moved to implemented destinations
-    // NavDestinations.MORE, // Moved to implemented destinations
-    // NavDestinations.CALENDAR_EVENT_EDITOR, // Moved to implemented destinations
-    // NavDestinations.CALENDAR_TIMELINE, // Moved to implemented destinations
-    // NavDestinations.NOTIFICATIONS // Moved to implemented destinations
+    private val placeholderDestinations = setOf<String>(
+        NavDestinations.ROOM_SCAN,
+        NavDestinations.BMS,
+        NavDestinations.BUILDING_DETAIL
+    )
 
     /**
      * Safely navigate to a destination
@@ -66,9 +81,19 @@ class NavigationHelper(private val context: Context) {
         showToast: Boolean = true
     ): Boolean {
         try {
+            Log.d(TAG, "Attempting navigation to: $destination")
+
             // Check if the destination is implemented
             if (isDestinationImplemented(destination)) {
+                // Get the current destination to avoid redundant navigation
+                val currentDestination = navController.currentDestination?.route
+                if (currentDestination == destination) {
+                    Log.d(TAG, "Already at destination: $destination, skipping navigation")
+                    return true
+                }
+
                 navController.navigate(destination)
+                Log.d(TAG, "Successfully navigated to: $destination")
                 return true
             }
 
@@ -82,6 +107,7 @@ class NavigationHelper(private val context: Context) {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+                Log.d(TAG, "Navigated to placeholder destination: $destination")
                 return true
             }
 
@@ -93,6 +119,7 @@ class NavigationHelper(private val context: Context) {
                     Toast.LENGTH_LONG
                 ).show()
             }
+            Log.w(TAG, "Navigation failed: The destination '$destination' is not implemented")
 
             // Return false to indicate navigation was not successful
             return false
@@ -106,9 +133,8 @@ class NavigationHelper(private val context: Context) {
                 ).show()
             }
 
-            // Log the error for debugging
-            android.util.Log.e("NavigationHelper", "Navigation failed to '$destination'", e)
-
+            // Log the error for debugging with stack trace
+            Log.e(TAG, "Navigation error to '$destination'", e)
             return false
         }
     }
@@ -128,7 +154,9 @@ class NavigationHelper(private val context: Context) {
         args: String,
         showToast: Boolean = true
     ): Boolean {
-        return navigateSafely(navController, "$destination/$args", showToast)
+        val fullDestination = "$destination/$args"
+        Log.d(TAG, "Attempting navigation to: $fullDestination")
+        return navigateSafely(navController, fullDestination, showToast)
     }
 
     /**
@@ -140,10 +168,16 @@ class NavigationHelper(private val context: Context) {
     fun isDestinationImplemented(destination: String): Boolean {
         // Check if the destination is in the implemented set
         // or if it starts with one of the implemented destinations followed by a slash
-        return implementedDestinations.contains(destination) ||
-                implementedDestinations.any { 
+        val isImplemented = implementedDestinations.contains(destination) ||
+                implementedDestinations.any {
                     destination.startsWith("$it/") 
                 }
+
+        if (!isImplemented) {
+            Log.d(TAG, "Destination is not implemented: $destination")
+        }
+
+        return isImplemented
     }
 
     /**
@@ -159,115 +193,5 @@ class NavigationHelper(private val context: Context) {
                 placeholderDestinations.any { 
                     destination.startsWith("$it/") 
                 }
-    }
-
-    /**
-     * Navigate to a destination and register for a result
-     * 
-     * @param navController The NavController to use for navigation
-     * @param destination The destination route
-     * @param resultKey The key to use for the result
-     * @param onResult Callback to be invoked when returning from the destination
-     * @return True if navigation was successful, false otherwise
-     */
-    fun navigateForResult(
-        navController: NavController,
-        destination: String,
-        resultKey: String,
-        onResult: (Any?) -> Unit
-    ): Boolean {
-        // First check if the destination is implemented
-        if (!isDestinationImplemented(destination) && !isDestinationPlaceholder(destination)) {
-            Toast.makeText(
-                context,
-                "Navigation failed: The screen '$destination' is not yet implemented",
-                Toast.LENGTH_LONG
-            ).show()
-            return false
-        }
-
-        try {
-            // Set up the previous backstack entry to receive the result
-            val currentEntry = navController.currentBackStackEntry
-            if (currentEntry != null) {
-                // Set up the result listener on the current entry
-                // Observe the result with a one-time observer
-                currentEntry.savedStateHandle.getLiveData<Any>(resultKey).observe(currentEntry) { result ->
-                    // Call the result callback
-                    onResult(result)
-
-                    // Clear the result to prevent it from being delivered again
-                    currentEntry.savedStateHandle.remove<Any>(resultKey)
-                }
-            }
-
-            // Navigate to the destination
-            navController.navigate(destination)
-            return true
-        } catch (e: Exception) {
-            // Handle navigation exceptions
-            Toast.makeText(
-                context,
-                "Navigation error: ${e.message ?: "Unknown error"}",
-                Toast.LENGTH_LONG
-            ).show()
-
-            // Log the error for debugging
-            android.util.Log.e("NavigationHelper", "Navigation for result failed to '$destination'", e)
-
-            return false
-        }
-    }
-
-    /**
-     * Set a navigation result to be returned to the previous screen
-     * 
-     * @param navController The NavController to use for navigation
-     * @param resultKey The key to use for the result
-     * @param result The result to return
-     */
-    fun setNavigationResult(
-        navController: NavController,
-        resultKey: String,
-        result: Any
-    ) {
-        // Get the previous backstack entry
-        val previousEntry = navController.previousBackStackEntry
-        if (previousEntry != null) {
-            // Set the result on the previous entry's saved state handle
-            previousEntry.savedStateHandle[resultKey] = result
-        }
-    }
-
-    /**
-     * Navigate to a destination with arguments and register for a result
-     * 
-     * @param navController The NavController to use for navigation
-     * @param destination The base destination route
-     * @param args The arguments to append to the route
-     * @param resultKey The key to use for the result
-     * @param onResult Callback to be invoked when returning from the destination
-     * @return True if navigation was successful, false otherwise
-     */
-    fun navigateWithArgsForResult(
-        navController: NavController,
-        destination: String,
-        args: String,
-        resultKey: String,
-        onResult: (Any?) -> Unit
-    ): Boolean {
-        return navigateForResult(navController, "$destination/$args", resultKey, onResult)
-    }
-
-    companion object {
-        /**
-         * Create a NavigationHelper instance
-         * 
-         * @param context The context to use for toast messages
-         * @return A NavigationHelper instance
-         */
-        fun create(context: Context): NavigationHelper {
-            return NavigationHelper(context)
-        }
     }
 }

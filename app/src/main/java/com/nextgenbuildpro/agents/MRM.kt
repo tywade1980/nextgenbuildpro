@@ -9,6 +9,7 @@ import kotlinx.coroutines.sync.withLock
 import android.util.Log
 import java.time.LocalDateTime
 import kotlin.math.min
+import kotlin.random.Random
 
 /**
  * MRM (Master Resource Manager) Agent
@@ -262,7 +263,7 @@ class MRM : LearningAgent {
         return null // No response needed for status updates
     }
     
-    private suspend fun handleAlert(message: AgentMessage): AgentMessage? {
+    private suspend fun handleAlert(message: AgentMessage): AgentMessage {
         Log.w("MRM", "Received alert: ${message.content}")
         
         // Analyze alert and take appropriate action
@@ -513,11 +514,11 @@ class MRM : LearningAgent {
     // Placeholder implementations for complex methods
     private fun calculateResourceUtilization(): Map<String, Double> {
         return mapOf(
-            "cpu" to (45..90).random() / 100.0,
-            "memory" to (55..85).random() / 100.0,
-            "network" to (30..70).random() / 100.0,
-            "storage" to (40..80).random() / 100.0,
-            "agents" to resourceRegistry.values.map { it.utilizationLevel }.average().coerceIn(0.0, 1.0)
+            "cpu" to Random.nextInt(45, 91) / 100.0,
+            "memory" to Random.nextInt(55, 86) / 100.0,
+            "network" to Random.nextInt(30, 71) / 100.0,
+            "storage" to Random.nextInt(40, 81) / 100.0,
+            "agents" to Random.nextDouble(0.3, 0.9) // Simplified since utilizationLevel doesn't exist
         )
     }
     
@@ -563,9 +564,9 @@ class MRM : LearningAgent {
                 )
             ),
             "agent_activity" to mapOf(
-                "total_tasks" to (timeRange * 10..timeRange * 50).random(),
-                "completion_rate" to (0.85..0.95).random(),
-                "collaboration_events" to (timeRange * 2..timeRange * 8).random()
+                "total_tasks" to Random.nextInt(timeRange * 10, timeRange * 50 + 1),
+                "completion_rate" to Random.nextDouble(0.85, 0.95),
+                "collaboration_events" to Random.nextInt(timeRange * 2, timeRange * 8 + 1)
             ),
             "patterns" to listOf(
                 "Peak usage during business hours",
@@ -576,8 +577,8 @@ class MRM : LearningAgent {
     }
     
     private fun generateCapacityPredictions(trends: Map<String, Any>): Map<String, Any> {
-        val resourceTrends = trends["resource_trends"] as? Map<String, Any> ?: mapOf()
-        val agentActivity = trends["agent_activity"] as? Map<String, Any> ?: mapOf()
+        trends["resource_trends"] as? Map<String, Any> ?: mapOf()
+        trends["agent_activity"] as? Map<String, Any> ?: mapOf()
         
         return mapOf(
             "next_24h" to mapOf(
@@ -620,13 +621,12 @@ class MRM : LearningAgent {
     }
     private fun calculateAgentLoads(): Map<AgentType, Double> {
         return mapOf(
-            AgentType.BIG_DADDY to (0.4..0.8).random(),
-            AgentType.ELITE_HUMAN to (0.3..0.7).random(),
-            AgentType.MRM to (0.5..0.9).random(),
-            AgentType.FIELD_AGENT to (0.2..0.6).random(),
-            AgentType.CLIENT_AGENT to (0.3..0.8).random(),
-            AgentType.DATA_SCIENTIST to (0.4..0.7).random(),
-            AgentType.SECURITY_AGENT to (0.2..0.5).random()
+            AgentType.ELITE_HUMAN to Random.nextDouble(0.3, 0.7),
+            AgentType.MRM to Random.nextDouble(0.5, 0.9),
+            AgentType.HERMES_BRAIN to Random.nextDouble(0.2, 0.6),
+            AgentType.BIG_DADDY to Random.nextDouble(0.3, 0.8),
+            AgentType.HRM_MODEL to Random.nextDouble(0.4, 0.7),
+            AgentType.ORCHESTRATOR to Random.nextDouble(0.2, 0.5)
         )
     }
     

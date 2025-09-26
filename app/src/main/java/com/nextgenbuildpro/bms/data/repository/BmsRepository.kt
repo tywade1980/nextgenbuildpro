@@ -30,33 +30,32 @@ class BmsRepository(private val context: Context) : Repository<Building> {
         loadSampleData()
     }
 
-    override suspend fun getAll(): Result<List<Building>> {
-        return Result.success(_buildings.value)
+    override suspend fun getAll(): List<Building> {
+        return _buildings.value
     }
 
-    override suspend fun getById(id: String): Result<Building?> {
-        val building = _buildings.value.find { it.id == id }
-        return Result.success(building)
+    override suspend fun getById(id: String): Building? {
+        return _buildings.value.find { it.id == id }
     }
 
-    override suspend fun create(item: Building): Result<Building> {
+    override suspend fun save(item: Building): Boolean {
         val updatedList = _buildings.value + item
         _buildings.value = updatedList
-        return Result.success(item)
+        return true
     }
 
-    override suspend fun update(item: Building): Result<Building> {
+    override suspend fun update(item: Building): Boolean {
         val updatedList = _buildings.value.map { 
             if (it.id == item.id) item else it 
         }
         _buildings.value = updatedList
-        return Result.success(item)
+        return true
     }
 
-    override suspend fun delete(id: String): Result<Unit> {
+    override suspend fun delete(id: String): Boolean {
         val updatedList = _buildings.value.filter { it.id != id }
         _buildings.value = updatedList
-        return Result.success(Unit)
+        return true
     }
 
     // Building Components

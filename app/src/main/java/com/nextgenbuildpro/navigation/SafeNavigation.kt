@@ -1,9 +1,12 @@
 package com.nextgenbuildpro.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+
+private const val TAG = "SafeNavigation"
 
 /**
  * Composable function to remember a NavigationHelper instance
@@ -22,9 +25,15 @@ fun rememberNavigationHelper(): NavigationHelper {
  * @return True if navigation was successful, false otherwise
  */
 fun NavController.navigateSafely(destination: String, showToast: Boolean = true): Boolean {
-    val context = this.context
-    val navigationHelper = NavigationHelper.create(context)
-    return navigationHelper.navigateSafely(this, destination, showToast)
+    try {
+        val context = this.context
+        val navigationHelper = NavigationHelper.create(context)
+        Log.d(TAG, "Attempting to navigate to: $destination")
+        return navigationHelper.navigateSafely(this, destination, showToast)
+    } catch (e: Exception) {
+        Log.e(TAG, "Critical navigation error for destination: $destination", e)
+        return false
+    }
 }
 
 /**
@@ -40,9 +49,15 @@ fun NavController.navigateSafelyWithArgs(
     args: String,
     showToast: Boolean = true
 ): Boolean {
-    val context = this.context
-    val navigationHelper = NavigationHelper.create(context)
-    return navigationHelper.navigateSafelyWithArgs(this, destination, args, showToast)
+    try {
+        val context = this.context
+        val navigationHelper = NavigationHelper.create(context)
+        Log.d(TAG, "Attempting to navigate to: $destination with args: $args")
+        return navigationHelper.navigateSafelyWithArgs(this, destination, args, showToast)
+    } catch (e: Exception) {
+        Log.e(TAG, "Critical navigation error for destination: $destination with args: $args", e)
+        return false
+    }
 }
 
 /**
@@ -54,7 +69,11 @@ fun NavController.navigateSafelyWithArgs(
 fun NavController.isDestinationImplemented(destination: String): Boolean {
     val context = this.context
     val navigationHelper = NavigationHelper.create(context)
-    return navigationHelper.isDestinationImplemented(destination)
+    val isImplemented = navigationHelper.isDestinationImplemented(destination)
+    if (!isImplemented) {
+        Log.w(TAG, "Attempted to navigate to unimplemented destination: $destination")
+    }
+    return isImplemented
 }
 
 /**

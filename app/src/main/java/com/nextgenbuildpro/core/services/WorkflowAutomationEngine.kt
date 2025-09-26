@@ -8,6 +8,8 @@ import com.nextgenbuildpro.shared.NextGenTask
 import com.nextgenbuildpro.shared.AgentType
 import com.nextgenbuildpro.shared.Priority
 import com.nextgenbuildpro.shared.TaskStatus
+import com.nextgenbuildpro.core.services.AutoFillService
+import com.nextgenbuildpro.core.services.AutoFillContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -83,7 +85,7 @@ class WorkflowAutomationEngine(private val context: Context) : NextGenService {
     override suspend fun getHealthStatus(): ServiceHealth {
         return ServiceHealth(
             isHealthy = _isRunning.value,
-            lastCheckTime = LocalDateTime.now(),
+            lastCheckTime = System.currentTimeMillis(),
             issues = if (!_isRunning.value) listOf("Service not running") else emptyList(),
             metrics = mapOf(
                 "active_workflows" to activeWorkflows.size.toDouble(),
@@ -331,7 +333,7 @@ class WorkflowAutomationEngine(private val context: Context) : NextGenService {
         val taskType = step.parameters["taskType"] as? String
             ?: throw IllegalArgumentException("Task type not provided")
         
-        val scheduledTime = step.parameters["scheduledTime"] as? LocalDateTime
+        val scheduledTimeParam = step.parameters["scheduledTime"] as? LocalDateTime
             ?: LocalDateTime.now().plusHours(1)
         
         val task = NextGenTask(
@@ -340,16 +342,16 @@ class WorkflowAutomationEngine(private val context: Context) : NextGenService {
             assignedAgent = AgentType.valueOf(step.parameters["assignedAgent"] as? String ?: "BIG_DADDY"),
             priority = Priority.valueOf(step.parameters["priority"] as? String ?: "MEDIUM"),
             status = TaskStatus.PENDING,
-            scheduledTime = scheduledTime
+            dueDate = scheduledTimeParam
         )
         
         // In a real implementation, this would schedule the task in the system
-        Log.d(TAG, "Scheduling task: ${task.title} for $scheduledTime")
-        
+        Log.d(TAG, "Scheduling task: ${task.title} for $scheduledTimeParam")
+
         return mapOf(
             "taskId" to task.id,
             "taskType" to taskType,
-            "scheduledTime" to scheduledTime,
+            "scheduledTime" to scheduledTimeParam,
             "assignedAgent" to task.assignedAgent.name,
             "timestamp" to LocalDateTime.now()
         )
@@ -363,7 +365,7 @@ class WorkflowAutomationEngine(private val context: Context) : NextGenService {
         val documentType = step.parameters["documentType"] as? String
             ?: throw IllegalArgumentException("Document type not provided")
         
-        val templateId = step.parameters["templateId"] as? String
+        val templateId = step.parameters["templateId"] as? String ?: ""
         val documentData = buildDocumentData(step, workflow, previousSteps)
         
         // In a real implementation, this would generate actual documents

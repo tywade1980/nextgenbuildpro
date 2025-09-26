@@ -1,5 +1,9 @@
 package com.nextgenbuildpro.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -11,43 +15,30 @@ import com.nextgenbuildpro.features.leads.LeadsScreen
 import com.nextgenbuildpro.features.leads.LeadDetailScreen
 import com.nextgenbuildpro.features.estimates.EstimatesScreen
 import com.nextgenbuildpro.features.estimates.EstimateDetailScreen
+import com.nextgenbuildpro.features.estimates.EstimateItemEditorScreen
 import com.nextgenbuildpro.features.tasks.TasksScreen
 import com.nextgenbuildpro.features.calendar.CalendarScreen
 import com.nextgenbuildpro.features.calendar.CalendarEventEditorScreen
-import com.nextgenbuildpro.features.estimates.EstimateItemEditorScreen
-//import com.nextgenbuildpro.fieldtools.ui.ArVisualizationScreen
-//import com.nextgenbuildpro.fieldtools.ui.VoiceToTextScreen
-//import com.nextgenbuildpro.fieldtools.ui.OfflineModeScreen
 import com.nextgenbuildpro.clientengagement.ui.ClientPortalScreen
 import com.nextgenbuildpro.clientengagement.ui.ProgressUpdatesScreen
-import com.nextgenbuildpro.clientengagement.ui.DigitalSignatureScreen
 import com.nextgenbuildpro.receptionist.ui.AIReceptionistSettingsScreen
 import com.nextgenbuildpro.timeclock.ui.TimeClockScreen
-//import com.nextgenbuildpro.ui.PlaceholderScreen
 import com.nextgenbuildpro.crm.ui.MessagesScreen
 import com.nextgenbuildpro.features.automation.WorkflowAutomationScreen
-import androidx.compose.runtime.remember
 import com.nextgenbuildpro.crm.rememberCrmComponents
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 
-/**
- * Main navigation graph for the application.
- * This defines all the routes and connects the different feature modules.
- */
 @Composable
 fun NavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = NavDestinations.HOME
     ) {
-        // Home
-        composable(NavDestinations.HOME) {
-            HomeScreen(navController)
-        }
+        composable(NavDestinations.HOME) { HomeScreen(navController) }
 
-        // Leads
-        composable(NavDestinations.LEADS) {
-            LeadsScreen(navController)
-        }
+        composable(NavDestinations.LEADS) { LeadsScreen(navController) }
 
         composable(
             route = "${NavDestinations.LEAD_DETAIL}/{leadId}",
@@ -69,10 +60,7 @@ fun NavGraph(navController: NavHostController) {
             com.nextgenbuildpro.features.leads.LeadEditorScreen(navController, leadId)
         }
 
-        // Estimates
-        composable(NavDestinations.ESTIMATES) {
-            EstimatesScreen(navController)
-        }
+        composable(NavDestinations.ESTIMATES) { EstimatesScreen(navController) }
 
         composable(
             route = "${NavDestinations.ESTIMATE_DETAIL}/{estimateId}",
@@ -90,7 +78,7 @@ fun NavGraph(navController: NavHostController) {
             route = "${NavDestinations.ESTIMATE_ITEM_EDITOR}/{estimateId}/{itemId}",
             arguments = listOf(
                 navArgument("estimateId") { type = NavType.StringType },
-                navArgument("itemId") { 
+                navArgument("itemId") {
                     type = NavType.StringType
                     nullable = true
                     defaultValue = null
@@ -106,7 +94,6 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        // Projects
         composable(NavDestinations.PROJECTS) {
             com.nextgenbuildpro.features.projects.AssembliesScreen(navController)
         }
@@ -116,14 +103,8 @@ fun NavGraph(navController: NavHostController) {
             arguments = listOf(navArgument("projectId") { type = NavType.StringType })
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("projectId") ?: ""
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Project Details",
-            //    message = "The project details feature is coming soon. You'll be able to view and manage all aspects of your projects."
-            //)
         }
 
-        // Assembly and Template details
         composable(
             route = "assembly_detail/{assemblyId}",
             arguments = listOf(navArgument("assemblyId") { type = NavType.StringType })
@@ -140,14 +121,8 @@ fun NavGraph(navController: NavHostController) {
             arguments = listOf(navArgument("templateId") { type = NavType.StringType })
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("templateId") ?: ""
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Template Details",
-            //    message = "The template details feature is coming soon. You'll be able to view and edit template details, and create projects from templates."
-            //)
         }
 
-        // Camera & Room Scan
         composable(NavDestinations.CAMERA) {
             com.nextgenbuildpro.features.camera.CameraScreen(navController)
         }
@@ -156,7 +131,6 @@ fun NavGraph(navController: NavHostController) {
             com.nextgenbuildpro.features.roomscan.RoomScanScreen(navController)
         }
 
-        // Messages
         composable(NavDestinations.MESSAGES) {
             val crmComponents = rememberCrmComponents()
             MessagesScreen(
@@ -170,19 +144,12 @@ fun NavGraph(navController: NavHostController) {
             arguments = listOf(navArgument("conversationId") { type = NavType.StringType })
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("conversationId") ?: ""
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Conversation",
-            //    message = "The conversation view is coming soon. You'll be able to see your message history with clients."
-            //)
         }
 
-        // File Upload
         composable(NavDestinations.FILE_UPLOAD) {
             com.nextgenbuildpro.features.files.FileUploadScreen(navController)
         }
 
-        // Notes
         composable(
             route = "${NavDestinations.NOTE_EDITOR}/{leadId}",
             arguments = listOf(navArgument("leadId") { type = NavType.StringType })
@@ -191,7 +158,6 @@ fun NavGraph(navController: NavHostController) {
             com.nextgenbuildpro.features.leads.NoteEditorScreen(navController, leadId)
         }
 
-        // Settings
         composable(NavDestinations.ACCOUNT_SETTINGS) {
             com.nextgenbuildpro.features.settings.AccountSettingsScreen(navController)
         }
@@ -200,30 +166,22 @@ fun NavGraph(navController: NavHostController) {
             com.nextgenbuildpro.features.settings.PermissionsScreen(navController)
         }
 
-        // Notifications
         composable(NavDestinations.NOTIFICATIONS) {
             com.nextgenbuildpro.features.settings.NotificationsScreen(navController)
         }
 
-        // Tasks
-        composable("tasks") {
-            TasksScreen(navController)
-        }
+        composable("tasks") { TasksScreen(navController) }
 
-        // Calendar
-        composable(NavDestinations.CALENDAR) {
-            CalendarScreen(navController)
-        }
+        composable(NavDestinations.CALENDAR) { CalendarScreen(navController) }
 
         composable(NavDestinations.CALENDAR_EVENT_EDITOR) {
             CalendarEventEditorScreen(navController)
         }
 
-        // Add a new route that accepts a leadId parameter
         composable(
             route = "${NavDestinations.CALENDAR_EVENT_EDITOR}?leadId={leadId}",
             arguments = listOf(
-                navArgument("leadId") { 
+                navArgument("leadId") {
                     type = NavType.StringType
                     nullable = true
                     defaultValue = null
@@ -234,11 +192,10 @@ fun NavGraph(navController: NavHostController) {
             CalendarEventEditorScreen(navController, leadId)
         }
 
-        // Add a route for editing an existing event
         composable(
             route = "${NavDestinations.CALENDAR_EVENT_EDITOR}/{eventId}",
             arguments = listOf(
-                navArgument("eventId") { 
+                navArgument("eventId") {
                     type = NavType.StringType
                 }
             )
@@ -247,50 +204,24 @@ fun NavGraph(navController: NavHostController) {
             CalendarEventEditorScreen(navController, eventId = eventId)
         }
 
-        composable(NavDestinations.CALENDAR_TIMELINE) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Project Timeline",
-            //    message = "The detailed project timeline view is coming soon. You'll be able to see a Gantt chart of your project schedule."
-            //)
-        }
+        composable(NavDestinations.CALENDAR_TIMELINE) { }
 
-        // Time Clock
-        composable(NavDestinations.TIME_CLOCK) {
-            TimeClockScreen(navController)
-        }
+        composable(NavDestinations.TIME_CLOCK) { TimeClockScreen(navController) }
 
-        // Field Tools - AR Visualization
-        composable(NavDestinations.AR_VISUALIZATION) {
-            //ArVisualizationScreen(navController)
-        }
+        composable(NavDestinations.AR_VISUALIZATION) { }
 
-        // Field Tools - Voice to Text
-        composable(NavDestinations.VOICE_TO_TEXT) {
-            //VoiceToTextScreen(navController)
-        }
+        composable(NavDestinations.VOICE_TO_TEXT) { }
 
-        // Field Tools - Offline Mode
-        composable(NavDestinations.OFFLINE_MODE) {
-            //OfflineModeScreen(navController)
-        }
+        composable(NavDestinations.OFFLINE_MODE) { }
 
-        // Client Engagement - Client Portal
-        composable(NavDestinations.CLIENT_PORTAL) {
-            ClientPortalScreen(navController)
-        }
+        composable(NavDestinations.CLIENT_PORTAL) { ClientPortalScreen(navController) }
 
-        // Client Engagement - Progress Updates
-        composable(NavDestinations.PROGRESS_UPDATES) {
-            ProgressUpdatesScreen(navController)
-        }
+        composable(NavDestinations.PROGRESS_UPDATES) { ProgressUpdatesScreen(navController) }
 
-        // Client Engagement - Digital Signature
         composable(NavDestinations.DIGITAL_SIGNATURE) {
             com.nextgenbuildpro.clientengagement.ui.DigitalSignatureScreen(navController)
         }
 
-        // Digital Signature with lead ID
         composable(
             route = "${NavDestinations.DIGITAL_SIGNATURE}/{leadId}",
             arguments = listOf(navArgument("leadId") { type = NavType.StringType })
@@ -302,7 +233,6 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        // Digital Signature with document ID
         composable(
             route = "${NavDestinations.DIGITAL_SIGNATURE}/document/{documentId}",
             arguments = listOf(navArgument("documentId") { type = NavType.StringType })
@@ -314,101 +244,84 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        // More
         composable(NavDestinations.MORE) {
             com.nextgenbuildpro.features.more.MoreScreen(navController)
         }
 
-        // AI Receptionist Settings
         composable(NavDestinations.AI_RECEPTIONIST_SETTINGS) {
             AIReceptionistSettingsScreen(navController)
         }
-        
 
-        // Building Management System
         composable(NavDestinations.BMS) {
             com.nextgenbuildpro.bms.ui.BmsScreen(navController)
+        }
 
-
-        // Workflow Automation
         composable(NavDestinations.WORKFLOW_AUTOMATION) {
             WorkflowAutomationScreen(navController)
- master
+        }
+
+        composable(NavDestinations.CALL_SCREEN) {
+            // Call handling features removed - placeholder screen
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = androidx.compose.ui.Alignment.Center
+            ) {
+                Text("Call Screen - Features Removed")
+            }
         }
     }
 }
 
-/**
- * Object containing all navigation destinations as constants.
- */
 object NavDestinations {
-    // Main sections
     const val HOME = "home"
     const val LEADS = "leads"
     const val ESTIMATES = "estimates"
     const val PROJECTS = "projects"
     const val MORE = "more"
 
-    // Leads
     const val LEAD_DETAIL = "lead_detail"
     const val LEAD_EDITOR = "lead_editor"
 
-    // Estimates
     const val ESTIMATE_DETAIL = "estimate_detail"
     const val ESTIMATE_EDITOR = "estimate_editor"
     const val ESTIMATE_ITEM_EDITOR = "estimate_item_editor"
 
-    // Projects
     const val PROJECT_DETAIL = "project_detail"
 
-    // Camera & Room Scan
     const val CAMERA = "camera"
     const val ROOM_SCAN = "room_scan"
 
-    // Messages
     const val MESSAGES = "messages"
     const val MESSAGE_DETAIL = "message_detail"
 
-    // File Upload
     const val FILE_UPLOAD = "file_upload"
 
-    // Notes
     const val NOTE_EDITOR = "note_editor"
 
-    // Settings
     const val ACCOUNT_SETTINGS = "account_settings"
     const val PERMISSIONS = "permissions"
 
-    // Notifications
     const val NOTIFICATIONS = "notifications"
 
-    // Calendar
     const val CALENDAR = "calendar"
     const val CALENDAR_EVENT_EDITOR = "calendar_event_editor"
     const val CALENDAR_TIMELINE = "calendar_timeline"
 
-    // Time Clock
     const val TIME_CLOCK = "time_clock"
 
-    // Field Tools
     const val AR_VISUALIZATION = "ar_visualization"
     const val VOICE_TO_TEXT = "voice_to_text"
     const val OFFLINE_MODE = "offline_mode"
 
-    // Client Engagement
     const val CLIENT_PORTAL = "client_portal"
     const val PROGRESS_UPDATES = "progress_updates"
     const val DIGITAL_SIGNATURE = "digital_signature"
 
-    // AI Receptionist
     const val AI_RECEPTIONIST_SETTINGS = "ai_receptionist_settings"
-    
 
-    // Building Management System
     const val BMS = "bms"
     const val BUILDING_DETAIL = "building_detail"
 
-    // Automation
     const val WORKFLOW_AUTOMATION = "workflow_automation"
-
+    const val CALL_SCREEN = "call_screen"
 }

@@ -11,9 +11,36 @@ import kotlinx.coroutines.runBlocking
  */
 class AutomationDebugger(private val context: Context) {
     
-    private val autoFillService by lazy { CoreModule.getAutoFillService() }
-    private val workflowEngine by lazy { CoreModule.getWorkflowAutomationEngine() }
-    
+    // Get services through methods instead of properties to ensure we always get the latest instance
+    private val autoFillService get() = CoreModule.getAutoFillService()
+    private val workflowEngine get() = CoreModule.getWorkflowAutomationEngine()
+
+    companion object {
+        private const val TAG = "AutomationDebugger"
+    }
+
+    /**
+     * Initialize the automation debugging system
+     */
+    fun initialize() {
+        Log.i(TAG, "Initializing automation debugging system...")
+        try {
+            Log.i(TAG, "Starting auto-fill service...")
+            runBlocking {
+                autoFillService.start()
+            }
+
+            Log.i(TAG, "Starting workflow engine...")
+            runBlocking {
+                workflowEngine.start()
+            }
+
+            Log.i(TAG, "Automation debugging system initialized successfully")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize automation debugging system", e)
+        }
+    }
+
     /**
      * Run comprehensive tests of the automation system
      */
@@ -296,9 +323,5 @@ class AutomationDebugger(private val context: Context) {
                 appendLine("Error generating report: ${e.message}")
             }
         }
-    }
-    
-    companion object {
-        private const val TAG = "AutomationDebugger"
     }
 }

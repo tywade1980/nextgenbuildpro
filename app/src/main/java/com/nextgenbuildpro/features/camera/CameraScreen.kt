@@ -1,5 +1,6 @@
 package com.nextgenbuildpro.features.camera
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -139,53 +140,144 @@ private fun GalleryTab(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        contentPadding = PaddingValues(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxSize()
     ) {
         items(photos) { photo ->
-            PhotoCard(
-                photo = photo,
-                onDelete = { onDeletePhoto(photo.id) }
+            PhotoItem(photo = photo, onDelete = { onDeletePhoto(photo.id) })
+        }
+    }
+}
+
+@Composable
+private fun PhotoItem(photo: Photo, onDelete: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            // Photo placeholder (in a real app, this would use Coil or similar to load the image)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Image,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = photo.title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
             )
+
+            Text(
+                text = photo.timestamp,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 1
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = photo.projectName,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    modifier = Modifier.weight(1f)
+                )
+
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Photo",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
 private fun ProjectsTab(photos: List<Photo>) {
-    val photosByProject = photos.groupBy { it.projectName }
-    
+    // Extract unique projects
+    val projects = photos.map { it.projectName }.distinct()
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Header
-        item {
-            Text(
-                text = "Photos by Project",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+        items(projects) { projectName ->
+            ProjectItem(
+                projectName = projectName,
+                photoCount = photos.count { it.projectName == projectName }
             )
         }
+    }
+}
 
-        photosByProject.forEach { (projectName, projectPhotos) ->
-            item {
+@Composable
+private fun ProjectItem(projectName: String, photoCount: Int) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Folder,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(40.dp)
+                    .padding(end = 16.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = projectName,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = "$photoCount photos",
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
-            items(projectPhotos) { photo ->
-                ProjectPhotoItem(photo = photo)
-            }
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null
+            )
         }
     }
 }
@@ -264,109 +356,8 @@ private fun QuickActionCard(action: QuickAction) {
     }
 }
 
-@Composable
-private fun PhotoCard(
-    photo: Photo,
-    onDelete: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp)
-        ) {
-            // Placeholder for image
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Image,
-                    contentDescription = photo.title,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(48.dp)
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = photo.title,
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = 1
-            )
-            
-            Text(
-                text = photo.timestamp,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ProjectPhotoItem(photo: Photo) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Image,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(48.dp)
-            )
-            
-            Spacer(modifier = Modifier.width(16.dp))
-            
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = photo.title,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = photo.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = photo.timestamp,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
 /**
- * Data classes
+ * Data class for photo information
  */
 data class Photo(
     val id: String,
@@ -377,53 +368,42 @@ data class Photo(
     val tags: List<String>
 )
 
-data class CameraOption(
-    val icon: ImageVector,
-    val title: String,
-    val description: String
-)
-
-data class QuickAction(
-    val icon: ImageVector,
-    val title: String
-)
-
 /**
- * Sample data functions
+ * Generate sample photos for testing
  */
 private fun getSamplePhotos(): List<Photo> {
     return listOf(
         Photo(
-            id = "1",
-            title = "Foundation Progress",
-            description = "Foundation concrete pour completed",
-            timestamp = "2 hours ago",
-            projectName = "Johnson Residence",
+            id = "photo_1",
+            title = "Foundation Work",
+            description = "Concrete foundation being poured",
+            timestamp = "Today, 10:45 AM",
+            projectName = "123 Main St Renovation",
             tags = listOf("Foundation", "Progress")
         ),
         Photo(
-            id = "2",
-            title = "Framing Stage",
+            id = "photo_2",
+            title = "Frame Construction",
             description = "Wall framing in progress",
-            timestamp = "1 day ago",
-            projectName = "Johnson Residence",
+            timestamp = "Yesterday, 3:30 PM",
+            projectName = "123 Main St Renovation",
             tags = listOf("Framing", "Progress")
         ),
         Photo(
-            id = "3",
-            title = "Site Overview",
-            description = "Aerial view of construction site",
-            timestamp = "3 days ago",
-            projectName = "Office Building",
-            tags = listOf("Site", "Overview")
+            id = "photo_3",
+            title = "Site Inspection",
+            description = "Pre-construction site review",
+            timestamp = "Sep 22, 2025",
+            projectName = "456 Oak Ave Build",
+            tags = listOf("Site", "Inspection")
         ),
         Photo(
-            id = "4",
+            id = "photo_4",
             title = "Material Delivery",
-            description = "Steel beams delivered to site",
-            timestamp = "1 week ago",
-            projectName = "Office Building",
-            tags = listOf("Materials", "Delivery")
+            description = "Lumber and supplies arrived on site",
+            timestamp = "Sep 21, 2025",
+            projectName = "456 Oak Ave Build",
+            tags = listOf("Materials", "Logistics")
         )
     )
 }
@@ -471,5 +451,16 @@ private fun getQuickActions(): List<QuickAction> {
             icon = Icons.Default.Edit,
             title = "Edit Last Photo"
         )
-    )
+    }
 }
+
+private data class CameraOption(
+    val icon: ImageVector,
+    val title: String,
+    val description: String
+)
+
+private data class QuickAction(
+    val icon: ImageVector,
+    val title: String
+)

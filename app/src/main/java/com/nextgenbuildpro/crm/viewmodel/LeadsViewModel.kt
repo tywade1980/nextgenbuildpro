@@ -262,4 +262,11 @@ class LeadsViewModel(
 
         _filteredLeads.value = filtered
     }
+
+    /**
+     * Get a lead by ID
+     */
+    fun getLeadById(leadId: String): Lead? {
+        return _leads.value.find { it.id == leadId }
+    }
 }

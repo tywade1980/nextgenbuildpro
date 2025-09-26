@@ -18,6 +18,9 @@ import android.util.Log
 import java.time.LocalDateTime
 import java.util.UUID
 
+// Import TaskStatus specifically to avoid ambiguity
+import com.nextgenbuildpro.shared.TaskStatus
+
 /**
  * MainOrchestrator
  * 
@@ -46,8 +49,8 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     // Core components
     private val livingEnv = LivingEnv()
     private val agents = mutableMapOf<AgentType, NextGenAgent>()
-    private val services = mutableMapOf<String, NextGenService>()
-    
+    private val services = mutableMapOf<String, OrchestratorService>()
+
     // Orchestration components
     private val taskQueue = TaskQueue()
     private val resourceManager = OrchestrationResourceManager()
@@ -69,8 +72,41 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         emergencyResponseTime = 5000L // 5 seconds
     )
     
+    // Define OrchestratorService interface to wrap NextGenService and ensure compatibility
+    private interface OrchestratorService {
+        val serviceName: String
+        suspend fun start(): Result<Unit>
+        suspend fun stop(): Result<Unit>
+    }
+
+    // Adapter class to wrap NextGenService
+    private class NextGenServiceAdapter(private val service: NextGenService) : OrchestratorService {
+        override val serviceName: String
+            get() = service.serviceName
+
+        override suspend fun start(): Result<Unit> = service.start()
+        override suspend fun stop(): Result<Unit> = service.stop()
+    }
+
+    // Broadcast system ready notification to all agents
+    private suspend fun broadcastSystemReady() {
+        val readyMessage = AgentMessage(
+            fromAgent = AgentType.ORCHESTRATOR,
+            toAgent = AgentType.SYSTEM,  // broadcast to all
+            messageType = MessageType.SYSTEM_NOTIFICATION,
+            content = "NextGen AI OS is now ready and operational",
+            metadata = mapOf(
+                "system_status" to "READY",
+                "timestamp" to LocalDateTime.now().toString()
+            )
+        )
+
+        // Broadcast to all agents
+        livingEnv.broadcastMessage(readyMessage)
+    }
+
     suspend fun initialize(): Result<Unit> = try {
-        mutex.withLock {
+        mutex.withLock<Unit> {
             Log.i("MainOrchestrator", "Initializing NextGen AI OS Orchestrator...")
             
             _systemStatus.value = SystemStatus.INITIALIZING
@@ -133,35 +169,36 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     
     // === ORCHESTRATION METHODS ===
     
-    override suspend fun orchestrateTask(task: NextGenTask): Result<Unit> = try {
-        Log.d("MainOrchestrator", "Orchestrating task: ${task.title}")
-        
-        // Validate task
-        val validation = validateTask(task)
-        if (!validation.isValid) {
-            return Result.failure(IllegalArgumentException("Task validation failed: ${validation.reason}"))
+    override suspend fun orchestrateTask(task: NextGenTask): Result<Unit> {
+        try {
+            Log.d("MainOrchestrator", "Orchestrating task: ${task.title}")
+
+            // Validate task
+            val validation = validateTask(task)
+            if (!validation.isValid) {
+                return Result.failure(IllegalArgumentException("Task validation failed: ${validation.reason}"))
+            }
+
+            // Determine optimal agent for task
+            val optimalAgent = decisionEngine.selectOptimalAgent(task, agents.keys.toList())
+
+            // Check resource availability
+            val resourceCheck = resourceManager.checkResourceAvailability(task)
+            if (!resourceCheck.available) {
+                // Queue task or reschedule
+                return queueTaskForLater(task, resourceCheck.availableAt)
+            }
+
+            // Execute task with selected agent
+            val execution = executeTaskWithAgent(task, optimalAgent)
+
+            // Monitor execution
+            monitorTaskExecution(execution)
+
+            return Result.success(Unit)
+        } catch (e: Exception) {
+            return Result.failure(e)
         }
-        
-        // Determine optimal agent for task
-        val optimalAgent = decisionEngine.selectOptimalAgent(task, agents.keys.toList())
-        
-        // Check resource availability
-        val resourceCheck = resourceManager.checkResourceAvailability(task)
-        if (!resourceCheck.available) {
-            // Queue task or reschedule
-            return queueTaskForLater(task, resourceCheck.availableAt)
-        }
-        
-        // Execute task with selected agent
-        val execution = executeTaskWithAgent(task, optimalAgent)
-        
-        // Monitor execution
-        monitorTaskExecution(execution)
-        
-        Result.success(Unit)
-    } catch (e: Exception) {
-        Log.e("MainOrchestrator", "Error orchestrating task", e)
-        Result.failure(e)
     }
     
     override suspend fun coordinateAgents(agents: List<AgentType>, task: NextGenTask): Result<Unit> = try {
@@ -242,7 +279,7 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         Result.failure(e)
     }
     
-    suspend fun getTaskStatus(taskId: String): TaskStatus? {
+    fun getTaskStatus(taskId: String): TaskStatus? {
         return _activeTasks.value.find { it.id == taskId }?.status
     }
     
@@ -290,7 +327,7 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     
     // === SYSTEM MANAGEMENT ===
     
-    suspend fun getSystemHealth(): SystemHealth {
+    fun getSystemHealth(): SystemHealth {
         return SystemHealth(
             overallStatus = _systemStatus.value,
             activeAgents = _activeAgents.value.size,
@@ -310,9 +347,12 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         val optimizations = identifyOptimizations(analysis)
         val results = applyOptimizations(optimizations)
         
+        // Get analysis data as a Map<String, Any>
+        val analysisMap = analysis.toMap()
+
         val report = OptimizationReport(
             timestamp = LocalDateTime.now(),
-            analysis = analysis,
+            analysisDetails = analysisMap,
             optimizationsApplied = optimizations,
             results = results,
             performanceImprovement = calculatePerformanceImprovement(results)
@@ -352,8 +392,6 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         val agentInstances = mapOf(
             AgentType.MRM to MRM(),
             AgentType.HERMES_BRAIN to HermesBrain(),
-            AgentType.BIG_DADDY to BigDaddyAgent(),
-            AgentType.HRM_MODEL to HRMModel(),
             AgentType.ELITE_HUMAN to EliteHuman()
         )
         
@@ -377,9 +415,8 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         
         // Create and initialize services
         val serviceInstances = mapOf(
-            "CallScreenService" to CallScreenService(),
-            "DialerApp" to DialerApp(context),
-            "ConstructionPlatform" to ConstructionPlatform(context)
+            "CallScreenService" to NextGenServiceAdapter(CallScreenService()),
+            "ConstructionPlatform" to NextGenServiceAdapter(ConstructionPlatform(context))
         )
         
         serviceInstances.forEach { (name, service) ->
@@ -399,9 +436,8 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
             name = "Construction Project Setup",
             description = "Complete workflow for setting up a new construction project",
             steps = listOf(
-                WorkflowStep("validate_requirements", AgentType.BIG_DADDY, mapOf()),
                 WorkflowStep("allocate_resources", AgentType.MRM, mapOf()),
-                WorkflowStep("create_project_plan", AgentType.HRM_MODEL, mapOf()),
+                WorkflowStep("create_project_plan", AgentType.ELITE_HUMAN, mapOf()),
                 WorkflowStep("setup_communication", AgentType.HERMES_BRAIN, mapOf()),
                 WorkflowStep("finalize_setup", AgentType.ELITE_HUMAN, mapOf())
             ),
@@ -413,10 +449,9 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
             name = "Emergency Response",
             description = "Rapid response workflow for emergency situations",
             steps = listOf(
-                WorkflowStep("assess_situation", AgentType.BIG_DADDY, mapOf()),
                 WorkflowStep("coordinate_response", AgentType.HERMES_BRAIN, mapOf()),
                 WorkflowStep("allocate_emergency_resources", AgentType.MRM, mapOf()),
-                WorkflowStep("manage_personnel", AgentType.HRM_MODEL, mapOf()),
+                WorkflowStep("manage_personnel", AgentType.ELITE_HUMAN, mapOf()),
                 WorkflowStep("provide_guidance", AgentType.ELITE_HUMAN, mapOf())
             ),
             estimatedDuration = 15 // minutes
@@ -430,7 +465,9 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
                 
                 // Check for critical issues
                 if (metrics.systemLoad > 0.9 || metrics.memoryUsage > 0.9) {
-                    handleSystemStress(metrics)
+                    scope.launch {
+                        handleSystemStress(metrics)
+                    }
                 }
             }
         }
@@ -452,6 +489,8 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         }
     }
     
+    // === TASK EXECUTION ===
+
     private suspend fun executeTaskWithAgent(task: NextGenTask, agentType: AgentType): TaskExecution {
         val agent = agents[agentType] ?: throw IllegalStateException("Agent not available: $agentType")
         
@@ -474,7 +513,7 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
             
             // Update task status
             updateTaskStatus(task.id, if (result.isSuccess) TaskStatus.COMPLETED else TaskStatus.FAILED)
-            
+
         } catch (e: Exception) {
             execution.endTime = LocalDateTime.now()
             execution.status = "FAILED"
@@ -487,7 +526,7 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         return execution
     }
     
-    private suspend fun updateTaskStatus(taskId: String, status: TaskStatus) {
+    private fun updateTaskStatus(taskId: String, status: TaskStatus) {
         val tasks = _activeTasks.value.toMutableList()
         val index = tasks.indexOfFirst { it.id == taskId }
         
@@ -497,21 +536,11 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         }
     }
     
-    private suspend fun broadcastSystemReady() {
-        val readyMessage = AgentMessage(
-            fromAgent = AgentType.ORCHESTRATOR,
-            toAgent = AgentType.MRM, // Will be broadcast to all
-            messageType = MessageType.NOTIFICATION,
-            content = "NextGen AI OS is now ready and operational",
-            metadata = mapOf("system_status" to "READY", "timestamp" to LocalDateTime.now().toString())
-        )
-        
-        livingEnv.broadcastMessage(readyMessage)
-    }
-    
+    // === ONGOING TASK MANAGEMENT ===
+
     private suspend fun completeOngoingTasks() {
         val ongoingTasks = _activeTasks.value.filter { it.status == TaskStatus.IN_PROGRESS }
-        
+
         ongoingTasks.forEach { task ->
             try {
                 // Allow tasks a grace period to complete
@@ -645,7 +674,7 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     
     data class OptimizationReport(
         val timestamp: LocalDateTime,
-        val analysis: SystemAnalysis,
+        val analysisDetails: Map<String, Any>, // Changed from the private SystemAnalysis type
         val optimizationsApplied: List<String>,
         val results: Map<String, Any>,
         val performanceImprovement: Double
@@ -668,17 +697,34 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     private data class FailureAnalysis(val task: NextGenTask, val error: Throwable)
     private data class RecoveryStrategy(val type: String)
     private data class RecoveryResult(val successful: Boolean)
-    private class SystemAnalysis
-    
+    private class SystemAnalysis {
+        val timestamp: LocalDateTime = LocalDateTime.now()
+        val systemLoad: Double = 0.0
+        val memoryUsage: Double = 0.0
+        val cpuUtilization: Double = 0.0
+        val networkLatency: Double = 0.0
+        val activeTaskCount: Int = 0
+
+        // Convert to Map for use in OptimizationReport
+        fun toMap(): Map<String, Any> = mapOf(
+            "timestamp" to timestamp,
+            "systemLoad" to systemLoad,
+            "memoryUsage" to memoryUsage,
+            "cpuUtilization" to cpuUtilization,
+            "networkLatency" to networkLatency,
+            "activeTaskCount" to activeTaskCount
+        )
+    }
+
     // Helper classes - these would have full implementations in a real system
-    private inner class TaskQueue {
+    private class TaskQueue {
         fun initialize() {}
         fun shutdown() {}
         suspend fun enqueue(task: NextGenTask) {}
         suspend fun remove(taskId: String) {}
     }
     
-    private inner class OrchestrationResourceManager {
+    private class OrchestrationResourceManager {
         fun initialize() {}
         fun shutdown() {}
         fun checkResourceAvailability(task: NextGenTask): ResourceAvailability = ResourceAvailability(true, null)
@@ -686,7 +732,7 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     
     private data class ResourceAvailability(val available: Boolean, val availableAt: LocalDateTime?)
     
-    private inner class PerformanceMonitor {
+    private class PerformanceMonitor {
         fun initialize() {}
         fun shutdown() {}
         suspend fun startContinuousMonitoring(callback: (SystemMetrics) -> Unit) {
@@ -697,21 +743,21 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         }
     }
     
-    private inner class DecisionEngine {
+    private class DecisionEngine {
         fun initialize() {}
         fun shutdown() {}
         fun selectOptimalAgent(task: NextGenTask, availableAgents: List<AgentType>): AgentType {
             return when {
                 task.title.contains("resource", ignoreCase = true) -> AgentType.MRM
                 task.title.contains("communication", ignoreCase = true) -> AgentType.HERMES_BRAIN
-                task.title.contains("decision", ignoreCase = true) -> AgentType.BIG_DADDY
-                task.title.contains("human", ignoreCase = true) -> AgentType.HRM_MODEL
+                task.title.contains("decision", ignoreCase = true) -> AgentType.ELITE_HUMAN
+                task.title.contains("human", ignoreCase = true) -> AgentType.ELITE_HUMAN
                 else -> AgentType.ELITE_HUMAN
             }
         }
     }
     
-    private inner class EmergencyHandler {
+    private class EmergencyHandler {
         fun initialize() {}
         fun shutdown() {}
     }

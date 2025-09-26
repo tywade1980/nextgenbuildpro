@@ -28,16 +28,29 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import com.nextgenbuildpro.crm.data.model.Lead
 import com.nextgenbuildpro.crm.rememberCrmComponents
+import com.nextgenbuildpro.debug.WorkflowAnalyzer
 import com.nextgenbuildpro.navigation.navigateSafely
 import com.nextgenbuildpro.navigation.navigateSafelyWithArgs
 import com.nextgenbuildpro.navigation.rememberNavigationHelper
 import com.nextgenbuildpro.navigation.NavDestinations
 import com.nextgenbuildpro.pm.data.model.Estimate
 import com.nextgenbuildpro.pm.rememberPmComponents
+import com.nextgenbuildpro.ui.ButtonNavigationValidator
+import com.nextgenbuildpro.ui.FeatureCompletionTracker
+import com.nextgenbuildpro.ui.components.trackFeature
+import com.nextgenbuildpro.ui.components.trackNavigation
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(navController: NavController) {
+    // Register this screen with WorkflowAnalyzer
+    val sessionId = remember { "user_${System.currentTimeMillis()}" }
+
+    LaunchedEffect(Unit) {
+        // Track user entering home screen
+        WorkflowAnalyzer.trackScreenVisit(sessionId, NavDestinations.HOME)
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp)
@@ -48,22 +61,22 @@ fun HomeScreen(navController: NavController) {
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
-            CrmPathSection(navController)
+            CrmPathSection(navController, sessionId)
         }
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
-            ProjectManagementPathSection(navController)
+            ProjectManagementPathSection(navController, sessionId)
         }
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
-            LeadsSection(navController)
+            LeadsSection(navController, sessionId)
         }
 
         item {
             Spacer(modifier = Modifier.height(16.dp))
-            EstimatesSection(navController)
+            EstimatesSection(navController, sessionId)
         }
     }
 }
@@ -230,172 +243,121 @@ fun SearchResultItem(title: String, subtitle: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun CrmPathSection(navController: NavController) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "CRM",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
+fun CrmPathSection(navController: NavController, sessionId: String) {
+    rememberNavigationHelper()
 
-                Text(
-                    text = ">",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { navController.navigateSafely("leads") }
-                )
-            }
+    Column {
+        Text(
+            text = "CRM",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ActionButton(
+                text = "Leads",
+                icon = Icons.Default.Person,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
+                    .trackNavigation(
+                        buttonId = "leads_button",
+                        screenName = "HomeScreen",
+                        destination = NavDestinations.LEADS,
+                        navController = navController
+                    )
+            )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                ActionItem(
-                    icon = Icons.Default.Person,
-                    label = "New Lead",
-                    onClick = { navController.navigateSafely("lead_editor") }
-                )
+            ActionButton(
+                text = "Messages",
+                icon = Icons.Default.Email,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .trackNavigation(
+                        buttonId = "messages_button",
+                        screenName = "HomeScreen",
+                        destination = NavDestinations.MESSAGES,
+                        navController = navController
+                    )
+            )
 
-                ActionItem(
-                    icon = Icons.Default.Email,
-                    label = "Message",
-                    onClick = { navController.navigateSafely("messages") }
-                )
-
-                ActionItem(
-                    icon = Icons.Default.Call,
-                    label = "Call",
-                    onClick = { navController.navigateSafely(NavDestinations.LEAD_DETAIL + "/1") }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                ActionItem(
-                    icon = Icons.Default.Schedule,
-                    label = "Follow-up",
-                    onClick = { navController.navigateSafely(NavDestinations.LEAD_DETAIL + "/2") }
-                )
-
-                ActionItem(
-                    icon = Icons.Default.Note,
-                    label = "Note",
-                    onClick = { navController.navigateSafely("note_editor") }
-                )
-
-                ActionItem(
-                    icon = Icons.Default.Upload,
-                    label = "File",
-                    onClick = { navController.navigateSafely("file_upload") }
-                )
-            }
+            ActionButton(
+                text = "Calendar",
+                icon = Icons.Default.DateRange,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp)
+                    .trackNavigation(
+                        buttonId = "calendar_button",
+                        screenName = "HomeScreen",
+                        destination = NavDestinations.CALENDAR,
+                        navController = navController
+                    )
+            )
         }
     }
 }
 
 @Composable
-fun ProjectManagementPathSection(navController: NavController) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Project Management",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
+fun ProjectManagementPathSection(navController: NavController, sessionId: String) {
+    Column {
+        Text(
+            text = "Project Management",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
 
-                Text(
-                    text = ">",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { navController.navigateSafely("projects") }
-                )
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ActionButton(
+                text = "Estimates",
+                icon = Icons.Default.Description,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
+                    .trackNavigation(
+                        buttonId = "estimates_button",
+                        screenName = "HomeScreen",
+                        destination = NavDestinations.ESTIMATES,
+                        navController = navController
+                    )
+            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            ActionButton(
+                text = "Projects",
+                icon = Icons.Default.Build,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+                    .trackNavigation(
+                        buttonId = "projects_button",
+                        screenName = "HomeScreen",
+                        destination = NavDestinations.PROJECTS,
+                        navController = navController
+                    )
+            )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                ActionItem(
-                    icon = Icons.Default.AttachMoney,
-                    label = "Estimate",
-                    onClick = { navController.navigateSafely("estimate_editor") }
-                )
-
-                ActionItem(
-                    icon = Icons.Default.Build,
-                    label = "Project",
-                    onClick = { navController.navigateSafely("projects") }
-                )
-
-                ActionItem(
-                    icon = Icons.Default.PhotoCamera,
-                    label = "Photo",
-                    onClick = { navController.navigateSafely("camera") }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                ActionItem(
-                    icon = Icons.Default.CameraAlt,
-                    label = "Room Scan",
-                    onClick = { navController.navigateSafely("room_scan") }
-                )
-
-                ActionItem(
-                    icon = Icons.Default.CalendarToday,
-                    label = "Schedule",
-                    onClick = { navController.navigateSafely(NavDestinations.CALENDAR) }
-                )
-
-                ActionItem(
-                    icon = Icons.Default.Assignment,
-                    label = "Tasks",
-                    onClick = { navController.navigateSafely("tasks") }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                ActionItem(
-                    icon = Icons.Default.Timer,
-                    label = "Time Clock",
-                    onClick = { navController.navigateSafely(NavDestinations.TIME_CLOCK) }
-                )
-            }
+            ActionButton(
+                text = "Tasks",
+                icon = Icons.Default.CheckCircle,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp)
+                    .trackNavigation(
+                        buttonId = "tasks_button",
+                        screenName = "HomeScreen",
+                        destination = "tasks",  // Direct route
+                        navController = navController
+                    )
+            )
         }
     }
 }
@@ -533,7 +495,42 @@ fun ActionItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: Str
 }
 
 @Composable
-fun LeadsSection(navController: NavController) {
+fun ActionButton(
+    text: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .padding(horizontal = 8.dp)
+            .wrapContentWidth()
+            .clickable { onClick?.invoke() }
+    ) {
+        IconButton(
+            onClick = { onClick?.invoke() },
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primaryContainer)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = text,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
+
+@Composable
+fun LeadsSection(navController: NavController, sessionId: String) {
     // Get the CRM components to access the LeadsViewModel
     val crmComponents = rememberCrmComponents()
     val leadsViewModel = crmComponents.leadsViewModel
@@ -657,7 +654,7 @@ fun LeadItem(
 }
 
 @Composable
-fun EstimatesSection(navController: NavController) {
+fun EstimatesSection(navController: NavController, sessionId: String) {
     // Get the PM components to access the EstimatesViewModel
     val pmComponents = rememberPmComponents()
     val estimatesViewModel = pmComponents.estimatesViewModel

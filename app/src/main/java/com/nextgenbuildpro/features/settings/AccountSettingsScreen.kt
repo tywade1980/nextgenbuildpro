@@ -158,63 +158,149 @@ fun AccountSettingsScreen(navController: NavController) {
     }
 }
 
+/**
+ * Data class for settings items
+ */
+data class SettingItem(
+    val key: String,
+    val title: String,
+    val description: String,
+    val icon: ImageVector
+)
+
+/**
+ * Get profile settings for display
+ */
+private fun getProfileSettings(userName: String, userEmail: String, companyName: String): List<SettingItem> {
+    return listOf(
+        SettingItem(
+            key = "user_info",
+            title = userName,
+            description = userEmail,
+            icon = Icons.Default.Person
+        ),
+        SettingItem(
+            key = "company_info",
+            title = companyName,
+            description = "Company Information",
+            icon = Icons.Default.Business
+        )
+    )
+}
+
+/**
+ * Get account action settings for display
+ */
+private fun getAccountActions(): List<SettingItem> {
+    return listOf(
+        SettingItem(
+            key = "change_password",
+            title = "Change Password",
+            description = "Update your security credentials",
+            icon = Icons.Default.Lock
+        ),
+        SettingItem(
+            key = "sync_data",
+            title = "Sync Data",
+            description = "Synchronize with cloud storage",
+            icon = Icons.Default.Sync
+        ),
+        SettingItem(
+            key = "export_data",
+            title = "Export Data",
+            description = "Download your data as CSV",
+            icon = Icons.Default.Download
+        ),
+        SettingItem(
+            key = "delete_account",
+            title = "Delete Account",
+            description = "Remove your account and data",
+            icon = Icons.Default.Delete
+        )
+    )
+}
+
+/**
+ * Get privacy and security settings for display
+ */
+private fun getPrivacySettings(): List<SettingItem> {
+    return listOf(
+        SettingItem(
+            key = "two_factor",
+            title = "Two-Factor Authentication",
+            description = "Add an extra layer of security",
+            icon = Icons.Default.Security
+        ),
+        SettingItem(
+            key = "data_privacy",
+            title = "Data Privacy",
+            description = "Manage your data sharing preferences",
+            icon = Icons.Default.PrivacyTip
+        ),
+        SettingItem(
+            key = "backup_settings",
+            title = "Backup Settings",
+            description = "Configure automatic backups",
+            icon = Icons.Default.Backup
+        )
+    )
+}
+
 @Composable
-private fun SettingItem(
-    setting: AccountSetting,
-    onClick: () -> Unit
-) {
+fun SettingItem(setting: SettingItem, onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .fillMaxWidth(),
-        onClick = onClick,
-        shape = RoundedCornerShape(12.dp)
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(8.dp),
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = setting.icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier
+                    .size(32.dp)
+                    .padding(end = 16.dp)
             )
-            
-            Spacer(modifier = Modifier.width(16.dp))
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = setting.title,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
                 )
+
                 Text(
-                    text = setting.subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = setting.description,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
             
             Icon(
                 imageVector = Icons.Default.ChevronRight,
-                contentDescription = "Navigate",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                contentDescription = null
             )
         }
     }
 }
 
+// Dialog for editing user information
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun UserInfoDialog(
+fun UserInfoDialog(
     userName: String,
     userEmail: String,
     onDismiss: () -> Unit,
     onSave: (String, String) -> Unit
 ) {
-    var name by remember { mutableStateOf(userName) }
-    var email by remember { mutableStateOf(userEmail) }
+    var nameInput by remember { mutableStateOf(userName) }
+    var emailInput by remember { mutableStateOf(userEmail) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -222,22 +308,31 @@ private fun UserInfoDialog(
         text = {
             Column {
                 OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
+                    value = nameInput,
+                    onValueChange = { nameInput = it },
                     label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth()
+                    singleLine = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+
                 OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = emailInput,
+                    onValueChange = { emailInput = it },
                     label = { Text("Email") },
+                    singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(name, email) }) {
+            TextButton(
+                onClick = {
+                    onSave(nameInput, emailInput)
+                    onDismiss()
+                }
+            ) {
                 Text("Save")
             }
         },
@@ -249,28 +344,35 @@ private fun UserInfoDialog(
     )
 }
 
+// Dialog for editing company information
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CompanyInfoDialog(
+fun CompanyInfoDialog(
     companyName: String,
     onDismiss: () -> Unit,
     onSave: (String) -> Unit
 ) {
-    var company by remember { mutableStateOf(companyName) }
+    var companyNameInput by remember { mutableStateOf(companyName) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Edit Company Info") },
+        title = { Text("Edit Company") },
         text = {
             OutlinedTextField(
-                value = company,
-                onValueChange = { company = it },
+                value = companyNameInput,
+                onValueChange = { companyNameInput = it },
                 label = { Text("Company Name") },
+                singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
         },
         confirmButton = {
-            TextButton(onClick = { onSave(company) }) {
+            TextButton(
+                onClick = {
+                    onSave(companyNameInput)
+                    onDismiss()
+                }
+            ) {
                 Text("Save")
             }
         },
@@ -279,93 +381,5 @@ private fun CompanyInfoDialog(
                 Text("Cancel")
             }
         }
-    )
-}
-
-/**
- * Data class for account settings
- */
-data class AccountSetting(
-    val key: String,
-    val icon: ImageVector,
-    val title: String,
-    val subtitle: String
-)
-
-/**
- * Get profile settings
- */
-private fun getProfileSettings(userName: String, userEmail: String, companyName: String): List<AccountSetting> {
-    return listOf(
-        AccountSetting(
-            key = "user_info",
-            icon = Icons.Default.Person,
-            title = userName,
-            subtitle = userEmail
-        ),
-        AccountSetting(
-            key = "company_info",
-            icon = Icons.Default.Business,
-            title = companyName,
-            subtitle = "Company information"
-        )
-    )
-}
-
-/**
- * Get account actions
- */
-private fun getAccountActions(): List<AccountSetting> {
-    return listOf(
-        AccountSetting(
-            key = "change_password",
-            icon = Icons.Default.Lock,
-            title = "Change Password",
-            subtitle = "Update your password"
-        ),
-        AccountSetting(
-            key = "sync_data",
-            icon = Icons.Default.Sync,
-            title = "Sync Data",
-            subtitle = "Synchronize with cloud storage"
-        ),
-        AccountSetting(
-            key = "export_data",
-            icon = Icons.Default.Download,
-            title = "Export Data",
-            subtitle = "Download your data"
-        ),
-        AccountSetting(
-            key = "delete_account",
-            icon = Icons.Default.DeleteForever,
-            title = "Delete Account",
-            subtitle = "Permanently delete your account"
-        )
-    )
-}
-
-/**
- * Get privacy settings
- */
-private fun getPrivacySettings(): List<AccountSetting> {
-    return listOf(
-        AccountSetting(
-            key = "two_factor",
-            icon = Icons.Default.Security,
-            title = "Two-Factor Authentication",
-            subtitle = "Add extra security to your account"
-        ),
-        AccountSetting(
-            key = "data_privacy",
-            icon = Icons.Default.PrivacyTip,
-            title = "Data Privacy",
-            subtitle = "Manage your privacy preferences"
-        ),
-        AccountSetting(
-            key = "backup_settings",
-            icon = Icons.Default.Backup,
-            title = "Backup Settings",
-            subtitle = "Configure automatic backups"
-        )
     )
 }

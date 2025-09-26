@@ -37,7 +37,7 @@ enum class SystemStatus {
  * Agent types in the NextGen ecosystem
  */
 enum class AgentType {
-    MRM, HERMES_BRAIN, BIG_DADDY, HRM_MODEL, ELITE_HUMAN, ORCHESTRATOR
+    MRM, HERMES_BRAIN, BIG_DADDY, HRM_MODEL, ELITE_HUMAN, ORCHESTRATOR, SYSTEM
 }
 
 // ===== DATA MODELS =====
@@ -63,7 +63,7 @@ data class AgentMessage(
  */
 enum class MessageType {
     COMMAND, QUERY, RESPONSE, NOTIFICATION, STATUS_UPDATE, 
-    ALERT, DATA_SYNC, HEARTBEAT, ERROR, ACKNOWLEDGMENT
+    ALERT, DATA_SYNC, HEARTBEAT, ERROR, ACKNOWLEDGMENT, SYSTEM_NOTIFICATION
 }
 
 /**
@@ -274,7 +274,7 @@ interface NextGenService {
  */
 data class ServiceHealth(
     val isHealthy: Boolean,
-    val lastCheckTime: LocalDateTime,
+    val lastCheckTime: Long,
     val issues: List<String> = emptyList(),
     val metrics: Map<String, Double> = emptyMap()
 )

@@ -1,8 +1,10 @@
 package com.nextgenbuildpro.features.leads
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -20,14 +22,31 @@ import com.nextgenbuildpro.crm.data.model.Lead
 import com.nextgenbuildpro.crm.data.model.LeadPhase
 import com.nextgenbuildpro.crm.rememberCrmComponents
 import com.nextgenbuildpro.crm.viewmodel.LeadsViewModel
+import com.nextgenbuildpro.debug.WorkflowAnalyzer
 import com.nextgenbuildpro.navigation.NavDestinations
 import com.nextgenbuildpro.navigation.navigateSafely
+import com.nextgenbuildpro.ui.ButtonNavigationValidator
+import com.nextgenbuildpro.ui.FeatureCompletionTracker
+import com.nextgenbuildpro.ui.components.completeFeature
+import com.nextgenbuildpro.ui.components.trackFeature
+import com.nextgenbuildpro.ui.components.trackNavigation
 
 /**
  * Screen for displaying and managing leads
  */
 @Composable
 fun LeadsScreen(navController: NavController) {
+    // Session ID for tracking this user's journey
+    val sessionId = remember { "user_${System.currentTimeMillis()}" }
+
+    // Register this screen visit with the WorkflowAnalyzer
+    LaunchedEffect(Unit) {
+        WorkflowAnalyzer.trackScreenVisit(
+            userId = sessionId,
+            destination = NavDestinations.LEADS
+        )
+    }
+
     // Get the LeadsViewModel from the CRM module
     val crmComponents = rememberCrmComponents()
     val viewModel = crmComponents.leadsViewModel
@@ -58,60 +77,193 @@ fun LeadsScreen(navController: NavController) {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigateSafely(NavDestinations.LEAD_EDITOR) },
-                containerColor = MaterialTheme.colorScheme.primary
+                onClick = { },
+                modifier = Modifier.trackFeature(
+                    buttonId = "add_lead_fab",
+                    screenName = "LeadsScreen",
+                    featureName = "create_lead"
+                ) { featureSessionId ->
+                    // Track this navigation with the ButtonNavigationValidator
+                    ButtonNavigationValidator.validateAndNavigate(
+                        navController = navController,
+                        destination = NavDestinations.LEAD_EDITOR,
+                        buttonId = "add_lead_fab",
+                        screenName = "LeadsScreen"
+                    )
+                }
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Lead"
-                )
+                Icon(Icons.Default.Add, contentDescription = "Add Lead")
             }
         }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Filter chips
-            ScrollableFilterChips(
-                options = statusOptions,
-                selectedOption = statusFilter,
-                onOptionSelected = { viewModel.updateStatusFilter(it) }
-            )
+            Column(modifier = Modifier.fillMaxSize()) {
+                // Search bar
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { viewModel.updateSearchQuery(it) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    placeholder = { Text("Search leads...") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    singleLine = true
+                )
 
-            // Leads list
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                // Status filter chip group
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    CircularProgressIndicator()
-                }
-            } else if (error != null) {
-                ErrorMessage(error = error!!) {
-                    viewModel.refresh()
-                }
-            } else if (leads.isEmpty()) {
-                EmptyLeadsView(searchQuery.isNotEmpty() || statusFilter != "All")
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(leads) { lead ->
-                        LeadCard(
-                            lead = lead,
-                            onClick = { 
-                                viewModel.selectLead(lead)
-                                navController.navigateSafely("${NavDestinations.LEAD_DETAIL}/${lead.id}") 
-                            }
+                    items(statusOptions) { status ->
+                        FilterChip(
+                            selected = statusFilter == status,
+                            onClick = { viewModel.updateStatusFilter(status) },
+                            label = { Text(status) }
                         )
+                    }
+                }
+
+                // Leads list
+                if (isLoading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                } else if (error != null) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "Error: $error",
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else if (leads.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = if (searchQuery.isEmpty() && statusFilter == "All") {
+                                "No leads available. Create your first lead!"
+                            } else {
+                                "No leads match your filters."
+                            },
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(leads) { lead ->
+                            LeadListItem(
+                                lead = lead,
+                                onClick = {
+                                    // Track this as part of a workflow for viewing lead details
+                                    val featureId = FeatureCompletionTracker.trackFeatureStart(
+                                        elementId = "lead_item_${lead.id}",
+                                        screenName = "LeadsScreen",
+                                        featureName = "view_lead_details",
+                                        expectedDestination = NavDestinations.LEAD_DETAIL
+                                    )
+
+                                    // Navigate to lead details screen
+                                    val success = ButtonNavigationValidator.validateAndNavigate(
+                                        navController = navController,
+                                        destination = "${NavDestinations.LEAD_DETAIL}/${lead.id}",
+                                        buttonId = "lead_item_${lead.id}",
+                                        screenName = "LeadsScreen"
+                                    )
+
+                                    // Mark the feature as complete or incomplete
+                                    if (success) {
+                                        completeFeature(featureId, true, "Successfully navigated to lead details")
+                                    } else {
+                                        completeFeature(featureId, false, "Failed to navigate to lead details")
+                                    }
+                                }
+                            )
+                            Divider()
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun LeadListItem(lead: Lead, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp, horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Avatar or initials circle
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .background(getColorForLead(lead), shape = androidx.compose.foundation.shape.CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = lead.name.take(1).uppercase(),
+                color = Color.White,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+        // Lead information
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)
+        ) {
+            Text(
+                text = lead.name,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.Phone,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = lead.phone ?: "No phone",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+        }
+
+        // Lead status
+        AssistChip(
+            onClick = {},
+            label = { Text(text = lead.phase.name, style = MaterialTheme.typography.bodySmall) },
+            colors = AssistChipDefaults.assistChipColors(
+                containerColor = getStatusColor(lead.phase.name)
+            )
+        )
+
+        // Navigate chevron
+        Icon(
+            Icons.Default.ChevronRight,
+            contentDescription = "View Lead Details",
+            modifier = Modifier.padding(start = 8.dp)
+        )
     }
 }
 
@@ -440,7 +592,6 @@ fun EmptyLeadsView(isFiltered: Boolean) {
 /**
  * Get color for lead phase
  */
-@Composable
 fun getColorForLeadPhase(phase: LeadPhase): Color {
     return when (phase) {
         LeadPhase.CONTACTED -> Color(0xFF607D8B)    // Blue Grey
@@ -451,5 +602,30 @@ fun getColorForLeadPhase(phase: LeadPhase): Color {
         LeadPhase.DELIVERED -> Color(0xFF4CAF50)     // Green
         LeadPhase.CLOSED_WON -> Color(0xFF4CAF50)    // Green
         LeadPhase.CLOSED_LOST -> Color(0xFFF44336)   // Red
+    }
+}
+
+private fun getColorForLead(lead: Lead): Color {
+    // Generate a consistent color based on the lead's name
+    val hash = lead.name.hashCode()
+    return when (Math.abs(hash % 5)) {
+        0 -> Color(0xFF2196F3) // Blue
+        1 -> Color(0xFF4CAF50) // Green
+        2 -> Color(0xFFFFC107) // Amber
+        3 -> Color(0xFFE91E63) // Pink
+        else -> Color(0xFF9C27B0) // Purple
+    }
+}
+
+private fun getStatusColor(status: String): Color {
+    return when (status.lowercase()) {
+        "new" -> Color(0xFF2196F3) // Blue
+        "contacted" -> Color(0xFFFF9800) // Orange
+        "qualified" -> Color(0xFF4CAF50) // Green
+        "proposal" -> Color(0xFF9C27B0) // Purple
+        "negotiation" -> Color(0xFFFFC107) // Amber
+        "won" -> Color(0xFF00E676) // Green A400
+        "lost" -> Color(0xFFF44336) // Red
+        else -> Color.Gray
     }
 }

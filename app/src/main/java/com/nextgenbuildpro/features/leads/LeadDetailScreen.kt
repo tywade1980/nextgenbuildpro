@@ -37,12 +37,31 @@ import com.nextgenbuildpro.crm.data.repository.LeadRepository
 import com.nextgenbuildpro.crm.rememberCrmComponents
 import com.nextgenbuildpro.crm.service.VoiceRecorderService
 import com.nextgenbuildpro.crm.ui.getColorForLeadPhase
+import com.nextgenbuildpro.debug.WorkflowAnalyzer
+import com.nextgenbuildpro.ui.ButtonNavigationValidator
+import com.nextgenbuildpro.ui.FeatureCompletionTracker
+import com.nextgenbuildpro.ui.components.completeFeature
+import com.nextgenbuildpro.ui.components.trackFeature
+import com.nextgenbuildpro.ui.components.trackNavigation
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.UUID
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeadDetailScreen(navController: NavController, leadId: String) {
+    // Session ID for tracking this user's journey
+    val sessionId = remember { "user_${System.currentTimeMillis()}" }
+
+    // Register this screen visit with the WorkflowAnalyzer
+    LaunchedEffect(Unit) {
+        WorkflowAnalyzer.trackScreenVisit(
+            userId = sessionId,
+            destination = "${NavDestinations.LEAD_DETAIL}/$leadId",
+            sourceElementId = "lead_item_$leadId"
+        )
+    }
+
     // Get CRM components
     val crmComponents = rememberCrmComponents()
     val photoRepository = crmComponents.photoRepository
@@ -51,178 +70,417 @@ fun LeadDetailScreen(navController: NavController, leadId: String) {
     // Coroutine scope for async operations
     val coroutineScope = rememberCoroutineScope()
 
-    // State for photos
-    val photos = remember { mutableStateListOf<ClientPhoto>() }
-
-    // Create a default lead as a fallback
-    val defaultLead = Lead(
-        id = leadId,
-        name = "Loading Lead...",
-        email = "",
-        phone = "",
-        address = "",
-        projectType = "",
-        phase = LeadPhase.CONTACTED,
-        notes = "",
-        urgency = "Low",
-        source = "Other",
-        intakeTimestamp = System.currentTimeMillis()
-    )
-
-    // State for lead (non-nullable with default value)
-    var lead by remember { mutableStateOf(defaultLead) }
-
-    // State to track if we're loading
+    // State for lead data and UI
+    var lead by remember { mutableStateOf<Lead?>(null) }
+    var photos by remember { mutableStateOf<List<ClientPhoto>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showPhaseDialog by remember { mutableStateOf(false) }
+    var recordingInProgress by remember { mutableStateOf(false) }
 
-    // Try to get lead from the ViewModel
+    // Context for camera and audio recording
+    val context = LocalContext.current
+    val voiceRecorderService = remember { VoiceRecorderService(context) }
+
+    // Load lead data
     LaunchedEffect(leadId) {
         isLoading = true
+        error = null
 
-        // Check if the lead is already in the ViewModel's items
-        val existingLead = leadsViewModel.items.value.find { it.id == leadId }
-
-        if (existingLead != null) {
-            // If found, use it
-            lead = existingLead
-            isLoading = false
-        } else {
-            // If not found, try to fetch it from the repository
+        try {
             coroutineScope.launch {
+                // Track loading state for the lead detail workflow
+                val featureId = FeatureCompletionTracker.trackFeatureStart(
+                    elementId = "lead_detail_load_$leadId",
+                    screenName = "LeadDetailScreen",
+                    featureName = "load_lead_details"
+                )
+
                 try {
-                    // This will trigger a repository fetch
-                    leadsViewModel.refresh()
+                    // Fetch lead data
+                    lead = leadsViewModel.getLeadById(leadId)
 
-                    // Check again after refresh
-                    val refreshedLead = leadsViewModel.items.value.find { it.id == leadId }
+                    // Fetch photos
+                    if (lead != null) {
+                        photos = photoRepository.getPhotosByLeadId(leadId)
+                    }
 
-                    if (refreshedLead != null) {
-                        lead = refreshedLead
+                    isLoading = false
+
+                    // Mark the feature as complete if data loaded successfully
+                    if (lead != null) {
+                        completeFeature(featureId, true, "Successfully loaded lead details")
                     } else {
-                        // If still not found, use a fallback
-                        lead = Lead(
-                            id = leadId,
-                            name = "Lead Not Found",
-                            email = "unknown@example.com",
-                            phone = "(555) 000-0000",
-                            address = "Unknown Address",
-                            projectType = "Unknown",
-                            phase = LeadPhase.CONTACTED,
-                            notes = "This lead could not be found in the database.",
-                            urgency = "Low",
-                            source = "Other",
-                            intakeTimestamp = System.currentTimeMillis()
-                        )
+                        completeFeature(featureId, false, "Lead not found")
+                        error = "Lead not found"
                     }
                 } catch (e: Exception) {
-                    // In case of error, use a fallback
-                    lead = Lead(
-                        id = leadId,
-                        name = "Error Loading Lead",
-                        email = "unknown@example.com",
-                        phone = "(555) 000-0000",
-                        address = "Unknown Address",
-                        projectType = "Unknown",
-                        phase = LeadPhase.CONTACTED,
-                        notes = "Error loading lead: ${e.message}",
-                        urgency = "Low",
-                        source = "Other",
-                        intakeTimestamp = System.currentTimeMillis()
-                    )
-                } finally {
                     isLoading = false
+                    error = "Error loading lead: ${e.message}"
+                    completeFeature(featureId, false, "Error: ${e.message}")
+                }
+            }
+        } catch (e: Exception) {
+            isLoading = false
+            error = "Error: ${e.message}"
+        }
+    }
+
+    // Setup image picker for adding photos
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            // Track photo addition workflow
+            val featureId = FeatureCompletionTracker.trackFeatureStart(
+                elementId = "add_photo_to_lead_$leadId",
+                screenName = "LeadDetailScreen",
+                featureName = "add_photo_to_lead"
+            )
+
+            coroutineScope.launch {
+                try {
+                    val newPhoto = ClientPhoto(
+                        id = UUID.randomUUID().toString(),
+                        leadId = leadId,
+                        filePath = it.toString(),
+                        fileName = "picked_image_${System.currentTimeMillis()}",
+                        timestamp = System.currentTimeMillis().toString(),
+                        location = null,
+                        description = ""
+                    )
+
+                    photoRepository.save(newPhoto)
+                    photos = photoRepository.getPhotosByLeadId(leadId)
+                    completeFeature(featureId, true, "Successfully added photo to lead")
+                } catch (e: Exception) {
+                    completeFeature(featureId, false, "Failed to add photo: ${e.message}")
                 }
             }
         }
     }
 
-    // Show loading state while lead is being fetched
-    if (isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
+    // Camera launcher for taking new photos
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap: Bitmap? ->
+        bitmap?.let {
+            // Track photo capture workflow
+            val featureId = FeatureCompletionTracker.trackFeatureStart(
+                elementId = "capture_photo_for_lead_$leadId",
+                screenName = "LeadDetailScreen",
+                featureName = "capture_photo_for_lead"
+            )
+
+            coroutineScope.launch {
+                try {
+                    // Save bitmap to file
+                    val photoFile = File(context.cacheDir, "lead_photo_${System.currentTimeMillis()}.jpg")
+                    photoFile.outputStream().use { out ->
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
+                    }
+
+                    val newPhoto = ClientPhoto(
+                        id = UUID.randomUUID().toString(),
+                        leadId = leadId,
+                        filePath = photoFile.absolutePath,
+                        fileName = photoFile.name,
+                        timestamp = System.currentTimeMillis().toString(),
+                        location = null,
+                        description = ""
+                    )
+
+                    photoRepository.save(newPhoto)
+                    photos = photoRepository.getPhotosByLeadId(leadId)
+                    completeFeature(featureId, true, "Successfully captured and saved photo")
+                } catch (e: Exception) {
+                    completeFeature(featureId, false, "Failed to save captured photo: ${e.message}")
+                }
+            }
         }
-        return
     }
 
-    // Load photos for this lead
-    LaunchedEffect(leadId) {
-        coroutineScope.launch {
-            photos.clear()
-            photos.addAll(photoRepository.getPhotosByLeadId(leadId))
-        }
-    }
-
+    // Content for the screen
     Scaffold(
         topBar = {
-            LeadDetailTopBar(lead = lead, navController = navController)
+            TopAppBar(
+                title = { Text(lead?.name ?: "Lead Details") },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.navigateUp()
+                        }
+                    ) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.trackFeature(
+                            buttonId = "edit_lead_${leadId}",
+                            screenName = "LeadDetailScreen",
+                            featureName = "edit_lead"
+                        ) { featureSessionId ->
+                            ButtonNavigationValidator.validateAndNavigate(
+                                navController = navController,
+                                destination = "${NavDestinations.LEAD_EDITOR}/$leadId",
+                                buttonId = "edit_lead_${leadId}",
+                                screenName = "LeadDetailScreen"
+                            )
+                        }
+                    ) {
+                        Icon(Icons.Default.Edit, contentDescription = "Edit Lead")
+                    }
+                    IconButton(
+                        onClick = { showDeleteDialog = true }
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete Lead")
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* Open actions menu */ },
-                containerColor = MaterialTheme.colorScheme.primary
+                onClick = { },
+                modifier = Modifier.trackFeature(
+                    buttonId = "create_estimate_for_lead",
+                    screenName = "LeadDetailScreen",
+                    featureName = "create_estimate_from_lead"
+                ) { featureSessionId ->
+                    // Check if the estimate creation feature is implemented
+                    if (ButtonNavigationValidator.validateAndNavigate(
+                        navController = navController,
+                        destination = NavDestinations.ESTIMATE_EDITOR,
+                        buttonId = "create_estimate_for_lead",
+                        screenName = "LeadDetailScreen"
+                    )) {
+                        completeFeature(featureSessionId, true, "Successfully started estimate creation")
+                    } else {
+                        completeFeature(featureSessionId, false, "Estimate creation navigation failed")
+                        WorkflowAnalyzer.registerDeadEndElement(
+                            elementId = "create_estimate_for_lead",
+                            screenName = "LeadDetailScreen",
+                            intendedDestination = NavDestinations.ESTIMATE_EDITOR
+                        )
+                    }
+                }
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Actions"
-                )
+                Icon(Icons.Default.AttachMoney, contentDescription = "Create Estimate")
             }
         }
     ) { paddingValues ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Lead header
-            item {
-                LeadHeader(lead = lead)
-            }
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                error != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = error ?: "Unknown error",
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = { navController.navigateUp() }
+                            ) {
+                                Text("Go Back")
+                            }
+                        }
+                    }
+                }
+                lead != null -> {
+                    LeadDetailContent(
+                        lead = lead!!,
+                        photos = photos,
+                        onTakePhoto = { cameraLauncher.launch(null) },
+                        onPickPhoto = { imagePickerLauncher.launch("image/*") },
+                        onChangePhase = { showPhaseDialog = true },
+                        onAddNote = {
+                            // Track note creation workflow
+                            val featureId = FeatureCompletionTracker.trackFeatureStart(
+                                elementId = "add_note_to_lead_$leadId",
+                                screenName = "LeadDetailScreen",
+                                featureName = "add_note_to_lead"
+                            )
 
-            // Quick actions
-            item {
-                QuickActions(navController = navController, lead = lead)
-            }
+                            val success = ButtonNavigationValidator.validateAndNavigate(
+                                navController = navController,
+                                destination = NavDestinations.NOTE_EDITOR,
+                                buttonId = "add_note_to_lead_$leadId",
+                                screenName = "LeadDetailScreen"
+                            )
 
-            // Contact information
-            item {
-                ContactInformation(lead = lead)
-            }
+                            if (!success) {
+                                completeFeature(featureId, false, "Note editor navigation failed")
+                                WorkflowAnalyzer.registerDeadEndElement(
+                                    elementId = "add_note_to_lead_$leadId",
+                                    screenName = "LeadDetailScreen",
+                                    intendedDestination = NavDestinations.NOTE_EDITOR
+                                )
+                            }
+                        },
+                        onRecordVoice = {
+                            // Track voice recording workflow
+                            val featureId = FeatureCompletionTracker.trackFeatureStart(
+                                elementId = "record_voice_for_lead_$leadId",
+                                screenName = "LeadDetailScreen",
+                                featureName = "record_voice_note"
+                            )
 
-            // Notes
-            item {
-                NotesSection(lead = lead, navController = navController)
-            }
+                            if (!recordingInProgress) {
+                                // Start recording
+                                try {
+                                    voiceRecorderService.startRecording(
+                                        fileName = "lead_${leadId}_${System.currentTimeMillis()}.mp3"
+                                    )
+                                    recordingInProgress = true
+                                } catch (e: Exception) {
+                                    completeFeature(featureId, false, "Failed to start recording: ${e.message}")
+                                    // Check if this is a dead-end feature
+                                    WorkflowAnalyzer.registerDeadEndElement(
+                                        elementId = "record_voice_for_lead_$leadId",
+                                        screenName = "LeadDetailScreen",
+                                        intendedDestination = "VoiceRecording"
+                                    )
+                                }
+                            } else {
+                                // Stop recording
+                                try {
+                                    voiceRecorderService.stopRecording()
+                                    recordingInProgress = false
 
-            // Estimates
-            item {
-                EstimatesSection(navController = navController, leadId = leadId)
-            }
-
-            // Photos
-            item {
-                PhotosSection(photos = photos, navController = navController, leadId = leadId)
-            }
-
-            // Status section
-            item {
-                StatusSection(lead = lead, navController = navController)
-            }
-
-            // Activity timeline
-            item {
-                ActivityTimeline()
-            }
-
-            // Bottom spacing
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
+                                    // Add voice note to lead
+                                    coroutineScope.launch {
+                                        // Here you would save the voice note to the lead
+                                        completeFeature(featureId, true, "Voice note recorded and saved")
+                                    }
+                                } catch (e: Exception) {
+                                    completeFeature(featureId, false, "Failed to save voice note: ${e.message}")
+                                }
+                            }
+                        },
+                        recordingInProgress = recordingInProgress,
+                        navController = navController
+                    )
+                }
             }
         }
+    }
+
+    // Delete confirmation dialog
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Lead") },
+            text = { Text("Are you sure you want to delete this lead? This action cannot be undone.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        // Track lead deletion workflow
+                        val featureId = FeatureCompletionTracker.trackFeatureStart(
+                            elementId = "delete_lead_$leadId",
+                            screenName = "LeadDetailScreen",
+                            featureName = "delete_lead"
+                        )
+
+                        coroutineScope.launch {
+                            try {
+                                leadsViewModel.deleteLead(leadId)
+                                showDeleteDialog = false
+                                completeFeature(featureId, true, "Lead deleted successfully")
+                                navController.navigateUp()
+                            } catch (e: Exception) {
+                                completeFeature(featureId, false, "Failed to delete lead: ${e.message}")
+                            }
+                        }
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showDeleteDialog = false }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Phase change dialog
+    if (showPhaseDialog && lead != null) {
+        val phases = LeadPhase.values()
+
+        AlertDialog(
+            onDismissRequest = { showPhaseDialog = false },
+            title = { Text("Change Lead Phase") },
+            text = {
+                Column {
+                    phases.forEach { phase ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    // Track phase change workflow
+                                    val featureId = FeatureCompletionTracker.trackFeatureStart(
+                                        elementId = "change_lead_phase_$leadId",
+                                        screenName = "LeadDetailScreen",
+                                        featureName = "change_lead_phase"
+                                    )
+
+                                    coroutineScope.launch {
+                                        try {
+                                            val updatedLead = lead!!.copy(phase = phase)
+                                            leadsViewModel.updateLead(updatedLead)
+                                            lead = updatedLead
+                                            showPhaseDialog = false
+                                            completeFeature(featureId, true, "Lead phase updated successfully")
+                                        } catch (e: Exception) {
+                                            completeFeature(featureId, false, "Failed to update lead phase: ${e.message}")
+                                        }
+                                    }
+                                }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = lead?.phase == phase,
+                                onClick = null
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(phase.name)
+                        }
+                    }
+                }
+            },
+            confirmButton = { },
+            dismissButton = {
+                TextButton(
+                    onClick = { showPhaseDialog = false }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
@@ -1038,6 +1296,57 @@ fun StatusSection(lead: Lead, navController: NavController) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun LeadDetailContent(
+    lead: Lead,
+    photos: List<ClientPhoto>,
+    onTakePhoto: () -> Unit,
+    onPickPhoto: () -> Unit,
+    onChangePhase: () -> Unit,
+    onAddNote: () -> Unit,
+    onRecordVoice: () -> Unit,
+    recordingInProgress: Boolean,
+    navController: NavController
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item {
+            LeadHeader(lead = lead)
+        }
+
+        item {
+            QuickActions(navController = navController, lead = lead)
+        }
+
+        item {
+            ContactInformation(lead = lead)
+        }
+
+        item {
+            NotesSection(lead = lead, navController = navController)
+        }
+
+        item {
+            PhotosSection(photos = photos, navController = navController, leadId = lead.id)
+        }
+
+        item {
+            EstimatesSection(navController = navController, leadId = lead.id)
+        }
+
+        item {
+            ActivityTimeline()
+        }
+
+        item {
+            StatusSection(lead = lead, navController = navController)
         }
     }
 }

@@ -7,15 +7,15 @@ package com.nextgenbuildpro.crm.data.model
 /**
  * Represents the phases a lead goes through from initial contact to closed
  */
-enum class LeadPhase {
-    CONTACTED,     // Basic info received (POC)
-    QUALIFIED,     // Warm/hot, passed pre-checks
-    DISCOVERY,     // Site visit / notes collected
-    SCOPED,        // Project goals defined
-    ESTIMATING,    // Assemblies + trade logic mapped
-    DELIVERED,     // Estimate submitted
-    CLOSED_WON,    // Contract signed
-    CLOSED_LOST    // Lead archived or rejected
+enum class LeadPhase(val displayName: String) {
+    CONTACTED("Contacted"),     // Basic info received (POC)
+    QUALIFIED("Qualified"),     // Warm/hot, passed pre-checks
+    DISCOVERY("Discovery"),     // Site visit / notes collected
+    SCOPED("Scoped"),        // Project goals defined
+    ESTIMATING("Estimating"),    // Assemblies + trade logic mapped
+    DELIVERED("Delivered"),     // Estimate submitted
+    CLOSED_WON("Closed Won"),    // Contract signed
+    CLOSED_LOST("Closed Lost")    // Lead archived or rejected
 }
 
 /**

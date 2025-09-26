@@ -629,7 +629,6 @@ private fun getProjectMilestones(): List<ProjectMilestone> {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DigitalSignatureScreen(navController: NavController) {
-    var signaturePadVisible by remember { mutableStateOf(false) }
     var documentSelected by remember { mutableStateOf<String?>(null) }
     var isSigningMode by remember { mutableStateOf(false) }
     

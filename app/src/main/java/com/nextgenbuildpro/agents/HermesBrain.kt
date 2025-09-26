@@ -279,8 +279,6 @@ class HermesBrain : LearningAgent {
     private fun initializeRoutingTable() {
         val defaultRoutes = mapOf(
             AgentType.MRM to AgentRoute(AgentType.MRM, "direct", 1.0, 100),
-            AgentType.BIG_DADDY to AgentRoute(AgentType.BIG_DADDY, "direct", 1.0, 100),
-            AgentType.HRM_MODEL to AgentRoute(AgentType.HRM_MODEL, "direct", 1.0, 100),
             AgentType.ELITE_HUMAN to AgentRoute(AgentType.ELITE_HUMAN, "direct", 1.0, 100),
             AgentType.ORCHESTRATOR to AgentRoute(AgentType.ORCHESTRATOR, "direct", 1.0, 100)
         )
@@ -638,10 +636,20 @@ class HermesBrain : LearningAgent {
     private fun createRoutingConfirmation(message: AgentMessage): AgentMessage? = null
     private fun createRoutingError(message: AgentMessage, error: String): AgentMessage? = null
     private fun parseMessageFromContent(content: String): AgentMessage = 
-        AgentMessage(AgentType.HERMES_BRAIN, AgentType.MRM, MessageType.NOTIFICATION, content)
+        AgentMessage(
+            fromAgent = AgentType.HERMES_BRAIN, 
+            toAgent = AgentType.MRM, 
+            messageType = MessageType.NOTIFICATION, 
+            content = content
+        )
     private fun parseBroadcastContent(content: String): String = content
     private fun createBroadcastMessage(fromAgent: AgentType, content: String): AgentMessage =
-        AgentMessage(fromAgent, AgentType.MRM, MessageType.NOTIFICATION, content)
+        AgentMessage(
+            fromAgent = fromAgent, 
+            toAgent = AgentType.MRM, 
+            messageType = MessageType.NOTIFICATION, 
+            content = content
+        )
     private fun optimizeCommunicationRoutes() {}
     private fun createRouteStatusResponse(message: AgentMessage): AgentMessage? = null
     private fun createCommunicationStatsResponse(message: AgentMessage): AgentMessage? = null

@@ -20,28 +20,72 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nextgenbuildpro.core.DateUtils
+import com.nextgenbuildpro.debug.WorkflowAnalyzer
+import com.nextgenbuildpro.navigation.NavDestinations
 import com.nextgenbuildpro.pm.data.model.Estimate
 import com.nextgenbuildpro.pm.data.model.EstimateItem
 import com.nextgenbuildpro.pm.data.model.EstimateStatus
 import com.nextgenbuildpro.pm.rememberPmComponents
+import com.nextgenbuildpro.ui.ButtonNavigationValidator
+import com.nextgenbuildpro.ui.FeatureCompletionTracker
+import com.nextgenbuildpro.ui.components.completeFeature
+import com.nextgenbuildpro.ui.components.trackFeature
+import com.nextgenbuildpro.ui.components.trackNavigation
 import java.text.NumberFormat
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EstimateDetailScreen(navController: NavController, estimateId: String) {
+    // Session ID for tracking this user's journey
+    val sessionId = remember { "user_${System.currentTimeMillis()}" }
+
+    // Register this screen visit with the WorkflowAnalyzer
+    LaunchedEffect(Unit) {
+        WorkflowAnalyzer.trackScreenVisit(
+            userId = sessionId,
+            destination = "${NavDestinations.ESTIMATE_DETAIL}/$estimateId",
+            sourceElementId = "estimate_item_$estimateId"
+        )
+    }
+
     // Get the EstimatesViewModel from the PM module
     val pmComponents = rememberPmComponents()
     val viewModel = pmComponents.estimatesViewModel
 
     // Fetch the estimate data from the repository
     LaunchedEffect(estimateId) {
-        viewModel.clearSelectedEstimate() // Clear any previously selected estimate
-        viewModel.refresh() // Refresh the list of estimates
+        // Track the data loading process
+        val featureId = FeatureCompletionTracker.trackFeatureStart(
+            elementId = "load_estimate_details_$estimateId",
+            screenName = "EstimateDetailScreen",
+            featureName = "load_estimate_details"
+        )
+
+        try {
+            viewModel.clearSelectedEstimate() // Clear any previously selected estimate
+            viewModel.refresh() // Refresh the list of estimates
+
+            // Mark the loading feature as complete once data is refreshed
+            completeFeature(featureId, true, "Successfully initiated estimate data loading")
+        } catch (e: Exception) {
+            // Mark the loading feature as incomplete if there was an error
+            completeFeature(featureId, false, "Error loading estimate data: ${e.message}")
+
+            // Register this as a dead-end element
+            WorkflowAnalyzer.registerDeadEndElement(
+                elementId = "load_estimate_details_$estimateId",
+                screenName = "EstimateDetailScreen",
+                intendedDestination = "${NavDestinations.ESTIMATE_DETAIL}/$estimateId"
+            )
+        }
     }
 
     // Get all estimates and find the one with the matching ID
     val allEstimates by viewModel.filteredEstimates.collectAsState()
     val selectedEstimate by viewModel.selectedEstimate.collectAsState()
+    var isLoading by remember { mutableStateOf(true) }
+    var error by remember { mutableStateOf<String?>(null) }
 
     // Find the estimate with the matching ID
     val foundEstimate = allEstimates.find { it.id == estimateId }
@@ -50,156 +94,291 @@ fun EstimateDetailScreen(navController: NavController, estimateId: String) {
     LaunchedEffect(foundEstimate) {
         if (foundEstimate != null) {
             viewModel.selectEstimate(foundEstimate)
+            isLoading = false
+
+            // Track successful data loading
+            val featureId = FeatureCompletionTracker.trackFeatureStart(
+                elementId = "display_estimate_details_$estimateId",
+                screenName = "EstimateDetailScreen",
+                featureName = "display_estimate_details"
+            )
+            completeFeature(featureId, true, "Successfully loaded and displayed estimate data")
+        } else if (allEstimates.isNotEmpty()) {
+            // If we have estimates but couldn't find the requested one
+            isLoading = false
+            error = "Estimate not found"
+
+            // Track failed data loading
+            val featureId = FeatureCompletionTracker.trackFeatureStart(
+                elementId = "display_estimate_details_$estimateId",
+                screenName = "EstimateDetailScreen",
+                featureName = "display_estimate_details"
+            )
+            completeFeature(featureId, false, "Failed to find estimate with ID: $estimateId")
+
+            // Register this as a dead-end element
+            WorkflowAnalyzer.registerDeadEndElement(
+                elementId = "display_estimate_details_$estimateId",
+                screenName = "EstimateDetailScreen",
+                intendedDestination = "${NavDestinations.ESTIMATE_DETAIL}/$estimateId"
+            )
         }
     }
 
-    // Use the selected estimate or a placeholder if not found
-    val estimate = selectedEstimate ?: remember {
-        Estimate(
-            id = estimateId,
-            projectId = null,
-            title = "Loading...",
-            clientName = "",
-            amount = 0.0,
-            status = EstimateStatus.DRAFT.name,
-            createdAt = "",
-            updatedAt = "",
-            items = emptyList()
-        )
-    }
-
-    var showActionsDialog by remember { mutableStateOf(false) }
+    // UI states for dialog visibility
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showStatusDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
-            EstimateDetailTopBar(
-                estimate = estimate,
-                navController = navController,
-                onActionsClick = { showActionsDialog = true }
+            TopAppBar(
+                title = { Text(selectedEstimate?.title ?: "Estimate Details") },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.navigateUp()
+                        }
+                    ) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier.trackFeature(
+                            buttonId = "edit_estimate_$estimateId",
+                            screenName = "EstimateDetailScreen",
+                            featureName = "edit_estimate"
+                        ) { featureSessionId ->
+                            val success = ButtonNavigationValidator.validateAndNavigate(
+                                navController = navController,
+                                destination = "${NavDestinations.ESTIMATE_EDITOR}/$estimateId",
+                                buttonId = "edit_estimate_$estimateId",
+                                screenName = "EstimateDetailScreen"
+                            )
+
+                            if (!success) {
+                                completeFeature(featureSessionId, false, "Failed to navigate to estimate editor")
+                                WorkflowAnalyzer.registerDeadEndElement(
+                                    elementId = "edit_estimate_$estimateId",
+                                    screenName = "EstimateDetailScreen",
+                                    intendedDestination = "${NavDestinations.ESTIMATE_EDITOR}/$estimateId"
+                                )
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Default.Edit, contentDescription = "Edit Estimate")
+                    }
+                    IconButton(
+                        onClick = { showDeleteDialog = true }
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete Estimate")
+                    }
+                }
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("estimate_item_editor/${estimate.id}/null") },
-                containerColor = MaterialTheme.colorScheme.primary
+                onClick = { },
+                modifier = Modifier.trackFeature(
+                    buttonId = "add_item_to_estimate_$estimateId",
+                    screenName = "EstimateDetailScreen",
+                    featureName = "add_estimate_item"
+                ) { featureSessionId ->
+                    val success = ButtonNavigationValidator.validateAndNavigate(
+                        navController = navController,
+                        destination = "${NavDestinations.ESTIMATE_ITEM_EDITOR}/$estimateId",
+                        buttonId = "add_item_to_estimate_$estimateId",
+                        screenName = "EstimateDetailScreen"
+                    )
+
+                    if (!success) {
+                        completeFeature(featureSessionId, false, "Failed to navigate to item editor")
+                        WorkflowAnalyzer.registerDeadEndElement(
+                            elementId = "add_item_to_estimate_$estimateId",
+                            screenName = "EstimateDetailScreen",
+                            intendedDestination = "${NavDestinations.ESTIMATE_ITEM_EDITOR}/$estimateId"
+                        )
+                    }
+                }
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Item"
-                )
+                Icon(Icons.Default.Add, contentDescription = "Add Item")
             }
         }
     ) { paddingValues ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Estimate header
-            item {
-                EstimateHeader(estimate = estimate)
-            }
-
-            // Client information
-            item {
-                ClientInformation(clientName = estimate.clientName)
-            }
-
-            // Items section
-            item {
-                Text(
-                    text = "Items",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
-                )
-            }
-
-            // List of estimate items
-            items(estimate.items) { item ->
-                EstimateItemCard(
-                    item = item,
-                    onClick = { navController.navigate("estimate_item_editor/${estimate.id}/${item.id}") }
-                )
-            }
-
-            // Summary section
-            item {
-                EstimateSummary(estimate = estimate)
-            }
-
-            // Action buttons
-            item {
-                ActionButtons(
-                    onPreviewClick = { 
-                        // Navigate to estimate preview screen
-                        navController.navigate("estimate_preview/${estimate.id}")
-                    },
-                    onSendClick = { 
-                        // Update estimate status to sent and navigate to send options
-                        viewModel.updateEstimateStatus(estimate.id, EstimateStatus.SENT)
-                        navController.navigate("estimate_send/${estimate.id}")
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
-                )
-            }
-
-            // Bottom spacing
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
-            }
-        }
-
-        // Actions dialog
-        if (showActionsDialog) {
-            EstimateActionsDialog(
-                onDismiss = { showActionsDialog = false },
-                onCollectSignature = { 
-                    showActionsDialog = false
-                    // Navigate to digital signature screen
-                    navController.navigate("digital_signature/${estimate.id}")
-                },
-                onMarkApproved = { 
-                    showActionsDialog = false
-                    viewModel.updateEstimateStatus(estimate.id, EstimateStatus.APPROVED)
-                },
-                onMarkDeclined = { 
-                    showActionsDialog = false
-                    viewModel.updateEstimateStatus(estimate.id, EstimateStatus.DECLINED)
-                },
-                onDuplicate = { 
-                    showActionsDialog = false
-                    // Create a copy of the current estimate
-                    val duplicatedEstimate = estimate.copy(
-                        id = UUID.randomUUID().toString(),
-                        title = "${estimate.title} (Copy)",
-                        status = EstimateStatus.DRAFT.name,
-                        createdAt = DateUtils.getCurrentDateString(),
-                        updatedAt = DateUtils.getCurrentDateString()
-                    )
-                    viewModel.createEstimate(duplicatedEstimate)
-                    navController.navigate("estimate_detail/${duplicatedEstimate.id}")
-                },
-                onViewActivity = { 
-                    showActionsDialog = false
-                    // Navigate to activity history screen
-                    navController.navigate("estimate_activity/${estimate.id}")
-                },
-                onArchive = { 
-                    showActionsDialog = false
-                    // Mark estimate as archived (update status)
-                    viewModel.updateEstimateStatus(estimate.id, EstimateStatus.EXPIRED)
-                },
-                onDownloadPdf = { 
-                    showActionsDialog = false
-                    // Implement PDF generation functionality
-                    val pdfService = pmComponents.pdfGenerationService
-                    pdfService.generateEstimatePdf(estimate)
-                    navController.navigate("estimate_pdf/${estimate.id}")
                 }
-            )
+                error != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = error ?: "Unknown error",
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = { navController.navigateUp() }
+                            ) {
+                                Text("Go Back")
+                            }
+                        }
+                    }
+                }
+                selectedEstimate != null -> {
+                    val estimate = selectedEstimate!!
+                    EstimateDetailContent(
+                        estimate = estimate,
+                        onItemClick = { itemId ->
+                            // Track item editing as part of workflow
+                            val featureId = FeatureCompletionTracker.trackFeatureStart(
+                                elementId = "edit_estimate_item_${itemId}",
+                                screenName = "EstimateDetailScreen",
+                                featureName = "edit_estimate_item"
+                            )
+
+                            val success = ButtonNavigationValidator.validateAndNavigate(
+                                navController = navController,
+                                destination = "${NavDestinations.ESTIMATE_ITEM_EDITOR}/$estimateId/$itemId",
+                                buttonId = "edit_item_${itemId}",
+                                screenName = "EstimateDetailScreen"
+                            )
+
+                            if (!success) {
+                                completeFeature(featureId, false, "Failed to navigate to item editor")
+                                WorkflowAnalyzer.registerDeadEndElement(
+                                    elementId = "edit_item_${itemId}",
+                                    screenName = "EstimateDetailScreen",
+                                    intendedDestination = "${NavDestinations.ESTIMATE_ITEM_EDITOR}/$estimateId/$itemId"
+                                )
+                            }
+                        },
+                        onChangeStatus = { showStatusDialog = true },
+                        onSendEstimate = {
+                            // Track estimate sending as part of workflow
+                            val featureId = FeatureCompletionTracker.trackFeatureStart(
+                                elementId = "send_estimate_$estimateId",
+                                screenName = "EstimateDetailScreen",
+                                featureName = "send_estimate"
+                            )
+
+                            // Here you would implement the actual sending logic
+                            // For now, we'll just track it as a potentially incomplete feature
+                            WorkflowAnalyzer.registerDeadEndElement(
+                                elementId = "send_estimate_$estimateId",
+                                screenName = "EstimateDetailScreen",
+                                intendedDestination = "SendEstimateEmail"
+                            )
+                            completeFeature(featureId, false, "Send estimate feature not fully implemented")
+                        }
+                    )
+                }
+            }
         }
+    }
+
+    // Delete confirmation dialog
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Estimate") },
+            text = { Text("Are you sure you want to delete this estimate? This action cannot be undone.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        // Track estimate deletion as part of workflow
+                        val featureId = FeatureCompletionTracker.trackFeatureStart(
+                            elementId = "delete_estimate_$estimateId",
+                            screenName = "EstimateDetailScreen",
+                            featureName = "delete_estimate"
+                        )
+
+                        // Perform deletion
+                        viewModel.deleteEstimate(estimateId)
+                        showDeleteDialog = false
+                        completeFeature(featureId, true, "Estimate deleted successfully")
+
+                        // Navigate back
+                        navController.navigateUp()
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showDeleteDialog = false }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Status change dialog
+    if (showStatusDialog && selectedEstimate != null) {
+        val statusOptions = EstimateStatus.values()
+
+        AlertDialog(
+            onDismissRequest = { showStatusDialog = false },
+            title = { Text("Change Estimate Status") },
+            text = {
+                Column {
+                    statusOptions.forEach { status ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    // Track status change as part of workflow
+                                    val featureId = FeatureCompletionTracker.trackFeatureStart(
+                                        elementId = "change_estimate_status_$estimateId",
+                                        screenName = "EstimateDetailScreen",
+                                        featureName = "change_estimate_status"
+                                    )
+
+                                    // Perform status update
+                                    viewModel.updateEstimateStatus(estimateId, status)
+                                    showStatusDialog = false
+                                    completeFeature(featureId, true, "Estimate status updated successfully")
+                                }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = selectedEstimate?.status == status.name,
+                                onClick = null
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(status.name)
+                        }
+                    }
+                }
+            },
+            confirmButton = { },
+            dismissButton = {
+                TextButton(
+                    onClick = { showStatusDialog = false }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
@@ -725,6 +904,62 @@ fun ActionItem(
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@Composable
+fun EstimateDetailContent(
+    estimate: Estimate,
+    onItemClick: (String) -> Unit,
+    onChangeStatus: () -> Unit,
+    onSendEstimate: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Header
+        EstimateHeader(estimate = estimate)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Client information
+        ClientInformation(clientName = estimate.clientName)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Items section
+        Text(
+            text = "Items",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+        )
+
+        // List of estimate items
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(estimate.items) { item ->
+                EstimateItemCard(
+                    item = item,
+                    onClick = { onItemClick(item.id) }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Summary section
+        EstimateSummary(estimate = estimate)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Action buttons
+        ActionButtons(
+            onPreviewClick = { /* TODO: Implement preview action */ },
+            onSendClick = onSendEstimate
         )
     }
 }
