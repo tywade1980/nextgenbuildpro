@@ -168,7 +168,7 @@ class EnhancedAssemblyCatalogueService(
             )
             
             val enhancedTasks = tasks.map { taskData ->
-                Task(
+                CatalogueTask(
                     assemblyId = "", // Will be set when assembly is created
                     name = taskData.name,
                     description = taskData.description,
@@ -182,7 +182,7 @@ class EnhancedAssemblyCatalogueService(
             }
             
             val enhancedMaterials = materials.map { materialData ->
-                Material(
+                CatalogueMaterial(
                     taskId = materialData.taskId,
                     assemblyId = materialData.assemblyId,
                     name = materialData.name,

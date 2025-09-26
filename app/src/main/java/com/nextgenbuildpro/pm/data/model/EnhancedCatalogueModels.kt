@@ -86,10 +86,10 @@ data class EnhancedAssembly(
 )
 
 /**
- * Task represents a specific work item within an assembly
+ * CatalogueTask represents a specific work item within an assembly
  * Provides detailed breakdown of labor and costs for each task
  */
-data class Task(
+data class CatalogueTask(
     val id: String = UUID.randomUUID().toString(),
     val assemblyId: String,
     val name: String,
@@ -106,10 +106,10 @@ data class Task(
 )
 
 /**
- * Material represents individual materials used in tasks or assemblies
+ * CatalogueMaterial represents individual materials used in tasks or assemblies
  * Can be associated with either a specific task or directly with an assembly
  */
-data class Material(
+data class CatalogueMaterial(
     val id: String = UUID.randomUUID().toString(),
     val taskId: String? = null,
     val assemblyId: String? = null,
@@ -165,15 +165,15 @@ data class ScopeWithChildren(
 data class AssemblyWithChildren(
     val assembly: EnhancedAssembly,
     val tasks: List<TaskWithMaterials>,
-    val materials: List<Material> // Direct assembly materials
+    val materials: List<CatalogueMaterial> // Direct assembly materials
 )
 
 /**
  * Task with its associated materials
  */
 data class TaskWithMaterials(
-    val task: Task,
-    val materials: List<Material>
+    val task: CatalogueTask,
+    val materials: List<CatalogueMaterial>
 )
 
 /**
@@ -196,8 +196,8 @@ data class AssemblySearchResultWithContext(
     val scope: Scope,
     val trade: Trade,
     val category: Category,
-    val tasks: List<Task> = emptyList(),
-    val materials: List<Material> = emptyList()
+    val tasks: List<CatalogueTask> = emptyList(),
+    val materials: List<CatalogueMaterial> = emptyList()
 )
 
 /**
@@ -233,8 +233,8 @@ data class AssemblyIndirectCosts(
  */
 data class CompleteAssemblyRequest(
     val assembly: EnhancedAssembly,
-    val tasks: List<Task>,
-    val materials: List<Material>
+    val tasks: List<CatalogueTask>,
+    val materials: List<CatalogueMaterial>
 )
 
 /**
