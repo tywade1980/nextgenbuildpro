@@ -39,6 +39,9 @@ android {
         compose = true
         buildConfig = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.15"
+    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -101,7 +104,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.mockito:mockito-core:5.1.1")
     testImplementation("org.mockito:mockito-inline:5.1.1")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.20")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:2.0.21")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

@@ -1,0 +1,801 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateDebugBuildConfig
+> Task :app:generateDebugResValues
+> Task :app:processDebugGoogleServices
+> Task :app:checkDebugAarMetadata
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:parseDebugLocalResources
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:mergeDebugResources
+> Task :app:javaPreCompileDebug
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets FROM-CACHE
+> Task :app:compressDebugAssets
+> Task :app:desugarDebugFileDependencies
+> Task :app:processDebugManifestForPackage
+> Task :app:checkDebugDuplicateClasses
+> Task :app:processDebugResources
+> Task :app:mergeExtDexDebug
+> Task :app:mergeDebugJniLibFolders FROM-CACHE
+> Task :app:mergeLibDexDebug
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:buildKotlinToolingMetadata
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :app:generateReleaseBuildConfig
+> Task :app:mergeDebugNativeLibs
+> Task :app:checkReleaseAarMetadata
+> Task :app:generateReleaseResValues FROM-CACHE
+> Task :app:processReleaseGoogleServices FROM-CACHE
+> Task :app:mapReleaseSourceSetPaths
+> Task :app:generateReleaseResources UP-TO-DATE
+
+> Task :app:stripDebugDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libonnxruntime.so, libonnxruntime4j_jni.so.
+
+> Task :app:packageReleaseResources
+> Task :app:parseReleaseLocalResources FROM-CACHE
+> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksRelease FROM-CACHE
+> Task :app:processReleaseMainManifest
+> Task :app:processReleaseManifest
+> Task :app:javaPreCompileRelease FROM-CACHE
+> Task :app:extractProguardFiles
+> Task :app:mergeReleaseJniLibFolders FROM-CACHE
+> Task :app:processReleaseManifestForPackage
+> Task :app:checkReleaseDuplicateClasses
+> Task :app:desugarReleaseFileDependencies
+> Task :app:mergeReleaseNativeLibs
+> Task :app:mergeReleaseResources
+> Task :app:compileDebugKotlin
+> Task :app:mergeExtDexRelease
+
+> Task :app:compileDebugKotlin
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/agents/HermesBrain.kt:423:24 Overload resolution ambiguity between candidates:
+fun analyzeCommunicationPatterns(): List<String>
+suspend fun analyzeCommunicationPatterns(): Result<String>
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/agents/HermesBrain.kt:429:49 Unresolved reference 'size'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/agents/HermesBrain.kt:681:5 Conflicting overloads:
+suspend fun analyzeCommunicationPatterns(): Result<String>
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/agents/HermesBrain.kt:875:5 Conflicting overloads:
+fun analyzeCommunicationPatterns(): List<String>
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:397:1 Syntax error: Expecting an expression.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:397:1 Syntax error: Expecting ')'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:397:7 Syntax error: Expecting an element.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:398:62 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:399:33 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:399:36 Unresolved reference 'BigDaddyAgent'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:399:51 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:400:33 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:400:36 Unresolved reference 'HRMModel'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:400:46 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:403:9 Syntax error: Expecting an element.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:406:24 Unresolved reference 'forEach'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:406:34 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:406:34 Function 'component1()' is ambiguous for this expression: 
+fun <T> Array<out T>.component1(): T
+fun ByteArray.component1(): Byte
+fun ShortArray.component1(): Short
+fun IntArray.component1(): Int
+fun LongArray.component1(): Long
+fun FloatArray.component1(): Float
+fun DoubleArray.component1(): Double
+fun BooleanArray.component1(): Boolean
+fun CharArray.component1(): Char
+fun <T> List<T>.component1(): T
+fun <K, V> Map.Entry<K, V>.component1(): K
+fun UIntArray.component1(): UInt
+fun ULongArray.component1(): ULong
+fun UByteArray.component1(): UByte
+fun UShortArray.component1(): UShort.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:406:34 Function 'component2()' is ambiguous for this expression: 
+fun <T> Array<out T>.component2(): T
+fun ByteArray.component2(): Byte
+fun ShortArray.component2(): Short
+fun IntArray.component2(): Int
+fun LongArray.component2(): Long
+fun FloatArray.component2(): Float
+fun DoubleArray.component2(): Double
+fun BooleanArray.component2(): Boolean
+fun CharArray.component2(): Char
+fun <T> List<T>.component2(): T
+fun <K, V> Map.Entry<K, V>.component2(): V
+fun UIntArray.component2(): UInt
+fun ULongArray.component2(): ULong
+fun UByteArray.component2(): UByte
+fun UShortArray.component2(): UShort.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:408:23 Unresolved reference 'initialize'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/core/MainOrchestrator.kt:410:27 Suspension functions can only be called within coroutine body.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/debug/AutomationDebugger.kt:19:15 Conflicting declarations:
+companion object Companion : Any
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/debug/AutomationDebugger.kt:332:1 Syntax error: Expecting member declaration.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/debug/AutomationDebugger.kt:332:4 Syntax error: Expecting member declaration.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/debug/AutomationDebugger.kt:332:7 Syntax error: Expecting member declaration.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/debug/AutomationDebugger.kt:347:5 Only one companion object is allowed per class.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/debug/AutomationDebugger.kt:347:15 Conflicting declarations:
+companion object Companion : Any
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/camera/CameraScreen.kt:453:10 Syntax error: Expecting ')'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/camera/CameraScreen.kt:455:1 Syntax error: Expecting a top level declaration.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/estimates/EnhancedCatalogueDemoScreen.kt:147:36 Unresolved reference 'AssemblyCreationData'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/estimates/EnhancedCatalogueDemoScreen.kt:160:29 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/estimates/EnhancedCatalogueDemoScreen.kt:161:21 Unresolved reference 'TaskCreationData'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/estimates/EnhancedCatalogueDemoScreen.kt:161:21 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/estimates/EnhancedCatalogueDemoScreen.kt:169:21 Unresolved reference 'TaskCreationData'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/estimates/EnhancedCatalogueDemoScreen.kt:177:21 Unresolved reference 'TaskCreationData'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/estimates/EnhancedCatalogueDemoScreen.kt:187:33 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/estimates/EnhancedCatalogueDemoScreen.kt:188:21 Unresolved reference 'MaterialCreationData'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/estimates/EnhancedCatalogueDemoScreen.kt:188:21 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/estimates/EnhancedCatalogueDemoScreen.kt:196:21 Unresolved reference 'MaterialCreationData'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/estimates/EnhancedCatalogueDemoScreen.kt:203:21 Unresolved reference 'MaterialCreationData'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:51:27 Unresolved reference 'title'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:54:16 Unresolved reference 'title'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:55:16 Unresolved reference 'status'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:243:59 Unresolved reference 'priority'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:251:37 Unresolved reference 'title'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:262:57 Unresolved reference 'status'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:267:45 Unresolved reference 'status'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:269:61 Unresolved reference 'status'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:277:30 Unresolved reference 'linkedEntityType'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:277:48 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:277:54 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:278:29 @Composable invocations can only happen from the context of a @Composable function
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:294:26 Unresolved reference 'dueDate'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:304:41 Unresolved reference 'dueDate'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:330:26 Unresolved reference 'assignedTo'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:342:41 Unresolved reference 'assignedTo'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/features/tasks/TasksScreen.kt:361:40 Unresolved reference 'estimatedHours'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/navigation/NavGraph.kt:23:1 Syntax error: Expecting a top level declaration.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/navigation/NavGraph.kt:23:4 Syntax error: Expecting a top level declaration.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/navigation/NavGraph.kt:23:7 Syntax error: Expecting a top level declaration.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/navigation/NavGraph.kt:23:8 Syntax error: imports are only allowed in the beginning of file.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/model/EnhancedCatalogueModels.kt:92:12 Redeclaration:
+data class Task : Any
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/model/EnhancedCatalogueModels.kt:112:12 Redeclaration:
+data class Material : Any
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/model/EnhancedCatalogueModels.kt:182:12 Redeclaration:
+data class CatalogueSearchCriteria : Any
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/model/HierarchicalCatalogueModels.kt:252:12 Redeclaration:
+data class CatalogueSearchCriteria : Any
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/model/PmModels.kt:118:12 Redeclaration:
+data class Task : Any
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/model/PmModels.kt:147:12 Redeclaration:
+data class Material : Any
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:13 Overload resolution ambiguity between candidates:
+suspend fun createFoundation(categoryId: String): Unit
+suspend fun createFoundation(categoryId: String): Unit
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:82 'operator' modifier is required on 'FirNamedFunctionSymbol kotlin/text/compareTo' in 'compareTo'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:83 Syntax error: Expecting an element.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:85 Syntax error: Expecting an element.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:87 Syntax error: Expecting an element.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:90 Unresolved reference 'copilot'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:98 Unresolved reference 'fix'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:101 Overload resolution ambiguity between candidates:
+fun <T> Iterable<T>.minus(element: T): List<T>
+fun <K, V> Map<out K, V>.minus(key: K): Map<K, V>
+fun <T> Set<T>.minus(element: T): Set<T>
+fun <T> Sequence<T>.minus(element: T): Sequence<T>
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:104 Unresolved reference 'bf7bae'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:104 Unsupported [literal prefixes and suffixes].
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:121 Unresolved reference 'ba67'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:125 Overload resolution ambiguity between candidates:
+fun <T> Iterable<T>.minus(element: T): List<T>
+fun <K, V> Map<out K, V>.minus(key: K): Map<K, V>
+fun <T> Set<T>.minus(element: T): Set<T>
+fun <T> Sequence<T>.minus(element: T): Sequence<T>
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:31:128 Unsupported [literal prefixes and suffixes].
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:140:5 Conflicting overloads:
+suspend fun createFoundation(categoryId: String): Unit
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/CatalogueSeeder.kt:1563:5 Conflicting overloads:
+suspend fun createFoundation(categoryId: String): Unit
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:496:41 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:513:98 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:513:105 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:513:111 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:513:111 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:514:75 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:514:80 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:514:86 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:514:86 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:515:82 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:515:89 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:515:95 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:515:95 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:528:41 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:531:71 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:531:77 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:531:83 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:531:83 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:532:71 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:532:78 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:532:84 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:532:84 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:533:73 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:533:80 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:533:86 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:533:86 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:546:41 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:549:80 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:549:87 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:549:93 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:549:93 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:550:82 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:550:89 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:550:95 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:550:95 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:551:81 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:551:86 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:551:93 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:551:93 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:558:37 Unresolved reference 'TON'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:564:41 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:567:73 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:567:81 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:567:87 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:567:87 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:568:67 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:568:73 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:568:79 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:568:79 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:569:76 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:569:83 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:569:89 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:569:89 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:585:92 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:585:98 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:585:104 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:585:104 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:601:85 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:601:90 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:601:97 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:601:97 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:614:41 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:617:84 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:617:90 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:617:97 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:617:97 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:618:71 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:618:76 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:618:83 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:618:83 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:619:78 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:619:83 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:619:91 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:619:91 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:635:84 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:635:91 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:635:97 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:635:97 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:636:88 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:636:95 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:636:101 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:636:101 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:652:81 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:652:86 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:652:92 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:652:92 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:653:82 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:653:87 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:653:93 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:653:93 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:654:75 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:654:80 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:654:86 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:654:86 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:670:85 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:670:92 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:670:98 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:670:98 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:688:13 No parameter with name 'skillsRequired' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:688:48 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:689:13 No parameter with name 'webResourceUrls' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:689:31 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:690:13 No parameter with name 'estimatedDuration' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:691:13 No parameter with name 'estimatedLaborHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:692:13 No parameter with name 'estimatedMaterialCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:693:13 No parameter with name 'estimatedLaborCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:694:13 No parameter with name 'estimatedTotalCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:713:41 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:716:81 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:716:88 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:716:94 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:716:94 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:717:84 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:717:89 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:717:96 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:717:96 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:718:85 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:718:90 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:718:97 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:718:97 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:734:79 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:734:85 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:734:91 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:734:91 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:761:41 Unresolved reference 'BASIC'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:764:82 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:764:89 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:764:95 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:764:95 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:765:80 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:765:87 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:765:93 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:765:93 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:781:76 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:781:83 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:781:89 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:781:89 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:782:92 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:782:97 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:782:105 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:782:105 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:795:41 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:798:83 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:798:91 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:798:97 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:798:97 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:799:83 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:799:90 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:799:96 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:799:96 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:800:84 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:800:89 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:800:96 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:800:96 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:816:81 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:816:88 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:816:94 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:816:94 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:817:77 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:817:84 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:817:90 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:817:90 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:830:41 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:833:71 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:833:77 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:833:83 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:833:83 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:846:41 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:863:79 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:863:84 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:863:90 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:863:90 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:864:80 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:864:85 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:864:93 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:864:93 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:877:41 Unresolved reference 'BASIC'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:880:81 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:880:86 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:880:93 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:880:93 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:881:84 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:881:91 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:881:97 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:881:97 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:899:13 No parameter with name 'skillsRequired' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:899:73 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:900:13 No parameter with name 'webResourceUrls' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:900:31 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:901:13 No parameter with name 'estimatedDuration' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:902:13 No parameter with name 'estimatedLaborHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:903:13 No parameter with name 'estimatedMaterialCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:904:13 No parameter with name 'estimatedLaborCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:905:13 No parameter with name 'estimatedTotalCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:941:84 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:941:91 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:941:97 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:941:97 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:942:88 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:942:94 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:942:100 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:942:100 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:943:69 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:943:74 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:943:82 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:943:82 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:959:65 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:959:72 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:959:78 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:959:78 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:960:71 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:960:76 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:960:82 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:960:82 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:976:68 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:976:75 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:976:81 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:976:81 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:977:71 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:977:76 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:977:82 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:977:82 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:993:83 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:993:89 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:993:95 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:993:95 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:994:66 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:994:72 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:994:78 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:994:78 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:995:69 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:995:74 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:995:80 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:995:80 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1011:69 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1011:75 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1011:81 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1011:81 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1012:73 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1012:78 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1012:84 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1012:84 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1025:41 Unresolved reference 'BASIC'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1028:66 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1028:72 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1028:78 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1028:78 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1029:63 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1029:68 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1029:74 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1029:74 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1042:41 Unresolved reference 'BASIC'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1045:78 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1045:86 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1045:92 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1045:92 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1046:89 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1046:97 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1046:103 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1046:103 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1059:41 Unresolved reference 'BASIC'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1062:82 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1062:90 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1062:96 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1062:96 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1063:72 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1063:79 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1063:85 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1063:85 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1081:13 No parameter with name 'skillsRequired' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1082:13 No parameter with name 'webResourceUrls' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1082:31 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1083:13 No parameter with name 'estimatedDuration' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1084:13 No parameter with name 'estimatedLaborHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1085:13 No parameter with name 'estimatedMaterialCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1086:13 No parameter with name 'estimatedLaborCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1087:13 No parameter with name 'estimatedTotalCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1106:41 Unresolved reference 'BASIC'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1109:81 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1109:88 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1109:94 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1109:94 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1110:85 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1110:92 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1110:98 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1110:98 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1126:84 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1126:91 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1126:97 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1126:97 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1127:88 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1127:95 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1127:101 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1127:101 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1143:73 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1143:80 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1143:86 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1143:86 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1144:82 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1144:87 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1144:93 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1144:93 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1157:41 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1160:76 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1160:83 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1160:89 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1160:89 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1161:82 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1161:87 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1161:94 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1161:94 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1162:75 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1162:81 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1162:87 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1162:87 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1178:83 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1178:88 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1178:94 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1178:94 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1179:90 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1179:95 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1179:102 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1179:102 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1195:75 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1195:80 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1195:87 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1195:87 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1196:82 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1196:87 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1196:94 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1196:94 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1197:86 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1197:91 Argument type mismatch: actual type is 'kotlin.String', but 'kotlin.Double' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1197:98 Argument type mismatch: actual type is 'kotlin.Double', but 'kotlin.String' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1197:98 No value passed for parameter 'unitCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1215:13 No parameter with name 'skillsRequired' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1215:73 Unresolved reference 'SKILLED'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1216:13 No parameter with name 'webResourceUrls' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1216:31 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1217:13 No parameter with name 'estimatedDuration' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1218:13 No parameter with name 'estimatedLaborHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1219:13 No parameter with name 'estimatedMaterialCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1220:13 No parameter with name 'estimatedLaborCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1221:13 No parameter with name 'estimatedTotalCost' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1273:26 Unresolved reference 'projectType'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1273:84 Unresolved reference 'projectType'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1275:34 Unresolved reference 'tradeType'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1275:89 Unresolved reference 'tradeType'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1278:42 Unresolved reference 'keyword'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1279:65 Unresolved reference 'keyword'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1280:72 Unresolved reference 'keyword'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1286:46 Unresolved reference 'keyword'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1287:65 Unresolved reference 'keyword'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/HierarchicalCatalogueRepository.kt:1288:72 Unresolved reference 'keyword'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:55:57 Unresolved reference 'getCompleteCatalogue'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:57:55 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:60:66 Unresolved reference 'size'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:68:32 Overload resolution ambiguity between candidates:
+fun <T> Iterable<T>.forEach(action: (T) -> Unit): Unit
+fun <K, V> Map<out K, V>.forEach(action: (Map.Entry<K, V>) -> Unit): Unit
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:68:42 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:69:67 Unresolved reference 'trades'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:72:46 Unresolved reference 'trades'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:72:63 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:73:65 Unresolved reference 'scopes'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:76:47 Unresolved reference 'scopes'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:76:64 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:77:73 Unresolved reference 'assemblies'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:80:51 Unresolved reference 'assemblies'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:80:72 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:81:72 Unresolved reference 'tasks'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:82:76 Unresolved reference 'materials'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:85:58 Unresolved reference 'tasks'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:85:74 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/SeedCatalogueRunner.kt:86:77 Unresolved reference 'materials'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:88:41 Unresolved reference 'status'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:95:41 Unresolved reference 'priority'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:102:41 Unresolved reference 'projectId'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:109:41 Unresolved reference 'estimateId'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:116:41 Unresolved reference 'materialId'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:123:41 Unresolved reference 'noteId'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:130:41 Unresolved reference 'clientId'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:137:41 Unresolved reference 'linkedEntityType'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:148:16 Unresolved reference 'title'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:161:25 No parameter with name 'status' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:162:37 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:183:25 No parameter with name 'priority' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:184:37 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:205:25 No parameter with name 'status' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:206:25 No parameter with name 'completedDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:207:37 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:228:25 No parameter with name 'projectId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:229:25 No parameter with name 'linkedEntityType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:230:37 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:251:25 No parameter with name 'estimateId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:252:25 No parameter with name 'linkedEntityType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:253:37 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:274:25 No parameter with name 'materialId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:275:25 No parameter with name 'linkedEntityType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:276:37 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:297:25 No parameter with name 'noteId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:298:25 No parameter with name 'linkedEntityType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:299:37 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:320:25 No parameter with name 'clientId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:321:25 No parameter with name 'linkedEntityType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:322:37 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:341:13 No parameter with name 'title' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:343:13 No parameter with name 'assignedTo' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:344:13 No parameter with name 'status' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:345:13 No parameter with name 'priority' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:346:13 No parameter with name 'dueDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:347:13 No parameter with name 'completedDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:348:13 No parameter with name 'estimatedHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:349:13 No parameter with name 'actualHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:350:13 No parameter with name 'dependencies' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:350:28 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:351:25 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:352:25 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:353:13 No parameter with name 'estimateId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:354:13 No parameter with name 'linkedEntityType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:354:13 No value passed for parameter 'assemblyId'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:354:13 No value passed for parameter 'name'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:354:13 No value passed for parameter 'sequence'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:354:13 No value passed for parameter 'laborHours'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:354:13 No value passed for parameter 'materialCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:354:13 No value passed for parameter 'laborCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:354:13 No value passed for parameter 'equipmentCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:371:17 No parameter with name 'status' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:372:29 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:395:17 No parameter with name 'title' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:397:17 No parameter with name 'assignedTo' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:398:17 No parameter with name 'status' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:399:17 No parameter with name 'priority' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:400:17 No parameter with name 'dueDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:401:17 No parameter with name 'completedDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:402:17 No parameter with name 'estimatedHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:403:17 No parameter with name 'actualHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:404:17 No parameter with name 'dependencies' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:404:32 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:405:29 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:406:29 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:407:17 No parameter with name 'projectId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:408:17 No parameter with name 'linkedEntityType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:408:17 No value passed for parameter 'assemblyId'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:408:17 No value passed for parameter 'name'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:408:17 No value passed for parameter 'sequence'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:408:17 No value passed for parameter 'laborHours'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:408:17 No value passed for parameter 'materialCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:408:17 No value passed for parameter 'laborCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:408:17 No value passed for parameter 'equipmentCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:412:17 No parameter with name 'title' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:414:17 No parameter with name 'assignedTo' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:415:17 No parameter with name 'status' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:416:17 No parameter with name 'priority' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:417:17 No parameter with name 'dueDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:418:17 No parameter with name 'completedDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:419:17 No parameter with name 'estimatedHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:420:17 No parameter with name 'actualHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:421:17 No parameter with name 'dependencies' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:422:29 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:423:29 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:424:17 No parameter with name 'projectId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:425:17 No parameter with name 'estimateId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:426:17 No parameter with name 'linkedEntityType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:426:17 No value passed for parameter 'assemblyId'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:426:17 No value passed for parameter 'name'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:426:17 No value passed for parameter 'sequence'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:426:17 No value passed for parameter 'laborHours'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:426:17 No value passed for parameter 'materialCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:426:17 No value passed for parameter 'laborCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:426:17 No value passed for parameter 'equipmentCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:430:17 No parameter with name 'title' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:432:17 No parameter with name 'assignedTo' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:433:17 No parameter with name 'status' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:434:17 No parameter with name 'priority' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:435:17 No parameter with name 'dueDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:436:17 No parameter with name 'completedDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:437:17 No parameter with name 'estimatedHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:438:17 No parameter with name 'actualHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:439:17 No parameter with name 'dependencies' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:439:32 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:440:29 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:441:29 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:442:17 No parameter with name 'projectId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:443:17 No parameter with name 'linkedEntityType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:443:17 No value passed for parameter 'assemblyId'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:443:17 No value passed for parameter 'name'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:443:17 No value passed for parameter 'sequence'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:443:17 No value passed for parameter 'laborHours'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:443:17 No value passed for parameter 'materialCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:443:17 No value passed for parameter 'laborCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:443:17 No value passed for parameter 'equipmentCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:447:17 No parameter with name 'title' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:449:17 No parameter with name 'assignedTo' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:450:17 No parameter with name 'status' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:451:17 No parameter with name 'priority' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:452:17 No parameter with name 'dueDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:453:17 No parameter with name 'completedDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:454:17 No parameter with name 'estimatedHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:455:17 No parameter with name 'actualHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:456:17 No parameter with name 'dependencies' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:456:32 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:457:29 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:458:29 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:459:17 No parameter with name 'projectId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:460:17 No parameter with name 'materialId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:461:17 No parameter with name 'linkedEntityType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:461:17 No value passed for parameter 'assemblyId'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:461:17 No value passed for parameter 'name'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:461:17 No value passed for parameter 'sequence'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:461:17 No value passed for parameter 'laborHours'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:461:17 No value passed for parameter 'materialCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:461:17 No value passed for parameter 'laborCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:461:17 No value passed for parameter 'equipmentCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:465:17 No parameter with name 'title' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:467:17 No parameter with name 'assignedTo' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:468:17 No parameter with name 'status' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:469:17 No parameter with name 'priority' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:470:17 No parameter with name 'dueDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:471:17 No parameter with name 'completedDate' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:472:17 No parameter with name 'estimatedHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:473:17 No parameter with name 'actualHours' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:474:17 No parameter with name 'dependencies' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:474:32 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:475:29 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:476:29 Argument type mismatch: actual type is 'kotlin.String', but 'java.time.LocalDateTime' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:477:17 No parameter with name 'estimateId' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:478:17 No parameter with name 'linkedEntityType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:478:17 No value passed for parameter 'assemblyId'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:478:17 No value passed for parameter 'name'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:478:17 No value passed for parameter 'sequence'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:478:17 No value passed for parameter 'laborHours'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:478:17 No value passed for parameter 'materialCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:478:17 No value passed for parameter 'laborCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/data/repository/TaskRepository.kt:478:17 No value passed for parameter 'equipmentCost'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/demo/CatalogueSystemDemo.kt:127:37 No parameter with name 'keyword' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/demo/CatalogueSystemDemo.kt:133:37 No parameter with name 'tradeType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/demo/CatalogueSystemDemo.kt:139:37 No parameter with name 'lifecyclePhase' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/examples/HierarchicalCatalogueExample.kt:166:45 No parameter with name 'keyword' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/examples/HierarchicalCatalogueExample.kt:172:45 No parameter with name 'tradeType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/examples/HierarchicalCatalogueExample.kt:178:45 No parameter with name 'projectType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/examples/HierarchicalCatalogueExample.kt:184:45 No parameter with name 'lifecyclePhase' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/service/AssemblyCatalogueService.kt:38:75 Argument type mismatch: actual type is 'com.nextgenbuildpro.pm.service.CatalogueSearchCriteria', but 'com.nextgenbuildpro.pm.data.model.CatalogueSearchCriteria' was expected.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/service/AssemblyCatalogueService.kt:70:36 None of the following candidates is applicable:
+fun convertToAssemblyDetails(assembly: Assembly): AssemblyDetails
+fun convertToAssemblyDetails(masterAssembly: MasterAssembly): AssemblyDetails
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/test/FoundationCatalogueValidation.kt:121:48 Unresolved reference 'getCompleteCatalogue'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/test/FoundationCatalogueValidation.kt:124:42 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/test/FoundationCatalogueValidation.kt:125:45 Overload resolution ambiguity between candidates:
+fun <T> Array<out T>.find(predicate: (T) -> Boolean): T?
+fun ByteArray.find(predicate: (Byte) -> Boolean): Byte?
+fun ShortArray.find(predicate: (Short) -> Boolean): Short?
+fun IntArray.find(predicate: (Int) -> Boolean): Int?
+fun LongArray.find(predicate: (Long) -> Boolean): Long?
+fun FloatArray.find(predicate: (Float) -> Boolean): Float?
+fun DoubleArray.find(predicate: (Double) -> Boolean): Double?
+fun BooleanArray.find(predicate: (Boolean) -> Boolean): Boolean?
+fun CharArray.find(predicate: (Char) -> Boolean): Char?
+fun <T> Iterable<T>.find(predicate: (T) -> Boolean): T?
+fun UIntArray.find(predicate: (UInt) -> Boolean): UInt?
+fun ULongArray.find(predicate: (ULong) -> Boolean): ULong?
+fun UByteArray.find(predicate: (UByte) -> Boolean): UByte?
+fun UShortArray.find(predicate: (UShort) -> Boolean): UShort?
+fun <T> Sequence<T>.find(predicate: (T) -> Boolean): T?
+fun CharSequence.find(predicate: (Char) -> Boolean): Char?
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/test/FoundationCatalogueValidation.kt:125:52 Unresolved reference 'it'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/test/FoundationCatalogueValidation.kt:126:9 Cannot infer type for this parameter. Please specify it explicitly.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/test/FoundationCatalogueValidation.kt:129:54 Unresolved reference 'trades'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/test/FoundationCatalogueValidation.kt:129:67 Unresolved reference 'it'.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/test/HierarchicalCatalogueTest.kt:302:75 No parameter with name 'keyword' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/test/HierarchicalCatalogueTest.kt:307:73 No parameter with name 'tradeType' found.
+e: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/app/src/main/java/com/nextgenbuildpro/pm/test/HierarchicalCatalogueTest.kt:312:73 No parameter with name 'lifecyclePhase' found.
+
+> Task :app:compileDebugKotlin FAILED
+
+[Incubating] Problems report is available at: file:///home/runner/work/nextgenbuildpro/nextgenbuildpro/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 4m 10s
+50 actionable tasks: 42 executed, 8 from cache
