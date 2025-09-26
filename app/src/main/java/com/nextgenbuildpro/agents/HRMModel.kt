@@ -1,6 +1,6 @@
 package com.nextgenbuildpro.agents
 
-import com.nextgenbuildpro.shared.NextGenAgent
+import com.nextgenbuildpro.shared.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,31 +10,37 @@ import kotlinx.coroutines.flow.asStateFlow
  * Stub implementation to fix compilation errors
  */
 class HRMModel : NextGenAgent {
-    override val agentId: String = "HRMModel"
-    override val agentName: String = "HRM Model"
+    override val agentType: AgentType = AgentType.HRM_MODEL
+    override val capabilities: List<AgentCapability> = emptyList()
     
-    private val _isActive = MutableStateFlow(false)
-    override val isActive: StateFlow<Boolean> = _isActive.asStateFlow()
+    private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
+    override val status: StateFlow<SystemStatus> = _status.asStateFlow()
     
-    override suspend fun start(): Result<Unit> {
+    override suspend fun initialize(): Result<Unit> {
         return try {
-            _isActive.value = true
+            _status.value = SystemStatus.ACTIVE
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
     
-    override suspend fun stop(): Result<Unit> {
+    override suspend fun processMessage(message: AgentMessage): Result<AgentMessage?> {
+        return Result.success(null)
+    }
+    
+    override suspend fun executeTask(task: NextGenTask): Result<NextGenTask> {
+        return Result.success(task)
+    }
+    
+    override suspend fun getStatus(): SystemStatus = _status.value
+    
+    override suspend fun shutdown(): Result<Unit> {
         return try {
-            _isActive.value = false
+            _status.value = SystemStatus.SHUTDOWN
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
-    
-    override suspend fun processMessage(message: Any): Result<Any> {
-        return Result.success("HRMModel processed: $message")
     }
 }
