@@ -41,6 +41,11 @@ This document provides essential information for GitHub Copilot coding agents wo
 
 ### Frontend Development
 
+**Setup Requirements**:
+```bash
+npm install  # Install all dependencies first
+```
+
 **TypeScript/React Native Build**: 
 ```bash
 npm run build    # Compile TypeScript
@@ -55,6 +60,8 @@ npm run seed:catalogue    # Seed construction catalogue
 npm run seed:verify      # Verify seeded data
 npm run seed:demo        # Run seeding demo
 ```
+
+**Note**: Frontend dependencies need to be installed with `npm install` before running scripts.
 
 ### Testing Strategy
 
@@ -194,7 +201,8 @@ interface NextGenService {
 - **TypeScript compilation**: Run `npm run build` to check for type errors
 - **Linting**: Use `npm run lint` to check code style
 - **Testing**: Run `npm run test` for Jest testing
-- **Dependencies**: Run `npm install` if packages are missing
+- **Dependencies**: Run `npm install` first - all dependencies need to be installed
+- **Missing packages**: Check `package.json` for required TypeScript types and tools
 
 ### Development Environment
 - **Android Studio**: Recommended for full development
