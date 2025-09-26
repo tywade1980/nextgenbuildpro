@@ -329,8 +329,6 @@ class AutomationDebugger(private val context: Context) {
         }
     }
 
-=======
-    
     private suspend fun testFoundationCatalogueValidation() {
         Log.d(TAG, "Testing Foundation & Basement catalogue enhancements...")
         
@@ -342,9 +340,5 @@ class AutomationDebugger(private val context: Context) {
             Log.e(TAG, "❌ Foundation catalogue validation failed: ${e.message}", e)
             throw e
         }
-    }
-    
-    companion object {
-        private const val TAG = "AutomationDebugger"
     }
 }

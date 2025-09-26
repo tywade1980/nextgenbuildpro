@@ -19,9 +19,6 @@ import com.nextgenbuildpro.features.estimates.EstimateItemEditorScreen
 import com.nextgenbuildpro.features.tasks.TasksScreen
 import com.nextgenbuildpro.features.calendar.CalendarScreen
 import com.nextgenbuildpro.features.calendar.CalendarEventEditorScreen
-
-=======
-import com.nextgenbuildpro.features.estimates.EstimateItemEditorScreen
 import com.nextgenbuildpro.features.estimates.AssemblySearchAndSelectionScreen
 import com.nextgenbuildpro.features.estimates.EnhancedEstimateEditorScreen
 import com.nextgenbuildpro.features.estimates.AssemblyIntegrationDemoScreen
