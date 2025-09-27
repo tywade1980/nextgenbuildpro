@@ -37,7 +37,28 @@ enum class SystemStatus {
  * Agent types in the NextGen ecosystem
  */
 enum class AgentType {
-    MRM, HERMES_BRAIN, BIG_DADDY, HRM_MODEL, ELITE_HUMAN, ORCHESTRATOR
+    MRM, HERMES_BRAIN, BIG_DADDY, HRM_MODEL, ELITE_HUMAN, ORCHESTRATOR,
+    // New Departmental Orchestrators
+    PERSONAL_ASSISTANT_ORCHESTRATOR,
+    CRM_ORCHESTRATOR,
+    PROJECT_MANAGEMENT_ORCHESTRATOR,
+    ANALYTICS_ORCHESTRATOR,
+    DESIGN_DEPARTMENT_ORCHESTRATOR,
+    MARKETING_ORCHESTRATOR
+}
+
+/**
+ * Specialized Agent Interface for MCP-enabled agents
+ */
+interface SpecializedAgent {
+    val agentId: String
+    val agentType: AgentType
+    val specialization: String
+    val isActive: StateFlow<Boolean>
+    
+    suspend fun initialize(): Result<Unit>
+    suspend fun processTask(task: NextGenTask): Result<NextGenTask>
+    suspend fun shutdown(): Result<Unit>
 }
 
 // ===== DATA MODELS =====
@@ -365,4 +386,205 @@ data class PerformanceMetrics(
     val throughput: Double,
     val errorRate: Double,
     val timestamp: LocalDateTime = LocalDateTime.now()
+)
+
+// ===== DEPARTMENTAL ORCHESTRATOR TYPES =====
+
+/**
+ * Base interface for departmental orchestrators
+ */
+interface DepartmentalOrchestrator : LearningAgent {
+    val departmentName: String
+    val toolsets: List<OrchestratorTool>
+    val sharedContext: StateFlow<SharedContext>
+    
+    suspend fun processVoiceCommand(command: String): Result<String>
+    suspend fun getSpecializedCapabilities(): List<AgentCapability>
+    suspend fun coordinateWithOtherDepartments(request: InterDepartmentalRequest): Result<InterDepartmentalResponse>
+}
+
+/**
+ * Shared context across all orchestrators
+ */
+data class SharedContext(
+    val currentProjects: List<ConstructionProject>,
+    val activeClients: List<ClientInfo>,
+    val systemMetrics: PerformanceMetrics,
+    val weatherConditions: WeatherInfo? = null,
+    val locationContext: LocationContext? = null,
+    val timestamp: LocalDateTime = LocalDateTime.now()
+)
+
+/**
+ * Tools available to orchestrators
+ */
+data class OrchestratorTool(
+    val name: String,
+    val description: String,
+    val toolType: ToolType,
+    val permissions: List<Permission>,
+    val isActive: Boolean = true
+)
+
+/**
+ * Tool types available to orchestrators
+ */
+enum class ToolType {
+    SYSTEM_INTEGRATION, VOICE_COMMAND, DATA_ANALYSIS, COMMUNICATION,
+    DESIGN_TOOL, MODELING_TOOL, REPORTING_TOOL, AUTOMATION_TOOL,
+    ANDROID_NATIVE, THIRD_PARTY_API, AI_SERVICE
+}
+
+/**
+ * Permission system for orchestrator tools
+ */
+enum class Permission {
+    READ_CONTACTS, WRITE_CONTACTS, MAKE_CALLS, SEND_SMS, ACCESS_CAMERA,
+    ACCESS_LOCATION, ACCESS_MICROPHONE, READ_CALENDAR, WRITE_CALENDAR,
+    ACCESS_STORAGE, INTERNET_ACCESS, SYSTEM_ADMIN
+}
+
+/**
+ * Inter-departmental communication
+ */
+data class InterDepartmentalRequest(
+    val requestingDepartment: AgentType,
+    val targetDepartment: AgentType,
+    val requestType: RequestType,
+    val data: Map<String, Any>,
+    val priority: Priority = Priority.MEDIUM
+)
+
+data class InterDepartmentalResponse(
+    val success: Boolean,
+    val data: Map<String, Any>,
+    val nextActions: List<String> = emptyList(),
+    val collaborationNeeded: Boolean = false
+)
+
+enum class RequestType {
+    DATA_QUERY, TASK_EXECUTION, RESOURCE_REQUEST, STATUS_UPDATE,
+    COLLABORATION_REQUEST, EXPERTISE_REQUEST
+}
+
+/**
+ * Client information model
+ */
+data class ClientInfo(
+    val id: EntityId = UUID.randomUUID().toString(),
+    val name: String,
+    val phone: String,
+    val email: String,
+    val address: String,
+    val projects: List<EntityId> = emptyList(),
+    val communicationHistory: List<CommunicationRecord> = emptyList(),
+    val preferences: ClientPreferences = ClientPreferences(),
+    val tags: List<String> = emptyList()
+)
+
+data class ClientPreferences(
+    val preferredCommunicationMethod: CommunicationMethod = CommunicationMethod.PHONE,
+    val bestTimeToContact: String = "9AM-5PM",
+    val language: String = "en",
+    val specialRequirements: List<String> = emptyList()
+)
+
+enum class CommunicationMethod {
+    PHONE, EMAIL, SMS, IN_PERSON, VIDEO_CALL
+}
+
+data class CommunicationRecord(
+    val id: EntityId = UUID.randomUUID().toString(),
+    val method: CommunicationMethod,
+    val direction: CommunicationDirection,
+    val content: String,
+    val timestamp: LocalDateTime = LocalDateTime.now(),
+    val outcome: String? = null
+)
+
+enum class CommunicationDirection {
+    INBOUND, OUTBOUND
+}
+
+/**
+ * Weather information for schedule optimization
+ */
+data class WeatherInfo(
+    val temperature: Double,
+    val humidity: Double,
+    val precipitation: Double,
+    val windSpeed: Double,
+    val conditions: WeatherConditions,
+    val forecast: List<WeatherForecast> = emptyList()
+)
+
+enum class WeatherConditions {
+    CLEAR, PARTLY_CLOUDY, CLOUDY, LIGHT_RAIN, HEAVY_RAIN, SNOW, STORM
+}
+
+data class WeatherForecast(
+    val date: LocalDateTime,
+    val conditions: WeatherConditions,
+    val temperature: Double,
+    val precipitationChance: Double
+)
+
+/**
+ * Location context for field operations
+ */
+data class LocationContext(
+    val latitude: Double,
+    val longitude: Double,
+    val address: String,
+    val accuracy: Float,
+    val isJobSite: Boolean = false,
+    val geofenceId: String? = null
+)
+
+/**
+ * Construction cost data models
+ */
+data class CostDatabase(
+    val residentialTemplates: Map<String, ResidentialTemplate>,
+    val laborRates: Map<String, LaborRate>,
+    val materialCosts: Map<String, MaterialCost>,
+    val equipmentRates: Map<String, EquipmentRate>,
+    val regionalMultipliers: Map<String, Double>
+)
+
+data class ResidentialTemplate(
+    val category: String,
+    val description: String,
+    val costPerSqFt: CostRange,
+    val laborHours: Double,
+    val materials: List<String>
+)
+
+data class CostRange(
+    val min: Double,
+    val max: Double,
+    val average: Double
+)
+
+data class LaborRate(
+    val trade: String,
+    val hourlyRate: CostRange,
+    val skillLevel: SkillLevel,
+    val region: String
+)
+
+data class MaterialCost(
+    val name: String,
+    val unit: String,
+    val cost: Double,
+    val supplier: String,
+    val lastUpdated: LocalDateTime
+)
+
+data class EquipmentRate(
+    val name: String,
+    val dailyRate: Double,
+    val weeklyRate: Double,
+    val monthlyRate: Double,
+    val category: String
 )
