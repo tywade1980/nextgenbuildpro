@@ -47,6 +47,20 @@ enum class AgentType {
     MARKETING_ORCHESTRATOR
 }
 
+/**
+ * Specialized Agent Interface for MCP-enabled agents
+ */
+interface SpecializedAgent {
+    val agentId: String
+    val agentType: AgentType
+    val specialization: String
+    val isActive: StateFlow<Boolean>
+    
+    suspend fun initialize(): Result<Unit>
+    suspend fun processTask(task: NextGenTask): Result<NextGenTask>
+    suspend fun shutdown(): Result<Unit>
+}
+
 // ===== DATA MODELS =====
 
 /**

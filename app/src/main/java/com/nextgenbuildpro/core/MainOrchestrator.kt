@@ -1,7 +1,7 @@
 package com.nextgenbuildpro.core
 
 import com.nextgenbuildpro.shared.*
-import com.nextgenbuildpro.agents.*
+import com.nextgenbuildpro.orchestrators.OrchestratorManager
 import com.nextgenbuildpro.env.LivingEnv
 import com.nextgenbuildpro.apps.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,16 +19,18 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 /**
- * MainOrchestrator
+ * MainOrchestrator for NextGen BuildPro v2.0
  * 
- * The central orchestrator for the NextGen AI OS that coordinates all agents,
- * services, and applications. It provides intelligent task distribution,
- * system-wide optimization, and seamless integration management.
+ * The central orchestrator that coordinates the new departmental orchestrator system
+ * with MCP server integration and intuitive navigation management.
  */
 class MainOrchestrator(private val context: Context) : Orchestrator {
     
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val mutex = Mutex()
+    
+    // New v2.0 orchestrator system
+    private val orchestratorManager = OrchestratorManager()
     
     // System state
     private val _systemStatus = MutableStateFlow(SystemStatus.INITIALIZING)
@@ -40,60 +42,31 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     private val _activeTasks = MutableStateFlow<List<NextGenTask>>(emptyList())
     val activeTasks: StateFlow<List<NextGenTask>> = _activeTasks.asStateFlow()
     
-    private val _systemMetrics = MutableStateFlow(SystemMetrics())
-    val systemMetrics: StateFlow<SystemMetrics> = _systemMetrics.asStateFlow()
-    
     // Core components
     private val livingEnv = LivingEnv()
-    private val agents = mutableMapOf<AgentType, NextGenAgent>()
     private val services = mutableMapOf<String, NextGenService>()
-    
-    // Orchestration components
-    private val taskQueue = TaskQueue()
-    private val resourceManager = OrchestrationResourceManager()
-    private val performanceMonitor = PerformanceMonitor()
-    private val decisionEngine = DecisionEngine()
-    private val emergencyHandler = EmergencyHandler()
-    
-    // Task management
-    private val taskHistory = mutableListOf<TaskExecution>()
-    private val workflowTemplates = mutableMapOf<String, WorkflowTemplate>()
-    
-    // Configuration
-    private val config = OrchestratorConfig(
-        maxConcurrentTasks = 50,
-        taskTimeoutMinutes = 30,
-        enablePredictiveScheduling = true,
-        enableAutoRecovery = true,
-        enablePerformanceOptimization = true,
-        emergencyResponseTime = 5000L // 5 seconds
-    )
     
     suspend fun initialize(): Result<Unit> = try {
         mutex.withLock {
-            Log.i("MainOrchestrator", "Initializing NextGen AI OS Orchestrator...")
+            Log.i("MainOrchestrator", "Initializing NextGen BuildPro v2.0 System...")
             
             _systemStatus.value = SystemStatus.INITIALIZING
+            
+            // Initialize new orchestrator system
+            orchestratorManager.initialize().getOrThrow()
             
             // Initialize core components
             initializeComponents()
             
-            // Initialize agents
-            initializeAgents()
-            
-            // Initialize services
+            // Initialize services  
             initializeServices()
             
-            // Initialize workflow templates
-            initializeWorkflowTemplates()
-            
-            // Start monitoring and optimization
+            // Start monitoring
             startSystemMonitoring()
-            startPerformanceOptimization()
             
             _systemStatus.value = SystemStatus.ACTIVE
             
-            Log.i("MainOrchestrator", "NextGen AI OS Orchestrator initialized successfully")
+            Log.i("MainOrchestrator", "NextGen BuildPro v2.0 System initialized successfully")
             
             // Send system ready notification
             broadcastSystemReady()
@@ -107,23 +80,20 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     
     suspend fun shutdown(): Result<Unit> = try {
         mutex.withLock {
-            Log.i("MainOrchestrator", "Shutting down NextGen AI OS Orchestrator...")
+            Log.i("MainOrchestrator", "Shutting down NextGen BuildPro v2.0 System...")
             
             _systemStatus.value = SystemStatus.SHUTDOWN
             
-            // Complete ongoing tasks
-            completeOngoingTasks()
+            // Shutdown orchestrator system
+            orchestratorManager.shutdown()
             
             // Shutdown services
             shutdownServices()
             
-            // Shutdown agents
-            shutdownAgents()
-            
-            // Shutdown components
+            // Shutdown components  
             shutdownComponents()
             
-            Log.i("MainOrchestrator", "NextGen AI OS Orchestrator shutdown complete")
+            Log.i("MainOrchestrator", "NextGen BuildPro v2.0 System shutdown complete")
         }
         Result.success(Unit)
     } catch (e: Exception) {
@@ -131,19 +101,20 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         Result.failure(e)
     }
     
-    // === ORCHESTRATION METHODS ===
+    // === NEW v2.0 ORCHESTRATION METHODS ===
     
     override suspend fun orchestrateTask(task: NextGenTask): Result<Unit> = try {
         Log.d("MainOrchestrator", "Orchestrating task: ${task.title}")
         
-        // Validate task
-        val validation = validateTask(task)
-        if (!validation.isValid) {
-            return Result.failure(IllegalArgumentException("Task validation failed: ${validation.reason}"))
-        }
+        // Use new orchestrator system
+        orchestratorManager.processTask(task).getOrThrow()
         
-        // Determine optimal agent for task
-        val optimalAgent = decisionEngine.selectOptimalAgent(task, agents.keys.toList())
+        // Update active tasks
+        val currentTasks = _activeTasks.value.toMutableList()
+        currentTasks.add(task)
+        _activeTasks.value = currentTasks
+        
+        Result.success(Unit)
         
         // Check resource availability
         val resourceCheck = resourceManager.checkResourceAvailability(task)
