@@ -347,15 +347,56 @@ class HierarchicalCatalogueRepository(private val context: Context) {
         )
     }
 
-    // Additional simplified trade creation methods...
+    // Trade creation methods with proper implementations
     private fun createPlumbingTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
+        // Create basic plumbing tasks
+        val plumbingTasks = listOf(
+            DetailedTask(
+                name = "Install Supply Lines",
+                description = "Install hot and cold water supply lines",
+                estimatedHours = 16.0,
+                materialCost = 450.0,
+                laborCost = 800.0,
+                requirements = listOf("Framing complete")
+            ),
+            DetailedTask(
+                name = "Install Drain Lines",
+                description = "Install waste and vent lines",
+                estimatedHours = 20.0,
+                materialCost = 350.0,
+                laborCost = 1000.0,
+                requirements = listOf("Supply lines installed")
+            ),
+            DetailedTask(
+                name = "Install Fixtures",
+                description = "Install toilets, sinks, and other fixtures",
+                estimatedHours = 12.0,
+                materialCost = 800.0,
+                laborCost = 600.0,
+                requirements = listOf("Drain lines complete")
+            )
+        )
+        
+        val plumbingAssembly = DetailedAssembly(
+            name = "Rough Plumbing",
+            description = "Basic plumbing infrastructure",
+            assemblyCode = "PLB-001",
+            unit = "sqft",
+            baseQuantity = 1500.0,
+            lifecyclePhase = HomeLifecyclePhase.SYSTEMS,
+            tasks = plumbingTasks,
+            macroTasks = emptyList(),
+            prerequisites = listOf("Framing inspection complete"),
+            deliverables = listOf("All rough plumbing installed and inspected")
+        )
+        
         val plumbingMasterAssembly = MasterAssembly(
             name = "Plumbing Master Assembly",
             description = "Complete plumbing system for residential construction",
             tradeCode = "PLB",
-            assemblies = emptyList(), // Would be populated with detailed assemblies
+            assemblies = listOf(plumbingAssembly),
             subAssemblies = emptyList(),
-            totalEstimatedHours = 60.0,
+            totalEstimatedHours = 48.0,
             totalEstimatedCost = 2800.0
         )
 
@@ -372,13 +413,54 @@ class HierarchicalCatalogueRepository(private val context: Context) {
     }
 
     private fun createHVACTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
+        // Create basic HVAC tasks
+        val hvacTasks = listOf(
+            DetailedTask(
+                name = "Install Ductwork",
+                description = "Install supply and return air ducts",
+                estimatedHours = 24.0,
+                materialCost = 800.0,
+                laborCost = 1200.0,
+                requirements = listOf("Framing complete")
+            ),
+            DetailedTask(
+                name = "Install HVAC Unit",
+                description = "Install heating and cooling equipment",
+                estimatedHours = 16.0,
+                materialCost = 2500.0,
+                laborCost = 800.0,
+                requirements = listOf("Electrical rough-in complete")
+            ),
+            DetailedTask(
+                name = "Install Controls",
+                description = "Install thermostats and control systems",
+                estimatedHours = 8.0,
+                materialCost = 200.0,
+                laborCost = 400.0,
+                requirements = listOf("HVAC unit installed")
+            )
+        )
+        
+        val hvacAssembly = DetailedAssembly(
+            name = "HVAC System Installation",
+            description = "Complete HVAC system installation",
+            assemblyCode = "HVC-001",
+            unit = "sqft",
+            baseQuantity = 1800.0,
+            lifecyclePhase = HomeLifecyclePhase.SYSTEMS,
+            tasks = hvacTasks,
+            macroTasks = emptyList(),
+            prerequisites = listOf("Framing and electrical rough-in complete"),
+            deliverables = listOf("HVAC system fully installed and tested")
+        )
+        
         val hvacMasterAssembly = MasterAssembly(
             name = "HVAC Master Assembly",
             description = "Complete HVAC system for residential construction",
             tradeCode = "HVC",
-            assemblies = emptyList(),
+            assemblies = listOf(hvacAssembly),
             subAssemblies = emptyList(),
-            totalEstimatedHours = 100.0,
+            totalEstimatedHours = 48.0,
             totalEstimatedCost = 4500.0
         )
 
@@ -395,13 +477,54 @@ class HierarchicalCatalogueRepository(private val context: Context) {
     }
 
     private fun createDrywallTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
+        // Create basic drywall tasks
+        val drywallTasks = listOf(
+            DetailedTask(
+                name = "Hang Drywall",
+                description = "Install gypsum board sheets",
+                estimatedHours = 24.0,
+                materialCost = 600.0,
+                laborCost = 720.0,
+                requirements = listOf("All systems rough-in complete")
+            ),
+            DetailedTask(
+                name = "Tape and Mud",
+                description = "Apply joint compound and tape joints",
+                estimatedHours = 20.0,
+                materialCost = 150.0,
+                laborCost = 600.0,
+                requirements = listOf("Drywall hung and inspected")
+            ),
+            DetailedTask(
+                name = "Sand and Prime",
+                description = "Sand smooth and apply primer",
+                estimatedHours = 16.0,
+                materialCost = 100.0,
+                laborCost = 480.0,
+                requirements = listOf("Final mud coat dried")
+            )
+        )
+        
+        val drywallAssembly = DetailedAssembly(
+            name = "Interior Drywall",
+            description = "Complete drywall installation and finishing",
+            assemblyCode = "DRY-001",
+            unit = "sqft",
+            baseQuantity = 3000.0,
+            lifecyclePhase = HomeLifecyclePhase.INTERIORS,
+            tasks = drywallTasks,
+            macroTasks = emptyList(),
+            prerequisites = listOf("All rough inspections passed", "Insulation installed"),
+            deliverables = listOf("Walls ready for paint")
+        )
+        
         val drywallMasterAssembly = MasterAssembly(
             name = "Drywall Master Assembly",
             description = "Complete drywall system for interior finishing",
             tradeCode = "DRY",
-            assemblies = emptyList(),
+            assemblies = listOf(drywallAssembly),
             subAssemblies = emptyList(),
-            totalEstimatedHours = 80.0,
+            totalEstimatedHours = 60.0,
             totalEstimatedCost = 1800.0
         )
 
@@ -418,14 +541,56 @@ class HierarchicalCatalogueRepository(private val context: Context) {
     }
 
     private fun createRoofingTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
+        // Create basic roofing tasks
+        val roofingTasks = listOf(
+            DetailedTask(
+                name = "Install Roof Decking",
+                description = "Install plywood or OSB roof sheathing",
+                estimatedHours = 16.0,
+                materialCost = 800.0,
+                laborCost = 640.0,
+                requirements = listOf("Roof framing complete")
+            ),
+            DetailedTask(
+                name = "Install Underlayment",
+                description = "Install roofing felt or synthetic underlayment",
+                estimatedHours = 8.0,
+                materialCost = 300.0,
+                laborCost = 320.0,
+                requirements = listOf("Roof decking installed")
+            ),
+            DetailedTask(
+                name = "Install Shingles",
+                description = "Install asphalt shingles and flashing",
+                estimatedHours = 20.0,
+                materialCost = 1500.0,
+                laborCost = 800.0,
+                requirements = listOf("Underlayment complete")
+            )
+        )
+        
+        val roofingAssembly = DetailedAssembly(
+            name = "Asphalt Shingle Roof",
+            description = "Complete roofing system installation",
+            assemblyCode = "ROF-001",
+            unit = "sqft",
+            baseQuantity = 2200.0,
+            lifecyclePhase = HomeLifecyclePhase.EXTERIOR,
+            tasks = roofingTasks,
+            macroTasks = emptyList(),
+            prerequisites = listOf("Roof framing inspection passed"),
+            deliverables = listOf("Weather-tight roof system")
+        )
+        
         val roofingMasterAssembly = MasterAssembly(
             name = "Roofing Master Assembly",
             description = "Complete roofing system for weather protection",
             tradeCode = "ROF",
-            assemblies = emptyList(),
+            assemblies = listOf(roofingAssembly),
             subAssemblies = emptyList(),
-            totalEstimatedHours = 60.0,
+            totalEstimatedHours = 44.0,
             totalEstimatedCost = 3200.0
+        )
         )
 
         return TradeIndex(
