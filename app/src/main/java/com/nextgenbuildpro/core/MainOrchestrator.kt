@@ -545,9 +545,10 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     private suspend fun queueTaskForLater(task: NextGenTask, availableAt: LocalDateTime?): Result<Unit> {
         return try {
             // Schedule task for later execution
-            val delay = availableAt?.let { 
+            val rawDelay = availableAt?.let { 
                 Duration.between(LocalDateTime.now(), it).toMillis() 
             } ?: 60000L // Default 1 minute delay
+            val delay = if (rawDelay > 0) rawDelay else 0L
             
             scope.launch {
                 kotlinx.coroutines.delay(delay)
