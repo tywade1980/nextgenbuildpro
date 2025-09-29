@@ -21,25 +21,43 @@ class NavigationHelper(private val context: Context) {
         NavDestinations.HOME,
         NavDestinations.LEADS,
         NavDestinations.LEAD_DETAIL,
-        NavDestinations.LEAD_EDITOR,  // Add this line
-        NavDestinations.NOTE_EDITOR,  // Add this line
+        NavDestinations.LEAD_EDITOR,
+        NavDestinations.NOTE_EDITOR,
         NavDestinations.ESTIMATES,
         NavDestinations.ESTIMATE_DETAIL,
+        NavDestinations.ESTIMATE_EDITOR,
+        NavDestinations.ESTIMATE_ITEM_EDITOR,
+        NavDestinations.ASSEMBLY_SEARCH,
+        NavDestinations.ENHANCED_ESTIMATE_EDITOR,
+        NavDestinations.ASSEMBLY_INTEGRATION_DEMO,
+        NavDestinations.ENHANCED_CATALOGUE_DEMO,
+        NavDestinations.PROJECTS,
+        NavDestinations.PROJECT_DETAIL,
+        NavDestinations.CAMERA,
+        NavDestinations.ROOM_SCAN,
+        NavDestinations.MESSAGES,
+        NavDestinations.MESSAGE_DETAIL,
+        NavDestinations.FILE_UPLOAD,
+        NavDestinations.ACCOUNT_SETTINGS,
+        NavDestinations.PERMISSIONS,
+        NavDestinations.NOTIFICATIONS,
         NavDestinations.CALENDAR,
-        NavDestinations.CALENDAR_EVENT_EDITOR, // Moved from placeholders
-        NavDestinations.CALENDAR_TIMELINE, // Moved from placeholders
-        NavDestinations.MESSAGES, // Moved from placeholders
-        NavDestinations.MORE, // Moved from placeholders
-        NavDestinations.NOTIFICATIONS, // Moved from placeholders
+        NavDestinations.CALENDAR_EVENT_EDITOR,
+        NavDestinations.CALENDAR_TIMELINE,
+        NavDestinations.TIME_CLOCK,
         NavDestinations.AR_VISUALIZATION,
         NavDestinations.VOICE_TO_TEXT,
         NavDestinations.OFFLINE_MODE,
-        NavDestinations.TIME_CLOCK,
         NavDestinations.CLIENT_PORTAL,
         NavDestinations.PROGRESS_UPDATES,
         NavDestinations.DIGITAL_SIGNATURE,
+        NavDestinations.AI_RECEPTIONIST_SETTINGS,
+        NavDestinations.BMS,
         NavDestinations.WORKFLOW_AUTOMATION,
-        "tasks" // Direct route for tasks screen
+        NavDestinations.MORE,
+        "tasks", // Direct route for tasks screen
+        "assembly_detail", // Direct route for assembly detail
+        "template_detail" // Direct route for template detail
     )
 
     // Set of partially implemented destinations (have a placeholder)

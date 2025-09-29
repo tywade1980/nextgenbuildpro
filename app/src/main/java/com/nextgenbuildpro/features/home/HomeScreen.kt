@@ -145,7 +145,7 @@ fun HomeTopBar(navController: NavController) {
                     }
 
                     IconButton(
-                        onClick = { navController.navigate("messages") }
+                        onClick = { navController.navigateSafely(NavDestinations.MESSAGES) }
                     ) {
                         Icon(
                             Icons.Default.Email,
@@ -251,7 +251,7 @@ fun CrmPathSection(navController: NavController) {
                     text = ">",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { navController.navigateSafely("leads") }
+                    modifier = Modifier.clickable { navController.navigateSafely(NavDestinations.LEADS) }
                 )
             }
 
@@ -264,13 +264,13 @@ fun CrmPathSection(navController: NavController) {
                 ActionItem(
                     icon = Icons.Default.Person,
                     label = "New Lead",
-                    onClick = { navController.navigateSafely("lead_editor") }
+                    onClick = { navController.navigateSafely(NavDestinations.LEAD_EDITOR) }
                 )
 
                 ActionItem(
                     icon = Icons.Default.Email,
                     label = "Message",
-                    onClick = { navController.navigateSafely("messages") }
+                    onClick = { navController.navigateSafely(NavDestinations.MESSAGES) }
                 )
 
                 ActionItem(
@@ -295,13 +295,13 @@ fun CrmPathSection(navController: NavController) {
                 ActionItem(
                     icon = Icons.Default.Note,
                     label = "Note",
-                    onClick = { navController.navigateSafely("note_editor") }
+                    onClick = { navController.navigateSafely(NavDestinations.NOTE_EDITOR) }
                 )
 
                 ActionItem(
                     icon = Icons.Default.Upload,
                     label = "File",
-                    onClick = { navController.navigateSafely("file_upload") }
+                    onClick = { navController.navigateSafely(NavDestinations.FILE_UPLOAD) }
                 )
             }
         }
@@ -330,7 +330,7 @@ fun ProjectManagementPathSection(navController: NavController) {
                     text = ">",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { navController.navigateSafely("projects") }
+                    modifier = Modifier.clickable { navController.navigateSafely(NavDestinations.PROJECTS) }
                 )
             }
 
@@ -343,19 +343,19 @@ fun ProjectManagementPathSection(navController: NavController) {
                 ActionItem(
                     icon = Icons.Default.AttachMoney,
                     label = "Estimate",
-                    onClick = { navController.navigateSafely("estimate_editor") }
+                    onClick = { navController.navigateSafely(NavDestinations.ESTIMATE_EDITOR) }
                 )
 
                 ActionItem(
                     icon = Icons.Default.Build,
                     label = "Project",
-                    onClick = { navController.navigateSafely("projects") }
+                    onClick = { navController.navigateSafely(NavDestinations.PROJECTS) }
                 )
 
                 ActionItem(
                     icon = Icons.Default.PhotoCamera,
                     label = "Photo",
-                    onClick = { navController.navigateSafely("camera") }
+                    onClick = { navController.navigateSafely(NavDestinations.CAMERA) }
                 )
             }
 
@@ -368,7 +368,7 @@ fun ProjectManagementPathSection(navController: NavController) {
                 ActionItem(
                     icon = Icons.Default.CameraAlt,
                     label = "Room Scan",
-                    onClick = { navController.navigateSafely("room_scan") }
+                    onClick = { navController.navigateSafely(NavDestinations.ROOM_SCAN) }
                 )
 
                 ActionItem(
@@ -436,7 +436,7 @@ fun CreateNewSection(navController: NavController) {
                     label = stringResource(R.string.take_photo),
                     onClick = { 
                         // Open camera to take a photo
-                        navController.navigate("camera")
+                        navController.navigateSafely(NavDestinations.CAMERA)
                     }
                 )
 
@@ -445,7 +445,7 @@ fun CreateNewSection(navController: NavController) {
                     label = stringResource(R.string.room_scan),
                     onClick = { 
                         // Open room scanning feature
-                        navController.navigate("room_scan")
+                        navController.navigateSafely(NavDestinations.ROOM_SCAN)
                     }
                 )
 
@@ -454,7 +454,7 @@ fun CreateNewSection(navController: NavController) {
                     label = stringResource(R.string.message),
                     onClick = { 
                         // Open messaging feature
-                        navController.navigate("messages")
+                        navController.navigateSafely(NavDestinations.MESSAGES)
                     }
                 )
             }
@@ -470,14 +470,14 @@ fun CreateNewSection(navController: NavController) {
                     label = stringResource(R.string.estimate),
                     onClick = { 
                         // Navigate to create new estimate screen
-                        navController.navigate("estimate_editor")
+                        navController.navigateSafely(NavDestinations.ESTIMATE_EDITOR)
                     }
                 )
 
                 ActionItem(
                     icon = Icons.Default.Person,
                     label = stringResource(R.string.lead),
-                    onClick = { navController.navigate("leads") }
+                    onClick = { navController.navigateSafely(NavDestinations.LEADS) }
                 )
 
                 ActionItem(
@@ -485,7 +485,7 @@ fun CreateNewSection(navController: NavController) {
                     label = stringResource(R.string.file),
                     onClick = { 
                         // Open file upload dialog
-                        navController.navigate("file_upload")
+                        navController.navigateSafely(NavDestinations.FILE_UPLOAD)
                     }
                 )
             }
@@ -501,7 +501,7 @@ fun CreateNewSection(navController: NavController) {
                     label = stringResource(R.string.note),
                     onClick = { 
                         // Navigate to note editor
-                        navController.navigate("note_editor")
+                        navController.navigateSafely(NavDestinations.NOTE_EDITOR)
                     }
                 )
             }
@@ -566,7 +566,7 @@ fun LeadsSection(navController: NavController) {
                     text = ">",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { navController.navigate("leads") }
+                    modifier = Modifier.clickable { navController.navigateSafely(NavDestinations.LEADS) }
                 )
             }
 
@@ -690,7 +690,7 @@ fun EstimatesSection(navController: NavController) {
                     text = ">",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { navController.navigate("estimates") }
+                    modifier = Modifier.clickable { navController.navigateSafely(NavDestinations.ESTIMATES) }
                 )
             }
 
