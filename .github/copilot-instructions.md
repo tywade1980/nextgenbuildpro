@@ -2,6 +2,14 @@
 
 This document provides essential information for GitHub Copilot coding agents working with the NextGen BuildPro repository. Following these instructions will reduce build failures, minimize exploration time, and improve code quality.
 
+## 🚀 Quick Start for Copilot Agents
+
+**Key Context**: This is a hybrid Android/TypeScript construction management app with a unique multi-agent AI architecture. Before making changes:
+1. Understand which build system you're working with (Gradle for Android, npm for frontend)
+2. Check if your changes affect AI agent coordination (`MainOrchestrator.kt`) 
+3. Verify Firebase integration requirements if working with data services
+4. Test both platforms if making cross-cutting changes
+
 ## Repository Overview
 
 **NextGen BuildPro** is an Android application built in Kotlin that implements a Multi-Agent AI Operating System for the construction industry. The project combines specialized AI agents with human intelligence to create an adaptive construction management platform.
@@ -217,3 +225,48 @@ interface NextGenService {
 - You need specific implementation details not documented
 
 This instruction set minimizes exploration time and maximizes productivity within the NextGen BuildPro AI architecture.
+
+## Guidelines for Code Changes
+
+### Do's
+- **Always** run `npm install` before using npm scripts
+- **Always** test both Android (Gradle) and frontend (npm) builds when making changes
+- **Always** use `Result<T>` pattern for error handling in Kotlin services
+- **Always** follow Material Design 3 patterns for UI components
+- **Always** use `StateFlow` for reactive state management
+- **Always** maintain thread safety with `Mutex` in AI agents
+
+### Don'ts  
+- **Never** commit without testing the affected build system
+- **Never** modify agent coordination without testing impact on `MainOrchestrator`
+- **Never** bypass the `shared/Types.kt` interfaces for agents and services
+- **Never** ignore Firebase configuration requirements for full functionality
+- **Don't** use blocking calls in Kotlin coroutines - use suspend functions
+- **Don't** modify both Kotlin models and TypeScript schemas without keeping them in sync
+
+### Context-Specific Notes
+- The codebase uses a unique multi-agent AI architecture - changes to one agent may affect others
+- Firebase integration is critical - many features require proper `google-services.json` configuration  
+- The project combines Android native and React Native/TypeScript - consider both platforms when making changes
+- Testing infrastructure is distributed across multiple locations (`app/src/test/` and `app/src/main/.../test/`)
+- Build issues often relate to Android SDK setup - focus on code analysis in sandboxed environments
+
+## Expected Outputs and Quality Standards
+
+### Code Quality
+- All Kotlin code should compile against Kotlin 2.0.21+ and follow coroutine patterns
+- TypeScript code should type-check with strict settings (`tsconfig.json`)
+- UI components should follow Material Design 3 guidelines
+- All agents should implement proper error handling with `Result<T>` patterns
+
+### Testing Expectations  
+- New agent features should have tests in `app/src/main/.../test/` or `app/src/test/`
+- Frontend functionality should have Jest tests in `tests/` directory
+- Complex integrations should be testable through `AutomationDebugger.kt`
+- Firebase-dependent features may require mock implementations for testing
+
+### Documentation Standards
+- New AI agents should document their capabilities and integration points
+- API changes should update relevant README files in module directories
+- Cross-platform features should note compatibility requirements
+- Complex algorithms should include inline documentation explaining the construction domain context
