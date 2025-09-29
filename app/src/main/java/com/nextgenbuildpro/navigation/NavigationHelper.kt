@@ -53,9 +53,10 @@ class NavigationHelper(private val context: Context) {
         NavDestinations.DIGITAL_SIGNATURE,
         NavDestinations.AI_RECEPTIONIST_SETTINGS,
         NavDestinations.BMS,
+        NavDestinations.BUILDING_DETAIL,
         NavDestinations.WORKFLOW_AUTOMATION,
         NavDestinations.MORE,
-        "tasks", // Direct route for tasks screen
+        NavDestinations.TASKS,
         "assembly_detail", // Direct route for assembly detail
         "template_detail" // Direct route for template detail
     )

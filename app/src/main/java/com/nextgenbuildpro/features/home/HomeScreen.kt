@@ -380,7 +380,7 @@ fun ProjectManagementPathSection(navController: NavController) {
                 ActionItem(
                     icon = Icons.Default.Assignment,
                     label = "Tasks",
-                    onClick = { navController.navigateSafely("tasks") }
+                    onClick = { navController.navigateSafely(NavDestinations.TASKS) }
                 )
             }
 

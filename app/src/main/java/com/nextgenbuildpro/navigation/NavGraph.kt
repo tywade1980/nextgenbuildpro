@@ -27,7 +27,7 @@ import com.nextgenbuildpro.clientengagement.ui.ProgressUpdatesScreen
 import com.nextgenbuildpro.clientengagement.ui.DigitalSignatureScreen
 import com.nextgenbuildpro.receptionist.ui.AIReceptionistSettingsScreen
 import com.nextgenbuildpro.timeclock.ui.TimeClockScreen
-//import com.nextgenbuildpro.ui.PlaceholderScreen
+
 import com.nextgenbuildpro.crm.ui.MessagesScreen
 import com.nextgenbuildpro.features.automation.WorkflowAutomationScreen
 import androidx.compose.runtime.remember
@@ -238,7 +238,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         // Tasks
-        composable("tasks") {
+        composable(NavDestinations.TASKS) {
             TasksScreen(navController)
         }
 
@@ -358,6 +358,15 @@ fun NavGraph(navController: NavHostController) {
             com.nextgenbuildpro.bms.ui.BmsScreen(navController)
         }
 
+        // Building Detail
+        composable(
+            route = "${NavDestinations.BUILDING_DETAIL}/{buildingId}",
+            arguments = listOf(navArgument("buildingId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val buildingId = backStackEntry.arguments?.getString("buildingId") ?: ""
+            com.nextgenbuildpro.bms.ui.BuildingDetailScreen(navController, buildingId)
+        }
+
         // Workflow Automation
         composable(NavDestinations.WORKFLOW_AUTOMATION) {
             WorkflowAutomationScreen(navController)
@@ -441,5 +450,8 @@ object NavDestinations {
 
     // Automation
     const val WORKFLOW_AUTOMATION = "workflow_automation"
+    
+    // Tasks
+    const val TASKS = "tasks"
 
 }
