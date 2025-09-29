@@ -1077,8 +1077,8 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
                 when (severity) {
                     Priority.EMERGENCY, Priority.CRITICAL -> {
                         // Stop all non-critical tasks
-                        val criticalTasks = _activeTasks.value.filter { it.priority <= Priority.HIGH }
-                        criticalTasks.forEach { task ->
+                        val nonCriticalTasks = _activeTasks.value.filter { it.priority > Priority.HIGH }
+                        nonCriticalTasks.forEach { task ->
                             cancelTask(task.id)
                         }
                     }
