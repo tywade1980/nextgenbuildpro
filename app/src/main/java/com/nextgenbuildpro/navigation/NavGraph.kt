@@ -19,15 +19,15 @@ import com.nextgenbuildpro.features.estimates.AssemblySearchAndSelectionScreen
 import com.nextgenbuildpro.features.estimates.EnhancedEstimateEditorScreen
 import com.nextgenbuildpro.features.estimates.AssemblyIntegrationDemoScreen
 import com.nextgenbuildpro.features.estimates.EnhancedCatalogueDemoScreen
-//import com.nextgenbuildpro.fieldtools.ui.ArVisualizationScreen
-//import com.nextgenbuildpro.fieldtools.ui.VoiceToTextScreen
-//import com.nextgenbuildpro.fieldtools.ui.OfflineModeScreen
+import com.nextgenbuildpro.fieldtools.ui.ArVisualizationScreen
+import com.nextgenbuildpro.fieldtools.ui.VoiceToTextScreen
+import com.nextgenbuildpro.fieldtools.ui.OfflineModeScreen
 import com.nextgenbuildpro.clientengagement.ui.ClientPortalScreen
 import com.nextgenbuildpro.clientengagement.ui.ProgressUpdatesScreen
 import com.nextgenbuildpro.clientengagement.ui.DigitalSignatureScreen
 import com.nextgenbuildpro.receptionist.ui.AIReceptionistSettingsScreen
 import com.nextgenbuildpro.timeclock.ui.TimeClockScreen
-//import com.nextgenbuildpro.ui.PlaceholderScreen
+
 import com.nextgenbuildpro.crm.ui.MessagesScreen
 import com.nextgenbuildpro.features.automation.WorkflowAutomationScreen
 import androidx.compose.runtime.remember
@@ -159,12 +159,8 @@ fun NavGraph(navController: NavHostController) {
             route = "${NavDestinations.PROJECT_DETAIL}/{projectId}",
             arguments = listOf(navArgument("projectId") { type = NavType.StringType })
         ) { backStackEntry ->
-            backStackEntry.arguments?.getString("projectId") ?: ""
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Project Details",
-            //    message = "The project details feature is coming soon. You'll be able to view and manage all aspects of your projects."
-            //)
+            val projectId = backStackEntry.arguments?.getString("projectId") ?: ""
+            com.nextgenbuildpro.features.projects.ProjectDetailScreen(navController, projectId)
         }
 
         // Assembly and Template details
@@ -183,12 +179,8 @@ fun NavGraph(navController: NavHostController) {
             route = "template_detail/{templateId}",
             arguments = listOf(navArgument("templateId") { type = NavType.StringType })
         ) { backStackEntry ->
-            backStackEntry.arguments?.getString("templateId") ?: ""
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Template Details",
-            //    message = "The template details feature is coming soon. You'll be able to view and edit template details, and create projects from templates."
-            //)
+            val templateId = backStackEntry.arguments?.getString("templateId") ?: ""
+            com.nextgenbuildpro.features.projects.TemplateDetailScreen(navController, templateId)
         }
 
         // Camera & Room Scan
@@ -213,12 +205,8 @@ fun NavGraph(navController: NavHostController) {
             route = "${NavDestinations.MESSAGE_DETAIL}/{conversationId}",
             arguments = listOf(navArgument("conversationId") { type = NavType.StringType })
         ) { backStackEntry ->
-            backStackEntry.arguments?.getString("conversationId") ?: ""
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Conversation",
-            //    message = "The conversation view is coming soon. You'll be able to see your message history with clients."
-            //)
+            val conversationId = backStackEntry.arguments?.getString("conversationId") ?: ""
+            com.nextgenbuildpro.crm.ui.MessageDetailScreen(navController, conversationId)
         }
 
         // File Upload
@@ -250,7 +238,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         // Tasks
-        composable("tasks") {
+        composable(NavDestinations.TASKS) {
             TasksScreen(navController)
         }
 
@@ -292,11 +280,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable(NavDestinations.CALENDAR_TIMELINE) {
-            //PlaceholderScreen(
-            //    navController = navController,
-            //    title = "Project Timeline",
-            //    message = "The detailed project timeline view is coming soon. You'll be able to see a Gantt chart of your project schedule."
-            //)
+            com.nextgenbuildpro.features.calendar.CalendarTimelineScreen(navController)
         }
 
         // Time Clock
@@ -306,17 +290,17 @@ fun NavGraph(navController: NavHostController) {
 
         // Field Tools - AR Visualization
         composable(NavDestinations.AR_VISUALIZATION) {
-            //ArVisualizationScreen(navController)
+            ArVisualizationScreen(navController)
         }
 
         // Field Tools - Voice to Text
         composable(NavDestinations.VOICE_TO_TEXT) {
-            //VoiceToTextScreen(navController)
+            VoiceToTextScreen(navController)
         }
 
         // Field Tools - Offline Mode
         composable(NavDestinations.OFFLINE_MODE) {
-            //OfflineModeScreen(navController)
+            OfflineModeScreen(navController)
         }
 
         // Client Engagement - Client Portal
@@ -372,12 +356,20 @@ fun NavGraph(navController: NavHostController) {
         // Building Management System
         composable(NavDestinations.BMS) {
             com.nextgenbuildpro.bms.ui.BmsScreen(navController)
+        }
 
+        // Building Detail
+        composable(
+            route = "${NavDestinations.BUILDING_DETAIL}/{buildingId}",
+            arguments = listOf(navArgument("buildingId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val buildingId = backStackEntry.arguments?.getString("buildingId") ?: ""
+            com.nextgenbuildpro.bms.ui.BuildingDetailScreen(navController, buildingId)
+        }
 
         // Workflow Automation
         composable(NavDestinations.WORKFLOW_AUTOMATION) {
             WorkflowAutomationScreen(navController)
- master
         }
     }
 }
@@ -458,5 +450,8 @@ object NavDestinations {
 
     // Automation
     const val WORKFLOW_AUTOMATION = "workflow_automation"
+    
+    // Tasks
+    const val TASKS = "tasks"
 
 }
