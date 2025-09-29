@@ -775,8 +775,8 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         optimizations.forEach { optimization ->
             when (optimization) {
                 "reduce_memory_usage" -> {
-                    System.gc()
-                    results[optimization] = "garbage_collection_performed"
+                    // Consider releasing references to large objects or optimizing data structures here.
+                    results[optimization] = "memory_optimization_suggested"
                 }
                 "batch_task_processing" -> {
                     // Group similar tasks for batch processing
