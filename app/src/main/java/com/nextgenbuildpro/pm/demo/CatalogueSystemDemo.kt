@@ -124,19 +124,19 @@ class CatalogueSystemDemo(private val context: Context) {
         
         // Search by keyword
         val framingResults = repo.searchCatalogue(
-            CatalogueSearchCriteria(keyword = "framing")
+            HierarchicalCatalogueSearchCriteria(keyword = "framing")
         )
         Log.d(TAG, "✓ Search 'framing': ${framingResults.size} results")
         
         // Search by trade
         val electricalResults = repo.searchCatalogue(
-            CatalogueSearchCriteria(tradeType = "Electrical")
+            HierarchicalCatalogueSearchCriteria(tradeType = "Electrical")
         )
         Log.d(TAG, "✓ Search 'Electrical': ${electricalResults.size} results")
         
         // Search by lifecycle phase
         val structureResults = repo.searchCatalogue(
-            CatalogueSearchCriteria(lifecyclePhase = HomeLifecyclePhase.STRUCTURE)
+            HierarchicalCatalogueSearchCriteria(lifecyclePhase = HomeLifecyclePhase.STRUCTURE)
         )
         Log.d(TAG, "✓ Search 'STRUCTURE' phase: ${structureResults.size} results")
     }

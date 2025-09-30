@@ -29,7 +29,7 @@ class AssemblyCatalogueService(
         contextMode: ContextMode? = null
     ): List<AssemblySearchResult> {
         try {
-            val criteria = CatalogueSearchCriteria(
+            val criteria = HierarchicalCatalogueSearchCriteria(
                 keyword = keyword,
                 tradeType = tradeType,
                 projectType = projectType

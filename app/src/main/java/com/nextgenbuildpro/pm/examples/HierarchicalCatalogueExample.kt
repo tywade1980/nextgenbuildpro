@@ -163,25 +163,25 @@ class HierarchicalCatalogueExample(private val context: Context) {
                 
                 // Search by keyword
                 val keywordResults = catalogueRepository.searchCatalogue(
-                    CatalogueSearchCriteria(keyword = "framing")
+                    HierarchicalCatalogueSearchCriteria(keyword = "framing")
                 )
                 Log.d(TAG, "Search results for 'framing': ${keywordResults.size} items")
                 
                 // Search by trade type
                 val tradeResults = catalogueRepository.searchCatalogue(
-                    CatalogueSearchCriteria(tradeType = "Electrical")
+                    HierarchicalCatalogueSearchCriteria(tradeType = "Electrical")
                 )
                 Log.d(TAG, "Search results for 'Electrical' trade: ${tradeResults.size} items")
                 
                 // Search by project type
                 val projectResults = catalogueRepository.searchCatalogue(
-                    CatalogueSearchCriteria(projectType = "New Construction")
+                    HierarchicalCatalogueSearchCriteria(projectType = "New Construction")
                 )
                 Log.d(TAG, "Search results for 'New Construction': ${projectResults.size} items")
                 
                 // Search by lifecycle phase
                 val phaseResults = catalogueRepository.searchCatalogue(
-                    CatalogueSearchCriteria(lifecyclePhase = HomeLifecyclePhase.STRUCTURE)
+                    HierarchicalCatalogueSearchCriteria(lifecyclePhase = HomeLifecyclePhase.STRUCTURE)
                 )
                 Log.d(TAG, "Search results for STRUCTURE phase: ${phaseResults.size} items")
                 

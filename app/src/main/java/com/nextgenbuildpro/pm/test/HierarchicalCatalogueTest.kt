@@ -299,17 +299,17 @@ class HierarchicalCatalogueTest(private val context: Context) {
         Log.d(TAG, "\n--- Test 9: Search Functionality ---")
         
         // Test keyword search
-        val keywordResults = repo.searchCatalogue(CatalogueSearchCriteria(keyword = "framing"))
+        val keywordResults = repo.searchCatalogue(HierarchicalCatalogueSearchCriteria(keyword = "framing"))
         assert(keywordResults.isNotEmpty()) { "Keyword search should return results" }
         Log.d(TAG, "✓ Keyword search 'framing': ${keywordResults.size} results")
         
         // Test trade search
-        val tradeResults = repo.searchCatalogue(CatalogueSearchCriteria(tradeType = "Electrical"))
+        val tradeResults = repo.searchCatalogue(HierarchicalCatalogueSearchCriteria(tradeType = "Electrical"))
         assert(tradeResults.isNotEmpty()) { "Trade search should return results" }
         Log.d(TAG, "✓ Trade search 'Electrical': ${tradeResults.size} results")
         
         // Test phase search
-        val phaseResults = repo.searchCatalogue(CatalogueSearchCriteria(lifecyclePhase = HomeLifecyclePhase.STRUCTURE))
+        val phaseResults = repo.searchCatalogue(HierarchicalCatalogueSearchCriteria(lifecyclePhase = HomeLifecyclePhase.STRUCTURE))
         assert(phaseResults.isNotEmpty()) { "Phase search should return results" }
         Log.d(TAG, "✓ Phase search 'STRUCTURE': ${phaseResults.size} results")
         

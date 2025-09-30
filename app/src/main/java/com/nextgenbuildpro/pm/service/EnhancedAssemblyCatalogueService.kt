@@ -34,7 +34,7 @@ class EnhancedAssemblyCatalogueService(
         tags: List<String> = emptyList()
     ): List<AssemblySearchResultWithContext> {
         try {
-            val criteria = CatalogueSearchCriteria(
+            val criteria = EnhancedCatalogueSearchCriteria(
                 query = keyword,
                 categoryId = categoryId,
                 tradeId = tradeId,
