@@ -1,7 +1,8 @@
 # NextGen BuildPro - AI OS Architecture
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/tywade1980/nextgenbuildpro)
-[![AI Agents](https://img.shields.io/badge/ai%20agents-5-blue.svg)](#ai-agents)
+[![AI Agents](https://img.shields.io/badge/ai%20agents-48-blue.svg)](#agent-framework-v20)
+[![Framework](https://img.shields.io/badge/framework-v2.0-green.svg)](./AGENT_FRAMEWORK_V2.md)
 [![Platform](https://img.shields.io/badge/platform-android-green.svg)](https://developer.android.com)
 [![License](https://img.shields.io/badge/license-proprietary-red.svg)](#license)
 
@@ -39,6 +40,39 @@ The NextGen AI OS is built on a revolutionary multi-agent architecture that comb
 │  └─────────────┘ └─────────────┘ └─────────────┘           │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+### 📖 Agent Framework v2.0
+
+**All agents in NextGen BuildPro now follow the ngbpv2-0 framework standard.** This ensures consistency, scalability, and maintainability across the entire AI system.
+
+**Quick Links:**
+- 📘 **[Agent Framework Documentation](./AGENT_FRAMEWORK_V2.md)** - Complete framework reference
+- 🔄 **[Migration Guide](./MIGRATION_GUIDE_V2.md)** - Upgrade from legacy patterns
+- 📊 **[Implementation Summary](./FRAMEWORK_ADOPTION_SUMMARY.md)** - What was changed and why
+
+**Framework Architecture:**
+```
+MainOrchestrator → OrchestratorManager → 6 Orchestrators → 48 Specialized Agents
+                                              ↓
+                                         MCP Server
+```
+
+**Key Standards:**
+- ✅ `DepartmentalOrchestrator` interface for department-level coordination
+- ✅ `SpecializedAgent` interface for focused, single-purpose agents  
+- ✅ `NextGenTask` v2.0 with `type`, `parameters`, `result` fields
+- ✅ MCP (Model Context Protocol) integration for agent communication
+- ✅ Type-safe with `TaskStatus` enum and `Result<T>` patterns
+
+**Six Departments:**
+1. Personal Assistant - Voice commands, hands-free operation
+2. CRM - Contact management, lead automation
+3. Project Management - Scheduling, cost estimation
+4. Analytics - Data analysis, reporting, predictions
+5. Design - 3D modeling, blueprints, design review
+6. Marketing - Proposals, campaigns, presentations
+
+Each department manages 8 specialized agents for a total of 48 AI agents working in harmony.
 
 ## 🤖 AI Agents
 
