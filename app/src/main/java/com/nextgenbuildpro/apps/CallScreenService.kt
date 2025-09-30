@@ -553,13 +553,13 @@ class CallScreenService : InCallService(), NextGenService {
  */
 @Composable
 fun CallScreenUI(
-    callState: CallState?,
+    callState: CallScreenService.CallState?,
     onAnswerCall: () -> Unit,
     onRejectCall: () -> Unit,
     onEndCall: () -> Unit,
     onMuteToggle: () -> Unit,
     onSpeakerToggle: () -> Unit,
-    smartSuggestions: List<SmartSuggestion> = emptyList()
+    smartSuggestions: List<CallScreenService.SmartSuggestion> = emptyList()
 ) {
     if (callState != null) {
         Column(
@@ -591,7 +591,7 @@ fun CallScreenUI(
 }
 
 @Composable
-private fun CallInfoSection(callState: CallState) {
+private fun CallInfoSection(callState: CallScreenService.CallState) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(32.dp)
@@ -642,12 +642,12 @@ private fun CallInfoSection(callState: CallState) {
 }
 
 @Composable
-private fun SmartSuggestionsSection(suggestions: List<SmartSuggestion>) {
+private fun SmartSuggestionsSection(suggestions: List<CallScreenService.SmartSuggestion>) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -664,7 +664,7 @@ private fun SmartSuggestionsSection(suggestions: List<SmartSuggestion>) {
 }
 
 @Composable
-private fun SuggestionItem(suggestion: SmartSuggestion) {
+private fun SuggestionItem(suggestion: CallScreenService.SmartSuggestion) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -692,7 +692,7 @@ private fun SuggestionItem(suggestion: SmartSuggestion) {
 
 @Composable
 private fun CallControlsSection(
-    callState: CallState,
+    callState: CallScreenService.CallState,
     onAnswerCall: () -> Unit,
     onRejectCall: () -> Unit,
     onEndCall: () -> Unit,

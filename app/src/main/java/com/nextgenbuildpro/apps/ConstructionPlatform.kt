@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.launch
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -364,6 +366,8 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         // Apply optimizations
         applyOptimizations(optimization)
         
+        Result.success(optimization)
+        
         Log.i("ConstructionPlatform", "Project optimization completed: $projectId")
         Result.success(optimization)
     } catch (e: Exception) {
@@ -591,7 +595,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         suspend fun optimizeProject(
             project: ConstructionProject,
             tasks: List<ConstructionTask>,
-            resources: List<Resource>
+            resources: List<ConstructionPlatform.Resource>
         ): OptimizationResult {
             return OptimizationResult(
                 projectId = project.id,
@@ -731,6 +735,7 @@ fun ConstructionPlatformUI(
     val resources by platform.resources.collectAsState()
     val safetyAlerts by platform.safetyAlerts.collectAsState()
     
+    val coroutineScope = rememberCoroutineScope()
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Dashboard", "Projects", "Tasks", "Resources", "Safety")
     
@@ -749,8 +754,12 @@ fun ConstructionPlatformUI(
         // Tab Content
         when (selectedTab) {
             0 -> DashboardTab(projects, tasks, resources, safetyAlerts)
-            1 -> ProjectsTab(projects, activeProject) { platform.selectProject(it) }
-            2 -> TasksTab(tasks, activeProject) { platform.updateTaskStatus(it, TaskStatus.COMPLETED) }
+            1 -> ProjectsTab(projects, activeProject) { projectId -> 
+                coroutineScope.launch { platform.selectProject(projectId) }
+            }
+            2 -> TasksTab(tasks, activeProject) { taskId -> 
+                coroutineScope.launch { platform.updateTaskStatus(taskId, TaskStatus.COMPLETED) }
+            }
             3 -> ResourcesTab(resources)
             4 -> SafetyTab(safetyAlerts)
         }
@@ -761,7 +770,7 @@ fun ConstructionPlatformUI(
 private fun DashboardTab(
     projects: List<ConstructionProject>,
     tasks: List<ConstructionTask>,
-    resources: List<Resource>,
+    resources: List<ConstructionPlatform.Resource>,
     safetyAlerts: List<SafetyAlert>
 ) {
     LazyColumn(
@@ -1166,7 +1175,7 @@ private fun TaskItem(
 }
 
 @Composable
-private fun ResourcesTab(resources: List<Resource>) {
+private fun ResourcesTab(resources: List<ConstructionPlatform.Resource>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
