@@ -228,7 +228,7 @@ class ContactManagementAgent : SpecializedAgent {
             result = mapOf(
                 "contact_id" to contactInfo.id,
                 "contact_name" to contactInfo.name,
-                "voice_confidence" to parsedInfo["confidence"] ?: 0.8f,
+                "voice_confidence" to (parsedInfo["confidence"] as? Float ?: 0.8f),
                 "lead_score" to contactInfo.leadScore
             )
         )

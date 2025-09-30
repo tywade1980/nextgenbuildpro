@@ -68,29 +68,31 @@ class VoiceCommandAgent : SpecializedAgent {
         Result.failure(e)
     }
     
-    override suspend fun processTask(task: NextGenTask): Result<NextGenTask> = try {
-        Log.d("VoiceCommandAgent", "Processing voice command: ${task.description}")
-        
-        val voiceInput = task.parameters["voice_input"] as? String
-            ?: return Result.failure(IllegalArgumentException("No voice input provided"))
-        
-        val processedCommand = processVoiceCommand(voiceInput)
-        val result = executeVoiceCommand(processedCommand)
-        
-        val completedTask = task.copy(
-            status = TaskStatus.COMPLETED,
-            result = mapOf(
-                "processed_command" to processedCommand,
-                "execution_result" to result,
-                "confidence_score" to calculateConfidenceScore(voiceInput),
-                "language_detected" to detectLanguage(voiceInput)
+    override suspend fun processTask(task: NextGenTask): Result<NextGenTask> {
+        return try {
+            Log.d("VoiceCommandAgent", "Processing voice command: ${task.description}")
+            
+            val voiceInput = task.parameters["voice_input"] as? String
+                ?: return Result.failure(IllegalArgumentException("No voice input provided"))
+            
+            val processedCommand = processVoiceCommand(voiceInput)
+            val result = executeVoiceCommand(processedCommand)
+            
+            val completedTask = task.copy(
+                status = TaskStatus.COMPLETED,
+                result = mapOf(
+                    "processed_command" to processedCommand,
+                    "execution_result" to result,
+                    "confidence_score" to calculateConfidenceScore(voiceInput),
+                    "language_detected" to detectLanguage(voiceInput)
+                )
             )
-        )
-        
-        Result.success(completedTask)
-    } catch (e: Exception) {
-        Log.e("VoiceCommandAgent", "Error processing voice command", e)
-        Result.failure(e)
+            
+            Result.success(completedTask)
+        } catch (e: Exception) {
+            Log.e("VoiceCommandAgent", "Error processing voice command", e)
+            Result.failure(e)
+        }
     }
     
     private suspend fun processVoiceCommand(voiceInput: String): VoiceCommand {
