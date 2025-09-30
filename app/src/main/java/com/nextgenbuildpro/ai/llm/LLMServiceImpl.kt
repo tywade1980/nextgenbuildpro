@@ -27,37 +27,8 @@ class LLMServiceImpl(
     private val COORDINATION_LOGS_COLLECTION = "coordination_logs"
     
     // Agent system prompts for different types
-    private val agentSystemPrompts = mapOf(
-        AgentType.HERMES_BRAIN to """
-            You are HermesBrain, the communication and coordination hub for the NextGen AI OS. 
-            Your role is to facilitate intelligent communication between agents, route messages 
-            efficiently, and maintain context across multi-agent conversations. You excel at 
-            understanding complex inter-agent relationships and optimizing communication flow.
-        """.trimIndent(),
-        
-        AgentType.BIG_DADDY to """
-            You are BigDaddy, the decision-making authority in the NextGen system. Your role 
-            is to make critical decisions, resolve conflicts between agents, and ensure system 
-            integrity. You have the final say on resource allocation and strategic direction.
-        """.trimIndent(),
-        
-        AgentType.MRM to """
-            You are MRM (Multi-Resource Manager), responsible for managing and allocating 
-            system resources efficiently. You track resource usage, predict needs, and 
-            optimize allocation across all agents and processes.
-        """.trimIndent(),
-        
-        AgentType.HRM_MODEL to """
-            You are HRM (Human Resource Model), specialized in managing human interactions 
-            and workforce coordination. You understand human needs, schedule management, 
-            and facilitate human-AI collaboration.
-        """.trimIndent(),
-        
-        AgentType.ELITE_HUMAN to """
-            You represent the Elite Human interface, bridging human decision-making with 
-            AI systems. You translate human requirements into system actions and ensure 
-            human oversight of critical operations.
-        """.trimIndent()
+    private val agentSystemPrompts = mapOf<AgentType, String>(
+        // System prompts for departmental orchestrators can be added here as needed
     )
     
     override suspend fun generateResponse(
@@ -253,11 +224,13 @@ class LLMServiceImpl(
     private fun generateAgentAssignments(request: MultiAgentCoordinationRequest): Map<AgentType, String> {
         return request.targetAgents.associateWith { agent ->
             when (agent) {
-                AgentType.MRM -> "Resource management and allocation for: ${request.task}"
-                AgentType.HERMES_BRAIN -> "Communication coordination and message routing"
-                AgentType.BIG_DADDY -> "Strategic oversight and final decision validation"
-                AgentType.HRM_MODEL -> "Human resource coordination and scheduling"
-                AgentType.ELITE_HUMAN -> "Human interface and quality assurance"
+                AgentType.ORCHESTRATOR -> "Overall system coordination for: ${request.task}"
+                AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR -> "Personal assistance and voice command processing"
+                AgentType.CRM_ORCHESTRATOR -> "Customer relationship and contact management"
+                AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR -> "Project planning and resource allocation for: ${request.task}"
+                AgentType.ANALYTICS_ORCHESTRATOR -> "Data analysis and reporting for task insights"
+                AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR -> "Design coordination and blueprint management"
+                AgentType.MARKETING_ORCHESTRATOR -> "Marketing and client engagement activities"
                 else -> "Task-specific execution for: ${request.task}"
             }
         }
@@ -279,16 +252,13 @@ class LLMServiceImpl(
     private fun extractDependencies(request: MultiAgentCoordinationRequest): List<String> {
         val dependencies = mutableListOf<String>()
         
-        if (request.targetAgents.contains(AgentType.MRM)) {
+        if (request.targetAgents.contains(AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR)) {
             dependencies.add("Resource availability validation")
+            dependencies.add("Timeline and scheduling")
         }
         
-        if (request.targetAgents.contains(AgentType.HRM_MODEL)) {
-            dependencies.add("Human resource scheduling")
-        }
-        
-        if (request.targetAgents.contains(AgentType.BIG_DADDY)) {
-            dependencies.add("Strategic approval")
+        if (request.targetAgents.contains(AgentType.ORCHESTRATOR)) {
+            dependencies.add("System coordination approval")
         }
         
         return dependencies
@@ -319,11 +289,13 @@ class LLMServiceImpl(
     
     private fun getAgentCapabilities(agentType: AgentType): List<String> {
         return when (agentType) {
-            AgentType.HERMES_BRAIN -> listOf("Message Routing", "Protocol Translation", "Communication Optimization")
-            AgentType.BIG_DADDY -> listOf("Decision Making", "Conflict Resolution", "Strategic Planning")
-            AgentType.MRM -> listOf("Resource Management", "Load Balancing", "Performance Optimization")
-            AgentType.HRM_MODEL -> listOf("Human Coordination", "Schedule Management", "Workflow Optimization")
-            AgentType.ELITE_HUMAN -> listOf("Human Interface", "Quality Assurance", "Critical Decision Support")
+            AgentType.ORCHESTRATOR -> listOf("Task Coordination", "System Management", "Agent Routing")
+            AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR -> listOf("Voice Commands", "Personal Assistance", "Task Management")
+            AgentType.CRM_ORCHESTRATOR -> listOf("Contact Management", "Communication Tracking", "Lead Management")
+            AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR -> listOf("Project Planning", "Resource Allocation", "Timeline Management")
+            AgentType.ANALYTICS_ORCHESTRATOR -> listOf("Data Analysis", "Reporting", "Insights Generation")
+            AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR -> listOf("Design Coordination", "Blueprint Management", "Visual Planning")
+            AgentType.MARKETING_ORCHESTRATOR -> listOf("Marketing Campaigns", "Client Engagement", "Brand Management")
             else -> listOf("General Processing", "Task Execution")
         }
     }

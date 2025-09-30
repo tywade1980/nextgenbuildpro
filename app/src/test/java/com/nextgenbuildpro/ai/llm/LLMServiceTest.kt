@@ -31,7 +31,7 @@ class LLMServiceTest {
     fun testGenerateResponse() = runBlocking {
         // Given
         val prompt = "Help coordinate resources for a construction project"
-        val agentType = AgentType.HERMES_BRAIN
+        val agentType = AgentType.ORCHESTRATOR
         
         // When
         val result = llmService.generateResponse(prompt, null, agentType)
@@ -48,8 +48,8 @@ class LLMServiceTest {
     fun testGenerateCoordinationResponse() = runBlocking {
         // Given
         val request = MultiAgentCoordinationRequest(
-            requestingAgent = AgentType.HERMES_BRAIN,
-            targetAgents = listOf(AgentType.MRM, AgentType.BIG_DADDY),
+            requestingAgent = AgentType.ORCHESTRATOR,
+            targetAgents = listOf(AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR, AgentType.CRM_ORCHESTRATOR),
             task = "Coordinate resource allocation for new project",
             context = "High priority construction project with tight deadline"
         )
@@ -69,7 +69,7 @@ class LLMServiceTest {
     @Test
     fun testGetAgentContext() = runBlocking {
         // Given
-        val agentType = AgentType.HERMES_BRAIN
+        val agentType = AgentType.ORCHESTRATOR
         
         // When
         val result = llmService.getAgentContext(agentType)
@@ -79,7 +79,6 @@ class LLMServiceTest {
         val context = result.getOrNull()
         assertTrue(context != null)
         assertEquals(agentType, context!!.agentType)
-        assertTrue(context.systemPrompt.isNotEmpty())
         assertTrue(context.capabilities.isNotEmpty())
     }
     
@@ -110,7 +109,7 @@ class LLMServiceTest {
     fun testLLMConversationCreation() {
         // Given
         val conversationId = "test-conversation-123"
-        val participants = listOf(AgentType.HERMES_BRAIN, AgentType.MRM)
+        val participants = listOf(AgentType.ORCHESTRATOR, AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR)
         val messages = listOf(
             LLMMessage("user", "Start coordination"),
             LLMMessage("assistant", "Coordination initiated")
@@ -136,8 +135,8 @@ class LLMServiceTest {
     @Test
     fun testMultiAgentCoordinationRequest() {
         // Given
-        val requestingAgent = AgentType.HERMES_BRAIN
-        val targetAgents = listOf(AgentType.MRM, AgentType.BIG_DADDY, AgentType.HRM_MODEL)
+        val requestingAgent = AgentType.ORCHESTRATOR
+        val targetAgents = listOf(AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR, AgentType.CRM_ORCHESTRATOR, AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR)
         val task = "Setup new construction project"
         val context = "Large commercial building project"
         

@@ -37,8 +37,8 @@ enum class SystemStatus {
  * Agent types in the NextGen ecosystem
  */
 enum class AgentType {
-    MRM, HERMES_BRAIN, BIG_DADDY, HRM_MODEL, ELITE_HUMAN, ORCHESTRATOR,
-    // New Departmental Orchestrators
+    ORCHESTRATOR,
+    // Departmental Orchestrators
     PERSONAL_ASSISTANT_ORCHESTRATOR,
     CRM_ORCHESTRATOR,
     PROJECT_MANAGEMENT_ORCHESTRATOR,

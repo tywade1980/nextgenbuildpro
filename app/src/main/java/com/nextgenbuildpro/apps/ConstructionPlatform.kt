@@ -454,7 +454,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
                     id = constructionTask.id,
                     title = constructionTask.title,
                     description = constructionTask.description,
-                    assignedAgent = AgentType.MRM, // Default assignment
+                    assignedAgent = AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR, // Default assignment
                     priority = Priority.MEDIUM,
                     status = constructionTask.status,
                     createdAt = constructionTask.createdAt,

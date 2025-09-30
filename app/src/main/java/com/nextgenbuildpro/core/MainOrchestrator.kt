@@ -320,14 +320,10 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     private suspend fun initializeAgents() {
         Log.d("MainOrchestrator", "Initializing AI agents...")
         
-        // Create and initialize agents with LLM service integration
-        val llmService = com.nextgenbuildpro.ai.AIModule.getLLMService()
-        val agentInstances = mapOf(
-            AgentType.MRM to MRM(),
-            AgentType.HERMES_BRAIN to HermesBrain(llmService),
-            AgentType.BIG_DADDY to BigDaddyAgent(),
-            AgentType.HRM_MODEL to HRMModel(),
-            AgentType.ELITE_HUMAN to EliteHuman()
+        // Agents removed - using specialized departmental orchestrators instead
+        // See agents/ directory for SpecializedAgent implementations
+        val agentInstances = mapOf<AgentType, NextGenAgent>(
+            // Agents will be initialized dynamically as needed
         )
         
         // Initialize each agent
@@ -372,11 +368,11 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
             name = "Construction Project Setup",
             description = "Complete workflow for setting up a new construction project",
             steps = listOf(
-                WorkflowStep("validate_requirements", AgentType.BIG_DADDY, mapOf()),
-                WorkflowStep("allocate_resources", AgentType.MRM, mapOf()),
-                WorkflowStep("create_project_plan", AgentType.HRM_MODEL, mapOf()),
-                WorkflowStep("setup_communication", AgentType.HERMES_BRAIN, mapOf()),
-                WorkflowStep("finalize_setup", AgentType.ELITE_HUMAN, mapOf())
+                WorkflowStep("validate_requirements", AgentType.ORCHESTRATOR, mapOf()),
+                WorkflowStep("allocate_resources", AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR, mapOf()),
+                WorkflowStep("create_project_plan", AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR, mapOf()),
+                WorkflowStep("setup_communication", AgentType.CRM_ORCHESTRATOR, mapOf()),
+                WorkflowStep("finalize_setup", AgentType.ORCHESTRATOR, mapOf())
             ),
             estimatedDuration = 120 // minutes
         )
@@ -386,11 +382,11 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
             name = "Emergency Response",
             description = "Rapid response workflow for emergency situations",
             steps = listOf(
-                WorkflowStep("assess_situation", AgentType.BIG_DADDY, mapOf()),
-                WorkflowStep("coordinate_response", AgentType.HERMES_BRAIN, mapOf()),
-                WorkflowStep("allocate_emergency_resources", AgentType.MRM, mapOf()),
-                WorkflowStep("manage_personnel", AgentType.HRM_MODEL, mapOf()),
-                WorkflowStep("provide_guidance", AgentType.ELITE_HUMAN, mapOf())
+                WorkflowStep("assess_situation", AgentType.ORCHESTRATOR, mapOf()),
+                WorkflowStep("coordinate_response", AgentType.CRM_ORCHESTRATOR, mapOf()),
+                WorkflowStep("allocate_emergency_resources", AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR, mapOf()),
+                WorkflowStep("manage_personnel", AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR, mapOf()),
+                WorkflowStep("provide_guidance", AgentType.ORCHESTRATOR, mapOf())
             ),
             estimatedDuration = 15 // minutes
         )
@@ -473,7 +469,7 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     private suspend fun broadcastSystemReady() {
         val readyMessage = AgentMessage(
             fromAgent = AgentType.ORCHESTRATOR,
-            toAgent = AgentType.MRM, // Will be broadcast to all
+            toAgent = AgentType.ORCHESTRATOR, // Broadcast from orchestrator
             messageType = MessageType.NOTIFICATION,
             content = "NextGen AI OS is now ready and operational",
             metadata = mapOf("system_status" to "READY", "timestamp" to LocalDateTime.now().toString())
@@ -1045,11 +1041,15 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
             }
             
             return when {
-                task.title.contains("resource", ignoreCase = true) && AgentType.MRM in availableAgents -> AgentType.MRM
-                task.title.contains("communication", ignoreCase = true) && AgentType.HERMES_BRAIN in availableAgents -> AgentType.HERMES_BRAIN
-                task.title.contains("decision", ignoreCase = true) && AgentType.BIG_DADDY in availableAgents -> AgentType.BIG_DADDY
-                task.title.contains("human", ignoreCase = true) && AgentType.HRM_MODEL in availableAgents -> AgentType.HRM_MODEL
-                AgentType.ELITE_HUMAN in availableAgents -> AgentType.ELITE_HUMAN
+                task.title.contains("project", ignoreCase = true) && AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR in availableAgents -> 
+                    AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR
+                task.title.contains("contact", ignoreCase = true) && AgentType.CRM_ORCHESTRATOR in availableAgents -> 
+                    AgentType.CRM_ORCHESTRATOR
+                task.title.contains("design", ignoreCase = true) && AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR in availableAgents -> 
+                    AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR
+                task.title.contains("assistant", ignoreCase = true) && AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR in availableAgents -> 
+                    AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR
+                AgentType.ORCHESTRATOR in availableAgents -> AgentType.ORCHESTRATOR
                 else -> availableAgents.first() // Return first available agent
             }
         }
