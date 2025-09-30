@@ -78,7 +78,7 @@ class VoiceCommandAgent : SpecializedAgent {
         val result = executeVoiceCommand(processedCommand)
         
         val completedTask = task.copy(
-            status = "completed",
+            status = TaskStatus.COMPLETED,
             result = mapOf(
                 "processed_command" to processedCommand,
                 "execution_result" to result,

@@ -121,7 +121,7 @@ class ContactManagementAgent : SpecializedAgent {
         saveContact(contactInfo)
         
         return task.copy(
-            status = "completed",
+            status = TaskStatus.COMPLETED,
             result = mapOf(
                 "contact_id" to contactInfo.id,
                 "contact_name" to contactInfo.name,
@@ -173,7 +173,7 @@ class ContactManagementAgent : SpecializedAgent {
         saveContact(contactInfo)
         
         return task.copy(
-            status = "completed",
+            status = TaskStatus.COMPLETED,
             result = mapOf(
                 "contact_id" to contactInfo.id,
                 "contact_name" to contactInfo.name,
@@ -224,7 +224,7 @@ class ContactManagementAgent : SpecializedAgent {
         saveContact(contactInfo)
         
         return task.copy(
-            status = "completed",
+            status = TaskStatus.COMPLETED,
             result = mapOf(
                 "contact_id" to contactInfo.id,
                 "contact_name" to contactInfo.name,
@@ -258,7 +258,7 @@ class ContactManagementAgent : SpecializedAgent {
         _contactDatabase.value = currentContacts
         
         return task.copy(
-            status = "completed",
+            status = TaskStatus.COMPLETED,
             result = mapOf(
                 "contact_id" to contactId,
                 "updated_fields" to updates.keys.toList()
@@ -298,7 +298,7 @@ class ContactManagementAgent : SpecializedAgent {
         _contactDatabase.value = currentContacts
         
         return task.copy(
-            status = "completed",
+            status = TaskStatus.COMPLETED,
             result = mapOf(
                 "merged_contact_id" to primaryContactId,
                 "removed_contact_id" to secondaryContactId,
@@ -330,7 +330,7 @@ class ContactManagementAgent : SpecializedAgent {
         }
         
         return task.copy(
-            status = "completed",
+            status = TaskStatus.COMPLETED,
             result = mapOf(
                 "populated_info" to populatedInfo,
                 "confidence_score" to calculatePopulationConfidence(populatedInfo)

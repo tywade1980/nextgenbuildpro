@@ -31,7 +31,7 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     private val mutex = Mutex()
     
     // New v2.0 orchestrator system
-    private val orchestratorManager = OrchestratorManager()
+    private val orchestratorManager = OrchestratorManager(context)
     
     // System state
     private val _systemStatus = MutableStateFlow(SystemStatus.INITIALIZING)

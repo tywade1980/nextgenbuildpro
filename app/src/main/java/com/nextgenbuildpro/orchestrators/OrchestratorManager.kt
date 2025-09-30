@@ -1,5 +1,6 @@
 package com.nextgenbuildpro.orchestrators
 
+import android.content.Context
 import android.util.Log
 import com.nextgenbuildpro.shared.*
 import com.nextgenbuildpro.mcp.MCPServer
@@ -15,7 +16,9 @@ import kotlinx.coroutines.flow.*
  * Manages all 6 departmental orchestrators and their 48 specialized agents.
  * Provides centralized coordination, MCP integration, and navigation management.
  */
-class OrchestratorManager {
+class OrchestratorManager(
+    private val context: Context
+) {
     
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val mcpServer = MCPServer.getInstance()
@@ -140,12 +143,12 @@ class OrchestratorManager {
     }
     
     private suspend fun initializeOrchestrators() {
-        personalAssistantOrchestrator = PersonalAssistantOrchestrator()
-        crmOrchestrator = CRMOrchestrator()
-        projectManagementOrchestrator = ProjectManagementOrchestrator()
-        analyticsOrchestrator = AnalyticsOrchestrator()
-        designDepartmentOrchestrator = DesignDepartmentOrchestrator()
-        marketingOrchestrator = MarketingOrchestrator()
+        personalAssistantOrchestrator = PersonalAssistantOrchestrator(context)
+        crmOrchestrator = CRMOrchestrator(context)
+        projectManagementOrchestrator = ProjectManagementOrchestrator(context)
+        analyticsOrchestrator = AnalyticsOrchestrator(context)
+        designDepartmentOrchestrator = DesignDepartmentOrchestrator(context)
+        marketingOrchestrator = MarketingOrchestrator(context)
         
         // Initialize each orchestrator
         listOf(
