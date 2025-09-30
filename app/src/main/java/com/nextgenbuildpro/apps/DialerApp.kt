@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.launch
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -16,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -139,35 +141,37 @@ class DialerApp(private val context: Context) : NextGenService {
     
     // === DIALING METHODS ===
     
-    suspend fun dialNumber(number: String): Result<Unit> = try {
-        Log.d("DialerApp", "Dialing number: $number")
-        
-        // Validate number
-        val validatedNumber = validatePhoneNumber(number)
-        if (validatedNumber == null) {
-            return Result.failure(IllegalArgumentException("Invalid phone number"))
+    suspend fun dialNumber(number: String): Result<Unit> {
+        return try {
+            Log.d("DialerApp", "Dialing number: $number")
+            
+            // Validate number
+            val validatedNumber = validatePhoneNumber(number)
+            if (validatedNumber == null) {
+                return Result.failure(IllegalArgumentException("Invalid phone number"))
+            }
+            
+            // Pre-call analysis
+            val callContext = smartDialer.analyzeCallContext(validatedNumber)
+            
+            // Record call attempt
+            recordCallAttempt(validatedNumber, callContext)
+            
+            // Initiate call
+            val intent = Intent(Intent.ACTION_CALL).apply {
+                data = Uri.parse("tel:$validatedNumber")
+            }
+            
+            context.startActivity(intent)
+            
+            // Update suggestions based on call
+            updateSmartSuggestions(validatedNumber)
+            
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("DialerApp", "Error dialing number: $number", e)
+            Result.failure(e)
         }
-        
-        // Pre-call analysis
-        val callContext = smartDialer.analyzeCallContext(validatedNumber)
-        
-        // Record call attempt
-        recordCallAttempt(validatedNumber, callContext)
-        
-        // Initiate call
-        val intent = Intent(Intent.ACTION_CALL).apply {
-            data = Uri.parse("tel:$validatedNumber")
-        }
-        
-        context.startActivity(intent)
-        
-        // Update suggestions based on call
-        updateSmartSuggestions(validatedNumber)
-        
-        Result.success(Unit)
-    } catch (e: Exception) {
-        Log.e("DialerApp", "Error dialing number: $number", e)
-        Result.failure(e)
     }
     
     suspend fun addDigit(digit: String) {
@@ -608,6 +612,7 @@ fun DialerAppUI(
     val contacts by dialerApp.contacts.collectAsState()
     val smartSuggestions by dialerApp.smartSuggestions.collectAsState()
     
+    val coroutineScope = rememberCoroutineScope()
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Keypad", "Recent", "Contacts", "Smart")
     
@@ -626,9 +631,15 @@ fun DialerAppUI(
         // Tab Content
         when (selectedTab) {
             0 -> KeypadTab(dialerApp, dialedNumber)
-            1 -> RecentCallsTab(recentCalls) { dialerApp.dialFromHistory(it) }
-            2 -> ContactsTab(contacts) { dialerApp.dialContact(it) }
-            3 -> SmartSuggestionsTab(smartSuggestions) { dialerApp.dialContact(it.contact) }
+            1 -> RecentCallsTab(recentCalls) { recordId -> 
+                coroutineScope.launch { dialerApp.dialFromHistory(recordId) }
+            }
+            2 -> ContactsTab(contacts) { contactId -> 
+                coroutineScope.launch { dialerApp.dialContact(contactId) }
+            }
+            3 -> SmartSuggestionsTab(smartSuggestions) { suggestion -> 
+                coroutineScope.launch { dialerApp.dialContact(suggestion.contact) }
+            }
         }
     }
 }
@@ -651,7 +662,7 @@ private fun KeypadTab(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Text(
                 text = if (dialedNumber.isEmpty()) "Enter number" else dialedNumber,
@@ -767,7 +778,7 @@ private fun DialerKeypadButton(
         onClick = onClick,
         modifier = modifier.aspectRatio(1f),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -789,7 +800,7 @@ private fun DialerKeypadButton(
 
 @Composable
 private fun RecentCallsTab(
-    recentCalls: List<CallRecord>,
+    recentCalls: List<DialerApp.CallRecord>,
     onCallSelected: (CallRecord) -> Unit
 ) {
     LazyColumn(
@@ -859,7 +870,7 @@ private fun CallRecordItem(
 
 @Composable
 private fun ContactsTab(
-    contacts: List<Contact>,
+    contacts: List<DialerApp.Contact>,
     onContactSelected: (Contact) -> Unit
 ) {
     LazyColumn(
@@ -875,7 +886,7 @@ private fun ContactsTab(
 
 @Composable
 private fun ContactItem(
-    contact: Contact,
+    contact: DialerApp.Contact,
     onContactSelected: (Contact) -> Unit
 ) {
     Card(
@@ -921,7 +932,7 @@ private fun ContactItem(
 
 @Composable
 private fun SmartSuggestionsTab(
-    suggestions: List<SmartContact>,
+    suggestions: List<DialerApp.SmartContact>,
     onSuggestionSelected: (SmartContact) -> Unit
 ) {
     LazyColumn(
