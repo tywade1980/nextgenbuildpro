@@ -168,8 +168,7 @@ class EnhancedAssemblyCatalogueService(
             )
             
             val enhancedTasks = tasks.map { taskData ->
-                Task(
-                    assemblyId = "", // Will be set when assembly is created
+                TaskCreationData(
                     name = taskData.name,
                     description = taskData.description,
                     sequence = taskData.sequence,
@@ -182,7 +181,7 @@ class EnhancedAssemblyCatalogueService(
             }
             
             val enhancedMaterials = materials.map { materialData ->
-                Material(
+                MaterialCreationData(
                     taskId = materialData.taskId,
                     assemblyId = materialData.assemblyId,
                     name = materialData.name,
@@ -190,7 +189,6 @@ class EnhancedAssemblyCatalogueService(
                     quantity = materialData.quantity,
                     unit = materialData.unit,
                     unitCost = materialData.unitCost,
-                    totalCost = materialData.unitCost * materialData.quantity * (1 + materialData.waste),
                     waste = materialData.waste,
                     notes = materialData.notes
                 )
@@ -307,7 +305,7 @@ data class EnhancedAssemblyDetails(
     val scope: Scope,
     val trade: Trade,
     val category: Category,
-    val tasks: List<Task>,
-    val materials: List<Material>,
+    val tasks: List<CatalogueTask>,
+    val materials: List<CatalogueMaterial>,
     val costBreakdown: AssemblyCostBreakdown
 )
