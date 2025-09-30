@@ -3,7 +3,6 @@ package com.nextgenbuildpro.examples
 import android.util.Log
 import com.nextgenbuildpro.ai.AIModule
 import com.nextgenbuildpro.ai.llm.*
-import com.nextgenbuildpro.agents.HermesBrain
 import com.nextgenbuildpro.shared.AgentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,8 +35,8 @@ class LLMMultiAgentExample {
                 
                 // Create a coordination request
                 val request = MultiAgentCoordinationRequest(
-                    requestingAgent = AgentType.HERMES_BRAIN,
-                    targetAgents = listOf(AgentType.MRM, AgentType.BIG_DADDY, AgentType.HRM_MODEL),
+                    requestingAgent = AgentType.ORCHESTRATOR,
+                    targetAgents = listOf(AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR, AgentType.CRM_ORCHESTRATOR, AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR),
                     task = "Setup and coordinate a new commercial construction project",
                     context = "Large office building with 50,000 sq ft, tight 18-month deadline, budget of $5M"
                 )

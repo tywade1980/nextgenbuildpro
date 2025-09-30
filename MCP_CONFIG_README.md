@@ -45,13 +45,13 @@ Categorizes files by their purpose:
 - **Priority Files**: 50 most important files get priority inclusion
 - **Smart Exclusions**: Excludes build artifacts, dependencies, and temporary files
 
-### AI Agent Recognition
-Maps all 5 core agents with their capabilities:
-- **MRM**: Master Resource Manager
-- **HermesBrain**: Communication Hub
-- **BigDaddyAgent**: Executive Intelligence
-- **HRMModel**: Human Resource Manager
-- **EliteHuman**: Human Excellence Framework
+### Specialized Agent Recognition
+Maps departmental orchestrators with their capabilities:
+- **CRM Orchestrator**: Contact management and client engagement
+- **Personal Assistant Orchestrator**: Voice command processing and task assistance
+- **Project Management Orchestrator**: Project planning and resource coordination
+- **Design Department Orchestrator**: Design workflow coordination
+- **Analytics Orchestrator**: Data analysis and reporting
 
 ### Build System Integration
 Supports both build systems:
