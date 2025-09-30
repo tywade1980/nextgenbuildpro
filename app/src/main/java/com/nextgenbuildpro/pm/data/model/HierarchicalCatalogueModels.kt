@@ -249,7 +249,7 @@ enum class CatalogueLevel {
 /**
  * Search and filter criteria for the catalogue
  */
-data class CatalogueSearchCriteria(
+data class HierarchicalCatalogueSearchCriteria(
     val keyword: String? = null,
     val tradeType: String? = null,
     val projectType: String? = null,

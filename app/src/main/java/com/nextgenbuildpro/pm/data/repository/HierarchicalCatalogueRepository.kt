@@ -1430,7 +1430,7 @@ class HierarchicalCatalogueRepository(private val context: Context) {
     /**
      * Search the catalogue based on criteria
      */
-    suspend fun searchCatalogue(criteria: CatalogueSearchCriteria): List<Any> {
+    suspend fun searchCatalogue(criteria: HierarchicalCatalogueSearchCriteria): List<Any> {
         val results = mutableListOf<Any>()
         val catalogue = _projectCatalogue.value ?: return results
 

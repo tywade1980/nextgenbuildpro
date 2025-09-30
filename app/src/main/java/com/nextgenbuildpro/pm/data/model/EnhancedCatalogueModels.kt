@@ -86,10 +86,11 @@ data class EnhancedAssembly(
 )
 
 /**
- * Task represents a specific work item within an assembly
+ * CatalogueTask represents a specific work item within an assembly
  * Provides detailed breakdown of labor and costs for each task
+ * Renamed from Task to avoid collision with PM Task model
  */
-data class Task(
+data class CatalogueTask(
     val id: String = UUID.randomUUID().toString(),
     val assemblyId: String,
     val name: String,
@@ -106,10 +107,11 @@ data class Task(
 )
 
 /**
- * Material represents individual materials used in tasks or assemblies
+ * CatalogueMaterial represents individual materials used in tasks or assemblies
  * Can be associated with either a specific task or directly with an assembly
+ * Renamed from Material to avoid collision with PM Material model
  */
-data class Material(
+data class CatalogueMaterial(
     val id: String = UUID.randomUUID().toString(),
     val taskId: String? = null,
     val assemblyId: String? = null,
@@ -165,21 +167,21 @@ data class ScopeWithChildren(
 data class AssemblyWithChildren(
     val assembly: EnhancedAssembly,
     val tasks: List<TaskWithMaterials>,
-    val materials: List<Material> // Direct assembly materials
+    val materials: List<CatalogueMaterial> // Direct assembly materials
 )
 
 /**
- * Task with its associated materials
+ * CatalogueTask with its associated materials
  */
 data class TaskWithMaterials(
-    val task: Task,
-    val materials: List<Material>
+    val task: CatalogueTask,
+    val materials: List<CatalogueMaterial>
 )
 
 /**
- * Search criteria for catalogue search operations
+ * Search criteria for enhanced catalogue search operations
  */
-data class CatalogueSearchCriteria(
+data class EnhancedCatalogueSearchCriteria(
     val query: String? = null,
     val categoryId: String? = null,
     val tradeId: String? = null,

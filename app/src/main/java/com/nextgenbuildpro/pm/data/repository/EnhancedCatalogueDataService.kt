@@ -425,7 +425,7 @@ class EnhancedCatalogueDataService(private val context: Context) {
     /**
      * Search assemblies by criteria
      */
-    suspend fun searchAssemblies(criteria: CatalogueSearchCriteria): Result<List<AssemblySearchResultWithContext>> {
+    suspend fun searchAssemblies(criteria: EnhancedCatalogueSearchCriteria): Result<List<AssemblySearchResultWithContext>> {
         return try {
             var filteredAssemblies = _assemblies.value.filter { it.isActive }
             
