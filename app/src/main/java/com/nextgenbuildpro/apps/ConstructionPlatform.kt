@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.launch
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -351,24 +353,25 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
     
     // === AI OPTIMIZATION ===
     
-    suspend fun optimizeProject(projectId: String): Result<OptimizationResult> = try {
-        Log.d("ConstructionPlatform", "Optimizing project: $projectId")
-        
-        val project = _projects.value.find { it.id == projectId }
-        if (project == null) {
-            return Result.failure(IllegalArgumentException("Project not found: $projectId"))
+    suspend fun optimizeProject(projectId: String): Result<OptimizationResult> {
+        return try {
+            Log.d("ConstructionPlatform", "Optimizing project: $projectId")
+            
+            val project = _projects.value.find { it.id == projectId }
+            if (project == null) {
+                return Result.failure(IllegalArgumentException("Project not found: $projectId"))
+            }
+            
+            val optimization = aiOptimizer.optimizeProject(project, _tasks.value, _resources.value)
+            
+            // Apply optimizations
+            applyOptimizations(optimization)
+            
+            Result.success(optimization)
+        } catch (e: Exception) {
+            Log.e("ConstructionPlatform", "Error optimizing project", e)
+            Result.failure(e)
         }
-        
-        val optimization = aiOptimizer.optimizeProject(project, _tasks.value, _resources.value)
-        
-        // Apply optimizations
-        applyOptimizations(optimization)
-        
-        Log.i("ConstructionPlatform", "Project optimization completed: $projectId")
-        Result.success(optimization)
-    } catch (e: Exception) {
-        Log.e("ConstructionPlatform", "Error optimizing project", e)
-        Result.failure(e)
     }
     
     // === PRIVATE METHODS ===
@@ -591,7 +594,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         suspend fun optimizeProject(
             project: ConstructionProject,
             tasks: List<ConstructionTask>,
-            resources: List<Resource>
+            resources: List<ConstructionPlatform.Resource>
         ): OptimizationResult {
             return OptimizationResult(
                 projectId = project.id,
@@ -731,6 +734,7 @@ fun ConstructionPlatformUI(
     val resources by platform.resources.collectAsState()
     val safetyAlerts by platform.safetyAlerts.collectAsState()
     
+    val coroutineScope = rememberCoroutineScope()
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Dashboard", "Projects", "Tasks", "Resources", "Safety")
     
@@ -749,8 +753,12 @@ fun ConstructionPlatformUI(
         // Tab Content
         when (selectedTab) {
             0 -> DashboardTab(projects, tasks, resources, safetyAlerts)
-            1 -> ProjectsTab(projects, activeProject) { platform.selectProject(it) }
-            2 -> TasksTab(tasks, activeProject) { platform.updateTaskStatus(it, TaskStatus.COMPLETED) }
+            1 -> ProjectsTab(projects, activeProject) { projectId -> 
+                coroutineScope.launch { platform.selectProject(projectId) }
+            }
+            2 -> TasksTab(tasks, activeProject) { taskId -> 
+                coroutineScope.launch { platform.updateTaskStatus(taskId, TaskStatus.COMPLETED) }
+            }
             3 -> ResourcesTab(resources)
             4 -> SafetyTab(safetyAlerts)
         }
@@ -760,9 +768,9 @@ fun ConstructionPlatformUI(
 @Composable
 private fun DashboardTab(
     projects: List<ConstructionProject>,
-    tasks: List<ConstructionTask>,
-    resources: List<Resource>,
-    safetyAlerts: List<SafetyAlert>
+    tasks: List<ConstructionPlatform.ConstructionTask>,
+    resources: List<ConstructionPlatform.Resource>,
+    safetyAlerts: List<ConstructionPlatform.SafetyAlert>
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -867,7 +875,7 @@ private fun DashboardCard(
 }
 
 @Composable
-private fun SafetyAlertsSection(alerts: List<SafetyAlert>) {
+private fun SafetyAlertsSection(alerts: List<ConstructionPlatform.SafetyAlert>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f))
@@ -897,7 +905,7 @@ private fun SafetyAlertsSection(alerts: List<SafetyAlert>) {
 }
 
 @Composable
-private fun SafetyAlertItem(alert: SafetyAlert) {
+private fun SafetyAlertItem(alert: ConstructionPlatform.SafetyAlert) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -935,7 +943,7 @@ private fun SafetyAlertItem(alert: SafetyAlert) {
 }
 
 @Composable
-private fun RecentActivitySection(recentTasks: List<ConstructionTask>) {
+private fun RecentActivitySection(recentTasks: List<ConstructionPlatform.ConstructionTask>) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -1084,7 +1092,7 @@ private fun ProjectItem(
 
 @Composable
 private fun TasksTab(
-    tasks: List<ConstructionTask>,
+    tasks: List<ConstructionPlatform.ConstructionTask>,
     activeProject: ConstructionProject?,
     onTaskCompleted: (String) -> Unit
 ) {
@@ -1115,7 +1123,7 @@ private fun TasksTab(
 
 @Composable
 private fun TaskItem(
-    task: ConstructionTask,
+    task: ConstructionPlatform.ConstructionTask,
     onTaskCompleted: (String) -> Unit
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
@@ -1166,7 +1174,7 @@ private fun TaskItem(
 }
 
 @Composable
-private fun ResourcesTab(resources: List<Resource>) {
+private fun ResourcesTab(resources: List<ConstructionPlatform.Resource>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -1187,7 +1195,7 @@ private fun ResourcesTab(resources: List<Resource>) {
 }
 
 @Composable
-private fun ResourceItem(resource: Resource) {
+private fun ResourceItem(resource: ConstructionPlatform.Resource) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -1239,7 +1247,7 @@ private fun ResourceItem(resource: Resource) {
 }
 
 @Composable
-private fun SafetyTab(safetyAlerts: List<SafetyAlert>) {
+private fun SafetyTab(safetyAlerts: List<ConstructionPlatform.SafetyAlert>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),

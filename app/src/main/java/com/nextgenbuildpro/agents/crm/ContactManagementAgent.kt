@@ -50,14 +50,15 @@ class ContactManagementAgent : SpecializedAgent {
     override suspend fun processTask(task: NextGenTask): Result<NextGenTask> = try {
         Log.d("ContactManagementAgent", "Processing contact task: ${task.description}")
         
-        val result = when (task.type) {
+        val taskType = task.metadata["type"] as? String ?: task.title
+        val result = when (taskType) {
             "create_contact_from_call" -> createContactFromCall(task)
             "create_contact_from_sms" -> createContactFromSMS(task)
             "create_contact_from_voice" -> createContactFromVoice(task)
             "update_contact" -> updateContact(task)
             "merge_contacts" -> mergeContacts(task)
             "auto_populate_contact" -> autoPopulateContact(task)
-            else -> throw IllegalArgumentException("Unknown contact task type: ${task.type}")
+            else -> throw IllegalArgumentException("Unknown contact task type: $taskType")
         }
         
         Result.success(result)
@@ -70,11 +71,11 @@ class ContactManagementAgent : SpecializedAgent {
      * Create contact from recent call data
      */
     private suspend fun createContactFromCall(task: NextGenTask): NextGenTask {
-        val phoneNumber = task.parameters["phone_number"] as? String
+        val phoneNumber = task.metadata["phone_number"] as? String
             ?: throw IllegalArgumentException("Phone number required")
         
-        val callDuration = task.parameters["call_duration"] as? Long ?: 0L
-        val callTime = task.parameters["call_time"] as? Long ?: System.currentTimeMillis()
+        val callDuration = task.metadata["call_duration"] as? Long ?: 0L
+        val callTime = task.metadata["call_time"] as? Long ?: System.currentTimeMillis()
         
         // Check if contact already exists
         val existingContact = findContactByPhone(phoneNumber)
@@ -121,8 +122,8 @@ class ContactManagementAgent : SpecializedAgent {
         saveContact(contactInfo)
         
         return task.copy(
-            status = "completed",
-            result = mapOf(
+            status = TaskStatus.COMPLETED,
+            metadata = task.metadata + mapOf(
                 "contact_id" to contactInfo.id,
                 "contact_name" to contactInfo.name,
                 "action" to if (existingContact != null) "updated" else "created",
@@ -135,13 +136,13 @@ class ContactManagementAgent : SpecializedAgent {
      * Create contact from SMS with address extraction
      */
     private suspend fun createContactFromSMS(task: NextGenTask): NextGenTask {
-        val phoneNumber = task.parameters["phone_number"] as? String
+        val phoneNumber = task.metadata["phone_number"] as? String
             ?: throw IllegalArgumentException("Phone number required")
         
-        val messageContent = task.parameters["message_content"] as? String
+        val messageContent = task.metadata["message_content"] as? String
             ?: throw IllegalArgumentException("Message content required")
         
-        val senderName = task.parameters["sender_name"] as? String
+        val senderName = task.metadata["sender_name"] as? String
         
         // Extract information from SMS
         val extractedInfo = extractInfoFromSMS(messageContent)
@@ -173,8 +174,8 @@ class ContactManagementAgent : SpecializedAgent {
         saveContact(contactInfo)
         
         return task.copy(
-            status = "completed",
-            result = mapOf(
+            status = TaskStatus.COMPLETED,
+            metadata = task.metadata + mapOf(
                 "contact_id" to contactInfo.id,
                 "contact_name" to contactInfo.name,
                 "extracted_info" to extractedInfo,
@@ -188,10 +189,10 @@ class ContactManagementAgent : SpecializedAgent {
      * Create contact from voice command
      */
     private suspend fun createContactFromVoice(task: NextGenTask): NextGenTask {
-        val voiceInput = task.parameters["voice_input"] as? String
+        val voiceInput = task.metadata["voice_input"] as? String
             ?: throw IllegalArgumentException("Voice input required")
         
-        val recentCallNumber = task.parameters["recent_call_number"] as? String
+        val recentCallNumber = task.metadata["recent_call_number"] as? String
         
         // Parse voice command for contact details
         val parsedInfo = parseVoiceContactCommand(voiceInput)
@@ -224,21 +225,21 @@ class ContactManagementAgent : SpecializedAgent {
         saveContact(contactInfo)
         
         return task.copy(
-            status = "completed",
-            result = mapOf(
+            status = TaskStatus.COMPLETED,
+            metadata = task.metadata + mapOf(
                 "contact_id" to contactInfo.id,
                 "contact_name" to contactInfo.name,
-                "voice_confidence" to parsedInfo["confidence"] ?: 0.8f,
+                "voice_confidence" to (parsedInfo["confidence"] as? Double ?: 0.8),
                 "lead_score" to contactInfo.leadScore
             )
         )
     }
     
     private suspend fun updateContact(task: NextGenTask): NextGenTask {
-        val contactId = task.parameters["contact_id"] as? String
+        val contactId = task.metadata["contact_id"] as? String
             ?: throw IllegalArgumentException("Contact ID required")
         
-        val updates = task.parameters["updates"] as? Map<String, Any>
+        val updates = task.metadata["updates"] as? Map<String, Any>
             ?: throw IllegalArgumentException("Updates required")
         
         val currentContacts = _contactDatabase.value.toMutableMap()
@@ -258,8 +259,8 @@ class ContactManagementAgent : SpecializedAgent {
         _contactDatabase.value = currentContacts
         
         return task.copy(
-            status = "completed",
-            result = mapOf(
+            status = TaskStatus.COMPLETED,
+            metadata = task.metadata + mapOf(
                 "contact_id" to contactId,
                 "updated_fields" to updates.keys.toList()
             )
@@ -267,10 +268,10 @@ class ContactManagementAgent : SpecializedAgent {
     }
     
     private suspend fun mergeContacts(task: NextGenTask): NextGenTask {
-        val primaryContactId = task.parameters["primary_contact_id"] as? String
+        val primaryContactId = task.metadata["primary_contact_id"] as? String
             ?: throw IllegalArgumentException("Primary contact ID required")
         
-        val secondaryContactId = task.parameters["secondary_contact_id"] as? String
+        val secondaryContactId = task.metadata["secondary_contact_id"] as? String
             ?: throw IllegalArgumentException("Secondary contact ID required")
         
         val currentContacts = _contactDatabase.value.toMutableMap()
@@ -298,8 +299,8 @@ class ContactManagementAgent : SpecializedAgent {
         _contactDatabase.value = currentContacts
         
         return task.copy(
-            status = "completed",
-            result = mapOf(
+            status = TaskStatus.COMPLETED,
+            metadata = task.metadata + mapOf(
                 "merged_contact_id" to primaryContactId,
                 "removed_contact_id" to secondaryContactId,
                 "merge_score" to calculateMergeScore(primaryContact, secondaryContact)
@@ -308,7 +309,7 @@ class ContactManagementAgent : SpecializedAgent {
     }
     
     private suspend fun autoPopulateContact(task: NextGenTask): NextGenTask {
-        val phoneNumber = task.parameters["phone_number"] as? String
+        val phoneNumber = task.metadata["phone_number"] as? String
             ?: throw IllegalArgumentException("Phone number required")
         
         // Auto-populate from recent calls and device contacts
@@ -330,8 +331,8 @@ class ContactManagementAgent : SpecializedAgent {
         }
         
         return task.copy(
-            status = "completed",
-            result = mapOf(
+            status = TaskStatus.COMPLETED,
+            metadata = task.metadata + mapOf(
                 "populated_info" to populatedInfo,
                 "confidence_score" to calculatePopulationConfidence(populatedInfo)
             )
