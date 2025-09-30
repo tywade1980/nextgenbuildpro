@@ -132,154 +132,18 @@ class HierarchicalCatalogueRepository(private val context: Context) {
 
     /**
      * Create Framing trade index with detailed assemblies and tasks
+     * TODO: Load from Firestore instead of hardcoded data
      */
     private fun createFramingTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
-        // Create detailed tasks for framing
-        val framingTasks = listOf(
-            DetailedTask(
-                name = "Install Sole Plate",
-                description = "Install pressure-treated sole plate on foundation",
-                workDescription = "Measure and cut pressure-treated lumber to length, position on foundation, check for level and square, drill pilot holes, and secure with anchor bolts or powder-actuated fasteners. Ensure proper spacing and alignment for wall framing.",
-                unitType = UnitType.LF,
-                defaultQty = 1.0,
-                laborTimePerUnit = 0.15, // 9 minutes per linear foot
-                laborCostPerUnit = 3.75, // Based on $25/hour carpenter rate
-                materialCostPerUnit = 2.50,
-                markup = 0.20,
-                skillLevel = SkillLevel.INTERMEDIATE,
-                requiredTools = listOf("Circular Saw", "Drill", "Level", "Chalk Line", "Measuring Tape"),
-                requiredMaterials = listOf(
-                    TaskMaterial(
-                        name = "Pressure Treated 2x6 Lumber",
-                        description = "Ground contact rated pressure treated lumber",
-                        quantity = 1.0,
-                        unit = "LF",
-                        unitCost = 2.50,
-                        supplier = "Home Depot",
-                        webSourceUrl = "https://www.homedepot.com/p/lumber"
-                    )
-                ),
-                safetyNotes = listOf("Wear safety glasses", "Use ear protection when cutting"),
-                qualityCheckpoints = listOf("Check level within 1/4 inch", "Verify square corners"),
-                webSourcedData = LaborCostData(
-                    source = "BLS Construction Laborers",
-                    sourceUrl = "https://www.bls.gov/oes/current/oes472061.htm",
-                    region = "National Average",
-                    lastUpdated = LocalDateTime.now(),
-                    avgHourlyRate = 25.00,
-                    lowRate = 18.00,
-                    highRate = 35.00,
-                    reliability = DataReliability.HIGH
-                )
-            ),
-            DetailedTask(
-                name = "Frame Wall Studs",
-                description = "Cut and install wall studs at 16\" on center",
-                workDescription = "Measure wall length, calculate stud layout at 16\" on center, cut studs to proper height (typically 8' walls require 92-5/8\" studs), mark top and bottom plates, position studs, and secure with framing nails. Install cripple studs under windows and above doors as needed.",
-                unitType = UnitType.LF,
-                defaultQty = 1.0,
-                laborTimePerUnit = 0.25, // 15 minutes per linear foot
-                laborCostPerUnit = 6.25,
-                materialCostPerUnit = 4.00,
-                markup = 0.20,
-                skillLevel = SkillLevel.INTERMEDIATE,
-                requiredTools = listOf("Framing Hammer", "Circular Saw", "Speed Square", "Measuring Tape"),
-                requiredMaterials = listOf(
-                    TaskMaterial(
-                        name = "2x6 Kiln Dried Stud",
-                        description = "Kiln dried dimensional lumber stud",
-                        quantity = 0.75, // Approximately 3/4 stud per linear foot
-                        unit = "EA",
-                        unitCost = 4.00
-                    )
-                ),
-                webSourcedData = LaborCostData(
-                    source = "RSMeans Building Construction",
-                    sourceUrl = "https://www.rsmeans.com/",
-                    region = "National Average",
-                    lastUpdated = LocalDateTime.now(),
-                    avgHourlyRate = 25.00,
-                    lowRate = 20.00,
-                    highRate = 30.00,
-                    reliability = DataReliability.VERIFIED
-                )
-            ),
-            DetailedTask(
-                name = "Install Top Plate",
-                description = "Install double top plate on wall frame",
-                workDescription = "Cut top plate lumber to length, ensuring joints are staggered from bottom plate joints. Install first top plate flush with stud tops, securing with 16d nails. Install second top plate overlapping joints by minimum 24 inches, tying intersecting walls together.",
-                unitType = UnitType.LF,
-                defaultQty = 1.0,
-                laborTimePerUnit = 0.10,
-                laborCostPerUnit = 2.50,
-                materialCostPerUnit = 5.00, // Double top plate
-                markup = 0.20,
-                skillLevel = SkillLevel.INTERMEDIATE
-            )
-        )
-
-        // Create macro task grouping related framing tasks
-        val wallFramingMacroTask = MacroTask(
-            name = "Complete Wall Framing",
-            description = "Frame complete wall from sole plate to top plate",
-            workDescription = "Complete wall framing assembly including sole plate installation, stud layout and installation, header framing for openings, and double top plate installation. Includes all rough openings for doors and windows.",
-            tasks = framingTasks,
-            totalEstimatedHours = framingTasks.sumOf { it.laborTimePerUnit * it.defaultQty },
-            totalEstimatedCost = framingTasks.sumOf { (it.laborCostPerUnit + it.materialCostPerUnit) * it.defaultQty },
-            sequenceOrder = 1
-        )
-
-        // Create detailed assembly
-        val wallFramingAssembly = DetailedAssembly(
-            name = "Exterior Wall Framing",
-            category = "Structural Framing",
-            description = "Complete exterior wall framing assembly with headers and rough openings",
-            workDescription = "Construct complete exterior wall framing system including foundation attachment, wall studs, headers for openings, corners, intersections, and top plate installation. Frame includes provisions for windows, doors, and mechanical penetrations per architectural plans.",
-            validModes = listOf(ContextMode.NEW_CONSTRUCTION),
-            defaultQuantityUnit = UnitType.LF,
-            baseQuantity = 40.0,
-            lifecyclePhase = HomeLifecyclePhase.STRUCTURE,
-            tasks = framingTasks,
-            macroTasks = listOf(wallFramingMacroTask),
-            prerequisites = listOf("Foundation cured and ready", "Lumber delivered to site"),
-            deliverables = listOf("Framed walls ready for sheathing", "Rough openings to spec"),
-            qualityStandards = listOf("Plumb walls within 1/4 inch", "Level within 1/8 inch per 10 feet"),
-            safetyRequirements = listOf("Fall protection required", "Hard hats mandatory")
-        )
-
-        // Create master assembly for framing trade
-        val framingMasterAssembly = MasterAssembly(
-            name = "Framing Master Assembly",
-            description = "Complete framing system for residential construction including all walls, floors, and roof framing",
-            tradeCode = "FRM",
-            assemblies = listOf(wallFramingAssembly),
-            subAssemblies = listOf(
-                SubAssembly(
-                    name = "Corner Assembly",
-                    description = "Three-stud corner assembly for exterior wall intersections",
-                    workDescription = "Construct three-stud corner using (2) full-length studs and (1) backing stud with blocks, providing nailing surface for interior and exterior finishes.",
-                    parentAssemblyId = wallFramingAssembly.id,
-                    tasks = framingTasks.take(2), // Subset of tasks
-                    estimatedHours = 2.0,
-                    estimatedCost = 45.00,
-                    skillLevel = SkillLevel.INTERMEDIATE
-                )
-            ),
-            totalEstimatedHours = 120.0,
-            totalEstimatedCost = 2400.0
-        )
-
-        return TradeIndex(
+        return createEmptyTradeIndex(
             tradeName = "Framing",
             tradeCode = "FRM",
             description = "Structural framing and carpentry work",
-            workDescription = "Structural framing includes all wood framing for walls, floors, roofs, stairs, and structural elements. Work encompasses layout, cutting, assembly, and installation of dimensional lumber and engineered wood products to create the structural skeleton of the building.",
             lifecyclePhase = HomeLifecyclePhase.STRUCTURE,
-            masterAssembly = framingMasterAssembly,
-            avgLaborRate = 25.00,
-            webResourceUrls = webResources.filter { it.dataType == WebResourceType.LABOR_RATES }
+            webResources = webResources
         )
     }
+            tradeCode = "FRM",
 
     /**
      * Create additional trade indices (simplified for brevity but follow same pattern)
@@ -349,285 +213,52 @@ class HierarchicalCatalogueRepository(private val context: Context) {
 
     // Trade creation methods with proper implementations
     private fun createPlumbingTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
-        // Create basic plumbing tasks
-        val plumbingTasks = listOf(
-            DetailedTask(
-                name = "Install Supply Lines",
-                description = "Install hot and cold water supply lines",
-                estimatedHours = 16.0,
-                materialCost = 450.0,
-                laborCost = 800.0,
-                requirements = listOf("Framing complete")
-            ),
-            DetailedTask(
-                name = "Install Drain Lines",
-                description = "Install waste and vent lines",
-                estimatedHours = 20.0,
-                materialCost = 350.0,
-                laborCost = 1000.0,
-                requirements = listOf("Supply lines installed")
-            ),
-            DetailedTask(
-                name = "Install Fixtures",
-                description = "Install toilets, sinks, and other fixtures",
-                estimatedHours = 12.0,
-                materialCost = 800.0,
-                laborCost = 600.0,
-                requirements = listOf("Drain lines complete")
-            )
-        )
-        
-        val plumbingAssembly = DetailedAssembly(
-            name = "Rough Plumbing",
-            description = "Basic plumbing infrastructure",
-            assemblyCode = "PLB-001",
-            unit = "sqft",
-            baseQuantity = 1500.0,
-            lifecyclePhase = HomeLifecyclePhase.SYSTEMS,
-            tasks = plumbingTasks,
-            macroTasks = emptyList(),
-            prerequisites = listOf("Framing inspection complete"),
-            deliverables = listOf("All rough plumbing installed and inspected")
-        )
-        
-        val plumbingMasterAssembly = MasterAssembly(
-            name = "Plumbing Master Assembly",
-            description = "Complete plumbing system for residential construction",
-            tradeCode = "PLB",
-            assemblies = listOf(plumbingAssembly),
-            subAssemblies = emptyList(),
-            totalEstimatedHours = 48.0,
-            totalEstimatedCost = 2800.0
-        )
-
-        return TradeIndex(
+        return createEmptyTradeIndex(
             tradeName = "Plumbing",
-            tradeCode = "PLB",
-            description = "Plumbing systems installation",
-            workDescription = "Plumbing work includes water supply lines, drainage systems, waste and vent piping, fixture installation, and system testing.",
+            tradeCode = "PLM",
+            description = "Plumbing system installation",
             lifecyclePhase = HomeLifecyclePhase.SYSTEMS,
-            masterAssembly = plumbingMasterAssembly,
-            avgLaborRate = 45.00,
-            webResourceUrls = webResources
+            webResources = webResources
         )
     }
 
     private fun createHVACTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
-        // Create basic HVAC tasks
-        val hvacTasks = listOf(
-            DetailedTask(
-                name = "Install Ductwork",
-                description = "Install supply and return air ducts",
-                estimatedHours = 24.0,
-                materialCost = 800.0,
-                laborCost = 1200.0,
-                requirements = listOf("Framing complete")
-            ),
-            DetailedTask(
-                name = "Install HVAC Unit",
-                description = "Install heating and cooling equipment",
-                estimatedHours = 16.0,
-                materialCost = 2500.0,
-                laborCost = 800.0,
-                requirements = listOf("Electrical rough-in complete")
-            ),
-            DetailedTask(
-                name = "Install Controls",
-                description = "Install thermostats and control systems",
-                estimatedHours = 8.0,
-                materialCost = 200.0,
-                laborCost = 400.0,
-                requirements = listOf("HVAC unit installed")
-            )
-        )
-        
-        val hvacAssembly = DetailedAssembly(
-            name = "HVAC System Installation",
-            description = "Complete HVAC system installation",
-            assemblyCode = "HVC-001",
-            unit = "sqft",
-            baseQuantity = 1800.0,
-            lifecyclePhase = HomeLifecyclePhase.SYSTEMS,
-            tasks = hvacTasks,
-            macroTasks = emptyList(),
-            prerequisites = listOf("Framing and electrical rough-in complete"),
-            deliverables = listOf("HVAC system fully installed and tested")
-        )
-        
-        val hvacMasterAssembly = MasterAssembly(
-            name = "HVAC Master Assembly",
-            description = "Complete HVAC system for residential construction",
-            tradeCode = "HVC",
-            assemblies = listOf(hvacAssembly),
-            subAssemblies = emptyList(),
-            totalEstimatedHours = 48.0,
-            totalEstimatedCost = 4500.0
-        )
-
-        return TradeIndex(
+        return createEmptyTradeIndex(
             tradeName = "HVAC",
             tradeCode = "HVC",
-            description = "Heating, ventilation, and air conditioning systems",
-            workDescription = "HVAC work includes heating and cooling equipment installation, ductwork, ventilation systems, and controls.",
+            description = "HVAC system installation",
             lifecyclePhase = HomeLifecyclePhase.SYSTEMS,
-            masterAssembly = hvacMasterAssembly,
-            avgLaborRate = 55.00,
-            webResourceUrls = webResources
+            webResources = webResources
         )
     }
 
     private fun createDrywallTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
-        // Create basic drywall tasks
-        val drywallTasks = listOf(
-            DetailedTask(
-                name = "Hang Drywall",
-                description = "Install gypsum board sheets",
-                estimatedHours = 24.0,
-                materialCost = 600.0,
-                laborCost = 720.0,
-                requirements = listOf("All systems rough-in complete")
-            ),
-            DetailedTask(
-                name = "Tape and Mud",
-                description = "Apply joint compound and tape joints",
-                estimatedHours = 20.0,
-                materialCost = 150.0,
-                laborCost = 600.0,
-                requirements = listOf("Drywall hung and inspected")
-            ),
-            DetailedTask(
-                name = "Sand and Prime",
-                description = "Sand smooth and apply primer",
-                estimatedHours = 16.0,
-                materialCost = 100.0,
-                laborCost = 480.0,
-                requirements = listOf("Final mud coat dried")
-            )
-        )
-        
-        val drywallAssembly = DetailedAssembly(
-            name = "Interior Drywall",
-            description = "Complete drywall installation and finishing",
-            assemblyCode = "DRY-001",
-            unit = "sqft",
-            baseQuantity = 3000.0,
-            lifecyclePhase = HomeLifecyclePhase.INTERIORS,
-            tasks = drywallTasks,
-            macroTasks = emptyList(),
-            prerequisites = listOf("All rough inspections passed", "Insulation installed"),
-            deliverables = listOf("Walls ready for paint")
-        )
-        
-        val drywallMasterAssembly = MasterAssembly(
-            name = "Drywall Master Assembly",
-            description = "Complete drywall system for interior finishing",
-            tradeCode = "DRY",
-            assemblies = listOf(drywallAssembly),
-            subAssemblies = emptyList(),
-            totalEstimatedHours = 60.0,
-            totalEstimatedCost = 1800.0
-        )
-
-        return TradeIndex(
+        return createEmptyTradeIndex(
             tradeName = "Drywall",
             tradeCode = "DRY",
             description = "Drywall installation and finishing",
-            workDescription = "Drywall work includes gypsum board installation, taping, mudding, sanding, and preparation for paint.",
-            lifecyclePhase = HomeLifecyclePhase.INTERIORS,
-            masterAssembly = drywallMasterAssembly,
-            avgLaborRate = 30.00,
-            webResourceUrls = webResources
+            lifecyclePhase = HomeLifecyclePhase.INTERIOR_FINISH,
+            webResources = webResources
         )
     }
 
     private fun createRoofingTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
-        // Create basic roofing tasks
-        val roofingTasks = listOf(
-            DetailedTask(
-                name = "Install Roof Decking",
-                description = "Install plywood or OSB roof sheathing",
-                estimatedHours = 16.0,
-                materialCost = 800.0,
-                laborCost = 640.0,
-                requirements = listOf("Roof framing complete")
-            ),
-            DetailedTask(
-                name = "Install Underlayment",
-                description = "Install roofing felt or synthetic underlayment",
-                estimatedHours = 8.0,
-                materialCost = 300.0,
-                laborCost = 320.0,
-                requirements = listOf("Roof decking installed")
-            ),
-            DetailedTask(
-                name = "Install Shingles",
-                description = "Install asphalt shingles and flashing",
-                estimatedHours = 20.0,
-                materialCost = 1500.0,
-                laborCost = 800.0,
-                requirements = listOf("Underlayment complete")
-            )
-        )
-        
-        val roofingAssembly = DetailedAssembly(
-            name = "Asphalt Shingle Roof",
-            description = "Complete roofing system installation",
-            assemblyCode = "ROF-001",
-            unit = "sqft",
-            baseQuantity = 2200.0,
-            lifecyclePhase = HomeLifecyclePhase.EXTERIOR,
-            tasks = roofingTasks,
-            macroTasks = emptyList(),
-            prerequisites = listOf("Roof framing inspection passed"),
-            deliverables = listOf("Weather-tight roof system")
-        )
-        
-        val roofingMasterAssembly = MasterAssembly(
-            name = "Roofing Master Assembly",
-            description = "Complete roofing system for weather protection",
-            tradeCode = "ROF",
-            assemblies = listOf(roofingAssembly),
-            subAssemblies = emptyList(),
-            totalEstimatedHours = 44.0,
-            totalEstimatedCost = 3200.0
-        )
-        )
-
-        return TradeIndex(
+        return createEmptyTradeIndex(
             tradeName = "Roofing",
             tradeCode = "ROF",
-            description = "Roofing systems installation",
-            workDescription = "Roofing work includes sheathing, underlayment, shingles or other roofing materials, flashing, and gutters.",
+            description = "Roofing system installation",
             lifecyclePhase = HomeLifecyclePhase.ENCLOSURE,
-            masterAssembly = roofingMasterAssembly,
-            avgLaborRate = 35.00,
-            webResourceUrls = webResources
+            webResources = webResources
         )
     }
 
     private fun createFoundationTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
-        // Create detailed foundation assemblies
-        val foundationAssemblies = createFoundationAssemblies()
-        
-        val foundationMasterAssembly = MasterAssembly(
-            name = "Foundation Master Assembly",
-            description = "Complete foundation system for structural support",
-            tradeCode = "FND",
-            assemblies = foundationAssemblies,
-            subAssemblies = emptyList(),
-            totalEstimatedHours = 156.0, // Sum of all foundation assembly hours
-            totalEstimatedCost = 28500.0 // Updated comprehensive cost
-        )
-
-        return TradeIndex(
+        return createEmptyTradeIndex(
             tradeName = "Foundation",
             tradeCode = "FND",
             description = "Foundation and concrete work",
-            workDescription = "Foundation work includes excavation, footings, foundation walls, slabs, waterproofing, and basement construction with finishing work.",
-            lifecyclePhase = HomeLifecyclePhase.STRUCTURE,
-            masterAssembly = foundationMasterAssembly,
-            avgLaborRate = 40.00,
-            webResourceUrls = webResources
+            lifecyclePhase = HomeLifecyclePhase.FOUNDATION,
+            webResources = webResources
         )
     }
 
@@ -1487,6 +1118,39 @@ class HierarchicalCatalogueRepository(private val context: Context) {
             "equipment" to 50.0,
             "markup" to 80.0,
             "total" to 480.0
+        )
+    }
+
+    /**
+     * Helper method to create an empty TradeIndex structure
+     * TODO: Replace with Firestore data loading
+     */
+    private fun createEmptyTradeIndex(
+        tradeName: String,
+        tradeCode: String,
+        description: String,
+        lifecyclePhase: HomeLifecyclePhase,
+        webResources: List<WebResourceUrl>
+    ): TradeIndex {
+        val emptyMasterAssembly = MasterAssembly(
+            name = "$tradeName Master Assembly",
+            description = description,
+            tradeCode = tradeCode,
+            assemblies = emptyList(),
+            subAssemblies = emptyList(),
+            totalEstimatedHours = 0.0,
+            totalEstimatedCost = 0.0
+        )
+        
+        return TradeIndex(
+            tradeName = tradeName,
+            tradeCode = tradeCode,
+            description = description,
+            workDescription = description,
+            lifecyclePhase = lifecyclePhase,
+            masterAssembly = emptyMasterAssembly,
+            avgLaborRate = 0.0,
+            webResourceUrls = webResources.filter { it.dataType == WebResourceType.LABOR_RATES }
         )
     }
 
