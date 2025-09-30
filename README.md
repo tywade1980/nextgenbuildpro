@@ -23,12 +23,12 @@ The NextGen AI OS is built on a revolutionary multi-agent architecture that comb
 ├─────────────────────────────────────────────────────────────┤
 │                 Living Environment Mesh                     │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
-│  │     MRM     │ │ HermesBrain │ │ BigDaddy    │           │
-│  │   Agent     │ │    Agent    │ │   Agent     │           │
+│  │   CRM       │ │  Personal   │ │  Project    │           │
+│  │Orchestrator │ │  Assistant  │ │ Management  │           │
 │  └─────────────┘ └─────────────┘ └─────────────┘           │
 │  ┌─────────────┐ ┌─────────────┐                           │
-│  │ HRM Model   │ │ EliteHuman  │                           │
-│  │   Agent     │ │   Agent     │                           │
+│  │ Analytics   │ │   Design    │                           │
+│  │Orchestrator │ │ Department  │                           │
 │  └─────────────┘ └─────────────┘                           │
 ├─────────────────────────────────────────────────────────────┤
 │               Main Orchestrator                             │
@@ -40,37 +40,36 @@ The NextGen AI OS is built on a revolutionary multi-agent architecture that comb
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 🤖 AI Agents
+## 🤖 Specialized Agents
 
-### Master Resource Manager (MRM)
-**Role**: Intelligent resource allocation and system optimization
-- **Capabilities**: Predictive resource allocation, dynamic load balancing, cross-domain optimization
-- **Intelligence Type**: Reinforcement learning with predictive analytics
-- **Key Feature**: Anticipates resource needs 24-48 hours in advance
+The system uses specialized departmental orchestrators that follow the SpecializedAgent framework:
 
-### HermesBrain
-**Role**: Communication and coordination hub
-- **Capabilities**: Protocol translation, emotional context analysis, multi-party coordination
-- **Intelligence Type**: Natural language processing with emotional intelligence
-- **Key Feature**: Seamless translation between different communication protocols
+### CRM Orchestrator
+**Role**: Customer relationship and contact management
+- **Capabilities**: Smart contact creation from calls/SMS, lead scoring, client engagement tracking
+- **Implementation**: ContactManagementAgent.kt
+- **Key Feature**: Automated contact enrichment from multiple sources
 
-### BigDaddyAgent
-**Role**: Executive decision-making and strategic oversight
-- **Capabilities**: Strategic decision synthesis, crisis management, stakeholder impact modeling
-- **Intelligence Type**: Strategic AI with crisis pattern recognition
-- **Key Feature**: Executive-level decision making with ethical oversight
+### Personal Assistant Orchestrator
+**Role**: Voice command processing and personal assistance
+- **Capabilities**: Bilingual voice recognition (English/Spanish), construction-specific vocabulary
+- **Implementation**: VoiceCommandAgent.kt
+- **Key Feature**: Natural language understanding for construction tasks
 
-### HRM Model
-**Role**: Human resource management and optimization
-- **Capabilities**: Workforce analytics, talent management, human-AI collaboration optimization
-- **Intelligence Type**: Human behavior analysis with predictive modeling
-- **Key Feature**: Optimizes human-AI team composition and performance
+### Project Management Orchestrator  
+**Role**: Project planning and resource coordination
+- **Capabilities**: Timeline management, resource allocation, task coordination
+- **Key Feature**: Integrated construction project lifecycle management
 
-### EliteHuman
-**Role**: Human excellence and creativity amplification
-- **Capabilities**: Creative problem solving, emotional intelligence, ethical leadership
-- **Intelligence Type**: Human-AI synthesis with creativity enhancement
-- **Key Feature**: Amplifies human creativity while providing AI-powered insights
+### Design Department Orchestrator
+**Role**: Design coordination and blueprint management
+- **Capabilities**: Design workflow coordination, visual planning support
+- **Key Feature**: Streamlined design-to-construction handoff
+
+### Analytics Orchestrator
+**Role**: Data analysis and reporting
+- **Capabilities**: Project analytics, performance insights, predictive modeling
+- **Key Feature**: Real-time construction metrics and KPI tracking
 
 ## 🌐 Living Environment Mesh
 
@@ -131,11 +130,10 @@ app/src/main/java/com/nextgenbuildpro/
 ├── shared/
 │   └── Types.kt                    # Shared types and interfaces
 ├── agents/
-│   ├── MRM.kt                      # Master Resource Manager
-│   ├── HermesBrain.kt              # Communication hub
-│   ├── BigDaddyAgent.kt            # Executive intelligence
-│   ├── HRMModel.kt                 # Human resource management
-│   └── EliteHuman.kt               # Human excellence framework
+│   ├── crm/
+│   │   └── ContactManagementAgent.kt  # CRM Orchestrator
+│   └── personal_assistant/
+│       └── VoiceCommandAgent.kt      # Personal Assistant Orchestrator
 ├── env/
 │   └── LivingEnv.kt                # Living Environment Mesh
 ├── apps/

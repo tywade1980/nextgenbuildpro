@@ -337,7 +337,7 @@ class WorkflowAutomationEngine(private val context: Context) : NextGenService {
         val task = NextGenTask(
             title = step.parameters["taskTitle"] as? String ?: "Automated Task",
             description = step.parameters["taskDescription"] as? String ?: "Task created by workflow automation",
-            assignedAgent = AgentType.valueOf(step.parameters["assignedAgent"] as? String ?: "BIG_DADDY"),
+            assignedAgent = AgentType.valueOf(step.parameters["assignedAgent"] as? String ?: "ORCHESTRATOR"),
             priority = Priority.valueOf(step.parameters["priority"] as? String ?: "MEDIUM"),
             status = TaskStatus.PENDING,
             scheduledTime = scheduledTime
@@ -505,7 +505,7 @@ class WorkflowAutomationEngine(private val context: Context) : NextGenService {
                     parameters = mapOf(
                         "taskType" to "meeting",
                         "taskTitle" to "Project Kickoff Meeting",
-                        "assignedAgent" to "ELITE_HUMAN"
+                        "assignedAgent" to "ORCHESTRATOR"
                     )
                 )
             ),
@@ -600,7 +600,7 @@ class WorkflowAutomationEngine(private val context: Context) : NextGenService {
                     parameters = mapOf(
                         "taskType" to "planning_session",
                         "taskTitle" to "Project Planning Session",
-                        "assignedAgent" to "HRM_MODEL"
+                        "assignedAgent" to "PROJECT_MANAGEMENT_ORCHESTRATOR"
                     )
                 )
             ),
