@@ -51,7 +51,7 @@ class ContactManagementAgent : SpecializedAgent {
         Log.d("ContactManagementAgent", "Processing contact task: ${task.description}")
         
         val taskType = task.metadata["type"] as? String ?: task.title
-        val metadata = task.metadata + when (taskType) {
+        val result = when (taskType) {
             "create_contact_from_call" -> createContactFromCall(task)
             "create_contact_from_sms" -> createContactFromSMS(task)
             "create_contact_from_voice" -> createContactFromVoice(task)
@@ -229,7 +229,7 @@ class ContactManagementAgent : SpecializedAgent {
             metadata = task.metadata + mapOf(
                 "contact_id" to contactInfo.id,
                 "contact_name" to contactInfo.name,
-                "voice_confidence" to parsedInfo["confidence"] ?: 0.8f,
+                "voice_confidence" to (parsedInfo["confidence"] as? Double ?: 0.8),
                 "lead_score" to contactInfo.leadScore
             )
         )

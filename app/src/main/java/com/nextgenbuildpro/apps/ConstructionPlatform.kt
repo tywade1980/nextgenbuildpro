@@ -353,26 +353,25 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
     
     // === AI OPTIMIZATION ===
     
-    suspend fun optimizeProject(projectId: String): Result<OptimizationResult> = try {
-        Log.d("ConstructionPlatform", "Optimizing project: $projectId")
-        
-        val project = _projects.value.find { it.id == projectId }
-        if (project == null) {
-            return Result.failure(IllegalArgumentException("Project not found: $projectId"))
+    suspend fun optimizeProject(projectId: String): Result<OptimizationResult> {
+        return try {
+            Log.d("ConstructionPlatform", "Optimizing project: $projectId")
+            
+            val project = _projects.value.find { it.id == projectId }
+            if (project == null) {
+                return Result.failure(IllegalArgumentException("Project not found: $projectId"))
+            }
+            
+            val optimization = aiOptimizer.optimizeProject(project, _tasks.value, _resources.value)
+            
+            // Apply optimizations
+            applyOptimizations(optimization)
+            
+            Result.success(optimization)
+        } catch (e: Exception) {
+            Log.e("ConstructionPlatform", "Error optimizing project", e)
+            Result.failure(e)
         }
-        
-        val optimization = aiOptimizer.optimizeProject(project, _tasks.value, _resources.value)
-        
-        // Apply optimizations
-        applyOptimizations(optimization)
-        
-        Result.success(optimization)
-        
-        Log.i("ConstructionPlatform", "Project optimization completed: $projectId")
-        Result.success(optimization)
-    } catch (e: Exception) {
-        Log.e("ConstructionPlatform", "Error optimizing project", e)
-        Result.failure(e)
     }
     
     // === PRIVATE METHODS ===
@@ -769,9 +768,9 @@ fun ConstructionPlatformUI(
 @Composable
 private fun DashboardTab(
     projects: List<ConstructionProject>,
-    tasks: List<ConstructionTask>,
+    tasks: List<ConstructionPlatform.ConstructionTask>,
     resources: List<ConstructionPlatform.Resource>,
-    safetyAlerts: List<SafetyAlert>
+    safetyAlerts: List<ConstructionPlatform.SafetyAlert>
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -876,7 +875,7 @@ private fun DashboardCard(
 }
 
 @Composable
-private fun SafetyAlertsSection(alerts: List<SafetyAlert>) {
+private fun SafetyAlertsSection(alerts: List<ConstructionPlatform.SafetyAlert>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f))
@@ -906,7 +905,7 @@ private fun SafetyAlertsSection(alerts: List<SafetyAlert>) {
 }
 
 @Composable
-private fun SafetyAlertItem(alert: SafetyAlert) {
+private fun SafetyAlertItem(alert: ConstructionPlatform.SafetyAlert) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -944,7 +943,7 @@ private fun SafetyAlertItem(alert: SafetyAlert) {
 }
 
 @Composable
-private fun RecentActivitySection(recentTasks: List<ConstructionTask>) {
+private fun RecentActivitySection(recentTasks: List<ConstructionPlatform.ConstructionTask>) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -1093,7 +1092,7 @@ private fun ProjectItem(
 
 @Composable
 private fun TasksTab(
-    tasks: List<ConstructionTask>,
+    tasks: List<ConstructionPlatform.ConstructionTask>,
     activeProject: ConstructionProject?,
     onTaskCompleted: (String) -> Unit
 ) {
@@ -1124,7 +1123,7 @@ private fun TasksTab(
 
 @Composable
 private fun TaskItem(
-    task: ConstructionTask,
+    task: ConstructionPlatform.ConstructionTask,
     onTaskCompleted: (String) -> Unit
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
@@ -1196,7 +1195,7 @@ private fun ResourcesTab(resources: List<ConstructionPlatform.Resource>) {
 }
 
 @Composable
-private fun ResourceItem(resource: Resource) {
+private fun ResourceItem(resource: ConstructionPlatform.Resource) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -1248,7 +1247,7 @@ private fun ResourceItem(resource: Resource) {
 }
 
 @Composable
-private fun SafetyTab(safetyAlerts: List<SafetyAlert>) {
+private fun SafetyTab(safetyAlerts: List<ConstructionPlatform.SafetyAlert>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
