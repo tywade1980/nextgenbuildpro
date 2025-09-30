@@ -30,11 +30,11 @@ class EnhancedCatalogueDataService(private val context: Context) {
     private val _assemblies = MutableStateFlow<List<EnhancedAssembly>>(emptyList())
     val assemblies: StateFlow<List<EnhancedAssembly>> = _assemblies.asStateFlow()
     
-    private val _tasks = MutableStateFlow<List<Task>>(emptyList())
-    val tasks: StateFlow<List<Task>> = _tasks.asStateFlow()
+    private val _tasks = MutableStateFlow<List<CatalogueTask>>(emptyList())
+    val tasks: StateFlow<List<CatalogueTask>> = _tasks.asStateFlow()
     
-    private val _materials = MutableStateFlow<List<Material>>(emptyList())
-    val materials: StateFlow<List<Material>> = _materials.asStateFlow()
+    private val _materials = MutableStateFlow<List<CatalogueMaterial>>(emptyList())
+    val materials: StateFlow<List<CatalogueMaterial>> = _materials.asStateFlow()
     
     init {
         loadSampleData()
@@ -200,9 +200,9 @@ class EnhancedCatalogueDataService(private val context: Context) {
         laborCost: Double,
         equipmentCost: Double = 0.0,
         notes: String = ""
-    ): Result<Task> {
+    ): Result<CatalogueTask> {
         return try {
-            val task = Task(
+            val task = CatalogueTask(
                 assemblyId = assemblyId,
                 name = name,
                 description = description,
@@ -239,11 +239,11 @@ class EnhancedCatalogueDataService(private val context: Context) {
         unitCost: Double,
         waste: Double = 0.0,
         notes: String = ""
-    ): Result<Material> {
+    ): Result<CatalogueMaterial> {
         return try {
             val totalCost = unitCost * quantity * (1 + waste)
             
-            val material = Material(
+            val material = CatalogueMaterial(
                 taskId = taskId,
                 assemblyId = assemblyId,
                 name = name,
@@ -313,7 +313,7 @@ class EnhancedCatalogueDataService(private val context: Context) {
                 
                 // Create materials for this task
                 val taskMaterials = request.materials.filter { it.taskId == taskData.id }
-                val createdTaskMaterials = mutableListOf<Material>()
+                val createdTaskMaterials = mutableListOf<CatalogueMaterial>()
                 
                 for (materialData in taskMaterials) {
                     val materialResult = createMaterial(
@@ -336,7 +336,7 @@ class EnhancedCatalogueDataService(private val context: Context) {
             
             // Create direct assembly materials
             val directMaterials = request.materials.filter { it.assemblyId != null && it.taskId == null }
-            val createdDirectMaterials = mutableListOf<Material>()
+            val createdDirectMaterials = mutableListOf<CatalogueMaterial>()
             
             for (materialData in directMaterials) {
                 val materialResult = createMaterial(
@@ -671,7 +671,7 @@ class EnhancedCatalogueDataService(private val context: Context) {
             // Create tasks
             val createdTasks = mutableListOf<TaskWithMaterials>()
             for (taskData in taskDataList) {
-                val task = Task(
+                val task = CatalogueTask(
                     assemblyId = assembly.id,
                     name = taskData["name"] as String,
                     description = taskData["description"] as String,
@@ -693,7 +693,7 @@ class EnhancedCatalogueDataService(private val context: Context) {
                     val taskIdFromMaterial = materialData["taskId"] as? String
                     taskIdFromMaterial == null || taskIdFromMaterial == task.id
                 }.map { materialData ->
-                    Material(
+                    CatalogueMaterial(
                         assemblyId = assembly.id,
                         taskId = task.id,
                         name = materialData["name"] as String,
@@ -719,7 +719,7 @@ class EnhancedCatalogueDataService(private val context: Context) {
             val directMaterials = materialDataList.filter { materialData ->
                 materialData["taskId"] == null
             }.map { materialData ->
-                Material(
+                CatalogueMaterial(
                     assemblyId = assembly.id,
                     taskId = null,
                     name = materialData["name"] as String,

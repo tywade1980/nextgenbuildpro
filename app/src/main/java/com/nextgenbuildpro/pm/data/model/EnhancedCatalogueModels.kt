@@ -198,8 +198,8 @@ data class AssemblySearchResultWithContext(
     val scope: Scope,
     val trade: Trade,
     val category: Category,
-    val tasks: List<Task> = emptyList(),
-    val materials: List<Material> = emptyList()
+    val tasks: List<CatalogueTask> = emptyList(),
+    val materials: List<CatalogueMaterial> = emptyList()
 )
 
 /**
@@ -231,12 +231,43 @@ data class AssemblyIndirectCosts(
 )
 
 /**
+ * Task creation data for assembly creation requests
+ */
+data class TaskCreationData(
+    val id: String = UUID.randomUUID().toString(),
+    val name: String,
+    val description: String,
+    val sequence: Int,
+    val laborHours: Double,
+    val materialCost: Double,
+    val laborCost: Double,
+    val equipmentCost: Double = 0.0,
+    val notes: String = ""
+)
+
+/**
+ * Material creation data for assembly creation requests  
+ */
+data class MaterialCreationData(
+    val id: String = UUID.randomUUID().toString(),
+    val taskId: String? = null,
+    val assemblyId: String? = null,
+    val name: String,
+    val description: String,
+    val quantity: Double,
+    val unit: String,
+    val unitCost: Double,
+    val waste: Double = 0.0,
+    val notes: String = ""
+)
+
+/**
  * Assembly creation request with complete data
  */
 data class CompleteAssemblyRequest(
     val assembly: EnhancedAssembly,
-    val tasks: List<Task>,
-    val materials: List<Material>
+    val tasks: List<TaskCreationData>,
+    val materials: List<MaterialCreationData>
 )
 
 /**
