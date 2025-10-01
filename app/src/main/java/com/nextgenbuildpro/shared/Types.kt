@@ -38,13 +38,23 @@ enum class SystemStatus {
  */
 enum class AgentType {
     ORCHESTRATOR,
-    // Departmental Orchestrators
+    // Main Personal Assistant (directs the orchestrator)
     PERSONAL_ASSISTANT_ORCHESTRATOR,
+    // Departmental Orchestrators (Department Heads)
     CRM_ORCHESTRATOR,
     PROJECT_MANAGEMENT_ORCHESTRATOR,
     ANALYTICS_ORCHESTRATOR,
     DESIGN_DEPARTMENT_ORCHESTRATOR,
-    MARKETING_ORCHESTRATOR
+    MARKETING_ORCHESTRATOR,
+    ESTIMATING_DEPARTMENT_ORCHESTRATOR,
+    FIELD_OPERATIONS_ORCHESTRATOR,
+    SAFETY_COMPLIANCE_ORCHESTRATOR,
+    ACCOUNTING_DEPARTMENT_ORCHESTRATOR,
+    HR_DEPARTMENT_ORCHESTRATOR,
+    EQUIPMENT_MANAGEMENT_ORCHESTRATOR,
+    QUALITY_CONTROL_ORCHESTRATOR,
+    // Sub-Agent Types (specialized agents under department heads)
+    SUB_AGENT
 }
 
 /**
@@ -60,6 +70,82 @@ interface SpecializedAgent {
     suspend fun processTask(task: NextGenTask): Result<NextGenTask>
     suspend fun shutdown(): Result<Unit>
 }
+
+/**
+ * Sub-Agent Interface for fine-tuned specialized agents under department heads
+ * These are the 5-8 agents per department with specific tooling and ML capabilities
+ */
+interface SubAgent : SpecializedAgent {
+    val departmentHead: AgentType
+    val subAgentRole: String
+    val mlModel: MLModelConfig?
+    val mcpTools: List<MCPTool>
+    val apiIntegrations: List<APIIntegration>
+    
+    suspend fun executeSpecializedTask(task: NextGenTask): Result<NextGenTask>
+    suspend fun requestHumanApproval(task: NextGenTask, reason: String): Result<HumanApprovalRecord>
+    suspend fun learnFromFeedback(feedback: TaskFeedback): Result<Unit>
+}
+
+/**
+ * ML Model configuration for sub-agents
+ */
+data class MLModelConfig(
+    val modelName: String,
+    val modelType: MLModelType,
+    val version: String,
+    val trainedOn: String,
+    val accuracy: Double = 0.0,
+    val lastUpdated: LocalDateTime = LocalDateTime.now()
+)
+
+enum class MLModelType {
+    CLASSIFICATION, REGRESSION, NLP, COMPUTER_VISION, 
+    REINFORCEMENT_LEARNING, ENSEMBLE, CUSTOM
+}
+
+/**
+ * MCP Tool configuration
+ */
+data class MCPTool(
+    val toolId: String,
+    val toolName: String,
+    val description: String,
+    val capabilities: List<String>,
+    val isActive: Boolean = true
+)
+
+/**
+ * API Integration configuration
+ */
+data class APIIntegration(
+    val apiId: String,
+    val apiName: String,
+    val endpoint: String,
+    val authType: APIAuthType,
+    val rateLimits: APIRateLimits? = null
+)
+
+enum class APIAuthType {
+    API_KEY, OAUTH2, BASIC_AUTH, JWT, NONE
+}
+
+data class APIRateLimits(
+    val requestsPerMinute: Int,
+    val requestsPerDay: Int
+)
+
+/**
+ * Task feedback for learning
+ */
+data class TaskFeedback(
+    val taskId: EntityId,
+    val wasSuccessful: Boolean,
+    val humanCorrections: Map<String, Any> = emptyMap(),
+    val executionTime: Long,
+    val qualityScore: Double, // 0.0 to 1.0
+    val notes: String = ""
+)
 
 // ===== DATA MODELS =====
 
@@ -92,7 +178,8 @@ enum class MessageType {
  */
 data class NextGenTask(
     val id: EntityId = UUID.randomUUID().toString(),
-    val title: String,
+    val title: String = "",
+    val type: String = "",
     val description: String,
     val assignedAgent: AgentType,
     val priority: Priority,
@@ -102,7 +189,11 @@ data class NextGenTask(
     val dueDate: LocalDateTime? = null,
     val dependencies: List<EntityId> = emptyList(),
     val metadata: Map<String, Any> = emptyMap(),
-    val progress: Float = 0f // 0.0 to 1.0
+    val parameters: Map<String, Any> = emptyMap(),
+    val result: Map<String, Any>? = null,
+    val progress: Float = 0f, // 0.0 to 1.0
+    val requiresHumanApproval: Boolean = false,
+    val automationLevel: AutomationLevel = AutomationLevel.HUMAN_IN_LOOP
 )
 
 /**
@@ -111,6 +202,42 @@ data class NextGenTask(
 enum class TaskStatus {
     PENDING, IN_PROGRESS, PAUSED, COMPLETED, FAILED, CANCELLED
 }
+
+/**
+ * Automation level for tasks - tracks human-in-the-loop progression
+ */
+enum class AutomationLevel {
+    MANUAL,              // Requires human execution
+    HUMAN_IN_LOOP,       // AI assists, human approves
+    SUPERVISED,          // AI executes, human reviews
+    AUTOMATED,           // Fully automated, no approval needed
+    LEARNING             // System is learning this task pattern
+}
+
+/**
+ * Human approval tracking for tasks
+ */
+data class HumanApprovalRecord(
+    val taskId: EntityId,
+    val approver: String,
+    val approved: Boolean,
+    val comments: String = "",
+    val timestamp: LocalDateTime = LocalDateTime.now(),
+    val reviewTime: Long = 0L // milliseconds
+)
+
+/**
+ * Task pattern for automation detection
+ */
+data class TaskPattern(
+    val patternId: EntityId = UUID.randomUUID().toString(),
+    val taskType: String,
+    val occurrences: Int = 0,
+    val successRate: Double = 0.0,
+    val averageReviewTime: Long = 0L,
+    val consistentOutcomes: Boolean = false,
+    val readyForAutomation: Boolean = false
+)
 
 /**
  * Agent capability definition
@@ -391,17 +518,34 @@ data class PerformanceMetrics(
 // ===== DEPARTMENTAL ORCHESTRATOR TYPES =====
 
 /**
- * Base interface for departmental orchestrators
+ * Base interface for departmental orchestrators (Department Heads)
+ * Department heads manage 5-8 sub-agents with specialized capabilities
  */
 interface DepartmentalOrchestrator : LearningAgent {
     val departmentName: String
     val toolsets: List<OrchestratorTool>
     val sharedContext: StateFlow<SharedContext>
+    val subAgents: List<SubAgent>
     
     suspend fun processVoiceCommand(command: String): Result<String>
     suspend fun getSpecializedCapabilities(): List<AgentCapability>
     suspend fun coordinateWithOtherDepartments(request: InterDepartmentalRequest): Result<InterDepartmentalResponse>
+    suspend fun delegateToSubAgent(task: NextGenTask, subAgentRole: String): Result<NextGenTask>
+    suspend fun getSubAgentStatus(): Map<String, AgentStatus>
+    suspend fun trainSubAgent(subAgentRole: String, trainingData: LearningData): Result<Unit>
 }
+
+/**
+ * Agent status information
+ */
+data class AgentStatus(
+    val agentId: String,
+    val isActive: Boolean,
+    val currentTasks: Int,
+    val completedTasks: Int,
+    val successRate: Double,
+    val lastActivity: LocalDateTime?
+)
 
 /**
  * Shared context across all orchestrators
