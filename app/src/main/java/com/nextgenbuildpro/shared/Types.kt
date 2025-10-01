@@ -344,7 +344,7 @@ data class ConstructionProject(
     val actualEndDate: LocalDateTime? = null,
     val budget: Double,
     val currentCost: Double = 0.0,
-    val phases: List<ProjectPhase> = emptyList(),
+    val phases: List<ProjectPhaseDetails> = emptyList(),
     val tasks: List<NextGenTask> = emptyList(),
     val documents: List<ProjectDocument> = emptyList()
 )
@@ -359,7 +359,7 @@ enum class ProjectStatus {
 /**
  * Project phase data
  */
-data class ProjectPhase(
+data class ProjectPhaseDetails(
     val id: EntityId = UUID.randomUUID().toString(),
     val name: String,
     val description: String,
