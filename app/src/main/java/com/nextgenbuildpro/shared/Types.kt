@@ -30,7 +30,7 @@ enum class Priority {
  * System-wide status indicators
  */
 enum class SystemStatus {
-    INITIALIZING, ACTIVE, IDLE, BUSY, ERROR, MAINTENANCE, SHUTDOWN
+    INITIALIZING, ACTIVE, IDLE, BUSY, ERROR, MAINTENANCE, SHUTDOWN, HEALTHY, STOPPED
 }
 
 /**
@@ -41,12 +41,20 @@ enum class AgentType {
     ORCHESTRATOR,
     // CEO Level - Main Personal Assistant (directs the orchestrator)
     CEO_PERSONAL_ASSISTANT,
+    PERSONAL_ASSISTANT_ORCHESTRATOR,  // Alias for CEO Personal Assistant
     // C-Suite Department Heads (Orchestrators)
     COO_OPERATIONS_ORCHESTRATOR,      // COO: Operations & Project Management
     CFO_FINANCIAL_ORCHESTRATOR,        // CFO: Financial & Analytics
     CHRO_CLIENT_HR_ORCHESTRATOR,       // CHRO/CMO: Client Relations & HR
     CTO_DESIGN_ORCHESTRATOR,           // CTO: Design & Technology
     CSO_SAFETY_ORCHESTRATOR,           // CSO: Safety & Compliance
+    // Department-level Orchestrators (aliases and specific departments)
+    CRM_ORCHESTRATOR,                  // Customer Relationship Management
+    PROJECT_MANAGEMENT_ORCHESTRATOR,   // Project Management
+    ANALYTICS_ORCHESTRATOR,            // Analytics & Reporting
+    DESIGN_DEPARTMENT_ORCHESTRATOR,    // Design Department (CTO)
+    ESTIMATING_DEPARTMENT_ORCHESTRATOR, // Estimating (CFO)
+    MARKETING_ORCHESTRATOR,            // Marketing (CHRO/CMO)
     // Operational Agent Types (specialized agents under C-suite)
     OPERATIONAL_AGENT,
     SUB_AGENT
@@ -298,7 +306,7 @@ data class AgentCapability(
  * Skill level for capabilities
  */
 enum class SkillLevel {
-    BASIC, INTERMEDIATE, ADVANCED, EXPERT, MASTER
+    BEGINNER, BASIC, INTERMEDIATE, ADVANCED, EXPERT, MASTER
 }
 
 /**
@@ -461,13 +469,23 @@ interface NextGenService {
 }
 
 /**
+ * Health status enum for services
+ */
+enum class HealthStatus {
+    HEALTHY, DEGRADED, UNHEALTHY, STOPPED, STARTING, UNKNOWN
+}
+
+/**
  * Service health status
  */
 data class ServiceHealth(
-    val isHealthy: Boolean,
-    val lastCheckTime: LocalDateTime,
+    val serviceName: String = "",
+    val status: HealthStatus = HealthStatus.HEALTHY,
+    val lastCheck: LocalDateTime = LocalDateTime.now(),
+    val isHealthy: Boolean = (status == HealthStatus.HEALTHY),
+    val lastCheckTime: LocalDateTime = lastCheck,
     val issues: List<String> = emptyList(),
-    val metrics: Map<String, Double> = emptyMap()
+    val metrics: Map<String, Any> = emptyMap()
 )
 
 /**
@@ -750,14 +768,18 @@ data class ResidentialTemplate(
 data class CostRange(
     val min: Double,
     val max: Double,
-    val average: Double
+    val average: Double = (min + max) / 2.0
 )
 
 data class LaborRate(
     val trade: String,
     val hourlyRate: CostRange,
     val skillLevel: SkillLevel,
-    val region: String
+    val region: String,
+    // Legacy properties for backward compatibility
+    val tradeName: String? = null,
+    val description: String? = null
+)
 )
 
 data class MaterialCost(
@@ -900,4 +922,180 @@ data class WorkflowHandoff(
     val artifact: DataArtifact,
     val handoffReason: String,
     val completionCriteria: List<String>
+)
+
+// Design & Technical Document Types for CTO Design Department
+
+// Project requirements for design generation
+data class ProjectRequirements(
+    val projectId: String,
+    val projectType: String,
+    val squareFootage: Double,
+    val floors: Int,
+    val bedrooms: Int,
+    val bathrooms: Double,
+    val specialFeatures: List<String> = emptyList(),
+    val buildingCode: String = "IBC 2021"
+)
+
+data class Blueprint(
+    val blueprintId: String,
+    val projectId: String,
+    val title: String = "",
+    val drawingNumber: String = "",
+    val revisionNumber: Int = 1,
+    val drawingType: DrawingType = DrawingType.FLOOR_PLAN,
+    val scale: String = "1/4\" = 1'",
+    val createdDate: LocalDateTime = LocalDateTime.now(),
+    val lastModified: LocalDateTime = LocalDateTime.now(),
+    val status: DrawingStatus = DrawingStatus.DRAFT,
+    val fileUrl: String = "",
+    val layers: List<String> = emptyList(),
+    val notes: List<String> = emptyList(),
+    // Legacy properties for backward compatibility
+    val projectType: String? = null,
+    val squareFootage: Double? = null,
+    val floors: Int? = null,
+    val bedrooms: Int? = null,
+    val bathrooms: Double? = null,
+    val specialFeatures: List<String>? = null,
+    val floorPlans: List<String>? = null,
+    val elevations: List<String>? = null,
+    val sections: List<String>? = null,
+    val version: String? = null,
+    val id: String? = null
+)
+
+enum class DrawingType {
+    SITE_PLAN, FLOOR_PLAN, ELEVATION, SECTION, DETAIL, ELECTRICAL, PLUMBING, STRUCTURAL
+}
+
+enum class DrawingStatus {
+    DRAFT, UNDER_REVIEW, APPROVED, SUPERSEDED, AS_BUILT
+}
+
+data class ThreeDModel(
+    val modelId: String,
+    val projectId: String,
+    val name: String,
+    val modelType: ModelType = ModelType.RENDERING,
+    val fileFormat: String = "OBJ",
+    val fileUrl: String = "",
+    val fileSize: Long = 0,
+    val createdDate: LocalDateTime = LocalDateTime.now(),
+    val lastModified: LocalDateTime = LocalDateTime.now(),
+    val renderingQuality: RenderingQuality = RenderingQuality.STANDARD,
+    val materials: List<String> = emptyList(),
+    val tags: List<String> = emptyList(),
+    // Legacy properties
+    val id: String? = null,
+    val blueprintId: String? = null,
+    val renderType: String? = null,
+    val renderQuality: String? = null
+)
+
+enum class ModelType {
+    BIM_MODEL, CAD_MODEL, RENDERING, VR_MODEL, AR_MODEL, EXTERIOR_INTERIOR
+}
+
+enum class RenderingQuality {
+    DRAFT, STANDARD, HIGH_QUALITY, PHOTOREALISTIC
+}
+
+data class ShopDrawing(
+    val drawingId: String,
+    val projectId: String,
+    val trade: String = "",
+    val description: String = "",
+    val drawingNumber: String = "",
+    val revisionNumber: Int = 1,
+    val submittedDate: LocalDateTime = LocalDateTime.now(),
+    val reviewStatus: ReviewStatus = ReviewStatus.SUBMITTED,
+    val fileUrl: String = "",
+    val reviewer: String? = null,
+    val comments: List<String> = emptyList(),
+    // Legacy properties
+    val id: String? = null
+)
+
+enum class ReviewStatus {
+    SUBMITTED, UNDER_REVIEW, APPROVED, APPROVED_AS_NOTED, REJECTED, RESUBMIT
+}
+
+data class MaterialTakeoff(
+    val takeoffId: String,
+    val projectId: String,
+    val trade: String = "",
+    val description: String = "",
+    val items: List<MaterialItem> = emptyList(),
+    val totalCost: Double = 0.0,
+    val createdDate: LocalDateTime = LocalDateTime.now(),
+    val lastModified: LocalDateTime = LocalDateTime.now(),
+    val status: TakeoffStatus = TakeoffStatus.DRAFT,
+    // Legacy properties
+    val id: String? = null
+)
+
+data class MaterialItem(
+    val itemId: String,
+    val description: String,
+    val category: Any? = null,  // Can be MaterialCategory enum or String
+    val quantity: Double = 0.0,
+    val unit: String = "",
+    val unitCost: Double = 0.0,
+    val totalCost: Double = 0.0,
+    val supplier: String? = null,
+    val notes: String? = null,
+    // Legacy property
+    val categoryName: String? = null
+)
+
+enum class MaterialCategory {
+    LUMBER, CONCRETE, STEEL, DRYWALL, INSULATION, ROOFING, SIDING, 
+    WINDOWS, DOORS, FLOORING, HVAC, ELECTRICAL, PLUMBING, FINISHES, OTHER
+}
+
+// MaterialCategoryGroup: Used for grouping material items by category name
+// This is different from the MaterialCategory enum which is used for individual items
+data class MaterialCategoryGroup(
+    val name: String,
+    val items: List<MaterialItem>
+)
+
+enum class TakeoffStatus {
+    DRAFT, IN_PROGRESS, COMPLETE, APPROVED, ORDERED
+}
+
+enum class TemplateType {
+    RESIDENTIAL, COMMERCIAL, INDUSTRIAL, MIXED_USE
+}
+
+data class DesignTemplate(
+    val templateId: String,
+    val name: String,
+    val description: String,
+    val category: String = "",
+    val designType: String = "",
+    val parameters: Map<String, Any> = emptyMap(),
+    val defaultValues: Map<String, Any> = emptyMap(),
+    val thumbnail: String? = null,
+    val tags: List<String> = emptyList(),
+    // Legacy properties
+    val templateType: TemplateType? = null
+)
+
+data class DesignKnowledgeBase(
+    val buildingCodes: Map<String, String>,
+    val structuralStandards: Map<String, String>,
+    val designGuidelines: Map<String, String> = emptyMap(),
+    val materialSpecs: Map<String, String> = emptyMap(),
+    val bestPractices: List<String> = emptyList()
+)
+
+// Agent health status (detailed health info for agents)
+data class AgentHealthStatus(
+    val isHealthy: Boolean,
+    val lastCheckTime: LocalDateTime,
+    val issues: List<String> = emptyList(),
+    val metrics: Map<String, Double> = emptyMap()
 )

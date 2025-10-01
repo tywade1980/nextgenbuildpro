@@ -349,7 +349,7 @@ class CEOPersonalAssistantOrchestrator(
             name = "Video Conferencing Integration",
             description = "Schedule and join video meetings with one command",
             toolType = ToolType.THIRD_PARTY_API,
-            permissions = listOf(Permission.INTERNET_ACCESS, Permission.CAMERA)
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_CAMERA)
         ),
         OrchestratorTool(
             name = "Team Collaboration Platform",

@@ -103,24 +103,26 @@ class OrchestratorManager(private val context: Context) {
     /**
      * Execute voice command across all orchestrators
      */
-    suspend fun executeVoiceCommand(voiceInput: String): Result<String> = try {
-        val voiceAgent = specializedAgents["voice_command_agent"] as? VoiceCommandAgent
-            ?: return Result.failure(IllegalStateException("Voice agent not available"))
-        
-        val task = NextGenTask(
-            id = "voice_${System.currentTimeMillis()}",
-            type = "voice_command",
-            description = "Process voice command: $voiceInput",
-            parameters = mapOf("voice_input" to voiceInput),
-            priority = Priority.HIGH
-        )
-        
-        val result = voiceAgent.processTask(task).getOrThrow()
-        val response = result.result?.get("execution_result") as? String ?: "Command processed"
-        
-        Result.success(response)
-    } catch (e: Exception) {
-        Result.failure(e)
+    suspend fun executeVoiceCommand(voiceInput: String): Result<String> {
+        return try {
+            val voiceAgent = specializedAgents["voice_command_agent"] as? VoiceCommandAgent
+                ?: return Result.failure(IllegalStateException("Voice agent not available"))
+            
+            val task = NextGenTask(
+                id = "voice_${System.currentTimeMillis()}",
+                type = "voice_command",
+                description = "Process voice command: $voiceInput",
+                parameters = mapOf("voice_input" to voiceInput),
+                priority = Priority.HIGH
+            )
+            
+            val result = voiceAgent.processTask(task).getOrThrow()
+            val response = result.result?.get("execution_result") as? String ?: "Command processed"
+            
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
     
     /**

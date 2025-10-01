@@ -308,7 +308,7 @@ class CTODesignOrchestrator(
             name = "As-Built Documentation",
             description = "Track and document field changes to create accurate as-built drawings",
             toolType = ToolType.SYSTEM_INTEGRATION,
-            permissions = listOf(Permission.ACCESS_STORAGE, Permission.CAMERA)
+            permissions = listOf(Permission.ACCESS_STORAGE, Permission.ACCESS_CAMERA)
         ),
         OrchestratorTool(
             name = "Submittal Manager",
@@ -352,7 +352,7 @@ class CTODesignOrchestrator(
             name = "Site Analysis AI",
             description = "Analyze site photos/surveys to optimize building placement and design",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_LOCATION, Permission.INTERNET_ACCESS)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_LOCATION, Permission.INTERNET_ACCESS)
         ),
         // Collaboration & Client Presentation
         OrchestratorTool(
@@ -390,7 +390,7 @@ class CTODesignOrchestrator(
             name = "Vision AI (GPT-4V)",
             description = "Blueprint analysis, photo interpretation, progress verification from site photos",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
         )
     )
     
@@ -585,7 +585,7 @@ class CTODesignOrchestrator(
     
     suspend fun create3DModelFromBlueprint(
         blueprintId: String
-    ): Result<ThreeDModel> = try {
+    ): Result<ThreeDModel> { return try {
         
         val blueprint = blueprintLibrary[blueprintId]
             ?: return Result.failure(Exception("Blueprint not found: $blueprintId"))
@@ -613,11 +613,12 @@ class CTODesignOrchestrator(
         Log.e(TAG, "Failed to create 3D model", e)
         Result.failure(e)
     }
+    }
     
     suspend fun generateShopDrawings(
         blueprintId: String,
         tradeType: String
-    ): Result<List<ShopDrawing>> = try {
+    ): Result<List<ShopDrawing>> { return try {
         
         val blueprint = blueprintLibrary[blueprintId]
             ?: return Result.failure(Exception("Blueprint not found: $blueprintId"))
@@ -643,10 +644,11 @@ class CTODesignOrchestrator(
         Log.e(TAG, "Failed to generate shop drawings", e)
         Result.failure(e)
     }
+    }
     
     suspend fun calculateMaterialTakeoff(
         blueprintId: String
-    ): Result<MaterialTakeoff> = try {
+    ): Result<MaterialTakeoff> { return try {
         
         val blueprint = blueprintLibrary[blueprintId]
             ?: return Result.failure(Exception("Blueprint not found: $blueprintId"))
@@ -672,6 +674,7 @@ class CTODesignOrchestrator(
         Log.e(TAG, "Failed to calculate material takeoff", e)
         Result.failure(e)
     }
+    }
     
     // Implementation methods
     
@@ -680,19 +683,22 @@ class CTODesignOrchestrator(
         
         designTemplates.putAll(mapOf(
             "residential_single_story" to DesignTemplate(
-                "Single Story Residential",
-                "Standard single-story home design template",
-                TemplateType.RESIDENTIAL
+                templateId = "residential_single_story",
+                name = "Single Story Residential",
+                description = "Standard single-story home design template",
+                templateType = TemplateType.RESIDENTIAL
             ),
             "residential_two_story" to DesignTemplate(
-                "Two Story Residential", 
-                "Standard two-story home design template",
-                TemplateType.RESIDENTIAL
+                templateId = "residential_two_story",
+                name = "Two Story Residential", 
+                description = "Standard two-story home design template",
+                templateType = TemplateType.RESIDENTIAL
             ),
             "commercial_office" to DesignTemplate(
-                "Commercial Office",
-                "Standard commercial office design template",
-                TemplateType.COMMERCIAL
+                templateId = "commercial_office",
+                name = "Commercial Office",
+                description = "Standard commercial office design template",
+                templateType = TemplateType.COMMERCIAL
             )
         ))
         
@@ -806,14 +812,14 @@ class CTODesignOrchestrator(
         )
     }
     
-    private fun calculateMaterialCategories(blueprint: Blueprint): Map<String, MaterialCategory> {
+    private fun calculateMaterialCategories(blueprint: Blueprint): Map<String, MaterialCategoryGroup> {
         return mapOf(
-            "structural" to MaterialCategory("Structural", calculateStructuralMaterials(blueprint)),
-            "roofing" to MaterialCategory("Roofing", calculateRoofingMaterials(blueprint)),
-            "siding" to MaterialCategory("Siding", calculateSidingMaterials(blueprint)),
-            "flooring" to MaterialCategory("Flooring", calculateFlooringMaterials(blueprint)),
-            "electrical" to MaterialCategory("Electrical", calculateElectricalMaterials(blueprint)),
-            "plumbing" to MaterialCategory("Plumbing", calculatePlumbingMaterials(blueprint))
+            "structural" to MaterialCategoryGroup("Structural", calculateStructuralMaterials(blueprint)),
+            "roofing" to MaterialCategoryGroup("Roofing", calculateRoofingMaterials(blueprint)),
+            "siding" to MaterialCategoryGroup("Siding", calculateSidingMaterials(blueprint)),
+            "flooring" to MaterialCategoryGroup("Flooring", calculateFlooringMaterials(blueprint)),
+            "electrical" to MaterialCategoryGroup("Electrical", calculateElectricalMaterials(blueprint)),
+            "plumbing" to MaterialCategoryGroup("Plumbing", calculatePlumbingMaterials(blueprint))
         )
     }
     

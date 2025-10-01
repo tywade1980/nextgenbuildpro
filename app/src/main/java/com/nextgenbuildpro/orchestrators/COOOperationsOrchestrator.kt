@@ -203,13 +203,13 @@ class COOOperationsOrchestrator(
             name = "Progress Photo AI",
             description = "AI-powered progress assessment from job site photos",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE)
         ),
         OrchestratorTool(
             name = "Field Inspection Checklist",
             description = "Digital inspection forms with photo documentation",
             toolType = ToolType.AUTOMATION_TOOL,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE)
         ),
         OrchestratorTool(
             name = "Progress Variance Reporter",
@@ -236,43 +236,6 @@ class COOOperationsOrchestrator(
             description = "Daily crew coordination, handoffs from CFO, progress reporting",
             toolType = ToolType.AI_SERVICE,
             permissions = listOf(Permission.INTERNET_ACCESS)
-        )
-    )
-            description = "Log serial numbers and receipts for insurance purposes",
-            toolType = ToolType.SYSTEM_INTEGRATION,
-            permissions = listOf(Permission.ACCESS_STORAGE, Permission.ACCESS_CAMERA)
-        ),
-        // Project Management Tools
-        OrchestratorTool(
-            name = "Project Planning",
-            description = "Comprehensive project planning with templates",
-            toolType = ToolType.AUTOMATION_TOOL,
-            permissions = listOf(Permission.READ_CALENDAR, Permission.WRITE_CALENDAR)
-        ),
-        OrchestratorTool(
-            name = "Resource Allocation",
-            description = "Optimize resource distribution across projects",
-            toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.INTERNET_ACCESS)
-        ),
-        OrchestratorTool(
-            name = "Schedule Optimization",
-            description = "AI-optimized scheduling with dependencies",
-            toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.INTERNET_ACCESS)
-        ),
-        // Quality Control - Field Metrics Tools
-        OrchestratorTool(
-            name = "Field Inspections",
-            description = "Digital inspection checklists and progress tracking",
-            toolType = ToolType.SYSTEM_INTEGRATION,
-            permissions = listOf(Permission.ACCESS_STORAGE, Permission.ACCESS_CAMERA)
-        ),
-        OrchestratorTool(
-            name = "Progress Documentation",
-            description = "Photo and video documentation of field progress",
-            toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE)
         )
     )
     

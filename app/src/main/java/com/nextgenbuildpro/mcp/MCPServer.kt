@@ -58,39 +58,43 @@ class MCPServer private constructor() {
         Result.failure(e)
     }
     
-    suspend fun createConnection(agentId: String, agentType: AgentType): Result<MCPConnection> = try {
-        if (activeConnections.containsKey(agentId)) {
-            return Result.failure(IllegalStateException("Agent $agentId already connected"))
+    suspend fun createConnection(agentId: String, agentType: AgentType): Result<MCPConnection> {
+        return try {
+            if (activeConnections.containsKey(agentId)) {
+                return Result.failure(IllegalStateException("Agent $agentId already connected"))
+            }
+            
+            val connection = MCPConnection(
+                agentId = agentId,
+                agentType = agentType,
+                server = this,
+                createdAt = System.currentTimeMillis()
+            )
+            
+            activeConnections[agentId] = connection
+            messageQueue[agentId] = mutableListOf()
+            
+            Log.d("MCPServer", "Created connection for agent: $agentId")
+            updateMetrics()
+            
+            Result.success(connection)
+        } catch (e: Exception) {
+            Log.e("MCPServer", "Failed to create connection for agent: $agentId", e)
+            Result.failure(e)
         }
-        
-        val connection = MCPConnection(
-            agentId = agentId,
-            agentType = agentType,
-            server = this,
-            createdAt = System.currentTimeMillis()
-        )
-        
-        activeConnections[agentId] = connection
-        messageQueue[agentId] = mutableListOf()
-        
-        Log.d("MCPServer", "Created connection for agent: $agentId")
-        updateMetrics()
-        
-        Result.success(connection)
-    } catch (e: Exception) {
-        Log.e("MCPServer", "Failed to create connection for agent: $agentId", e)
-        Result.failure(e)
     }
     
-    suspend fun sendMessage(message: MCPMessage): Result<Unit> = try {
-        val targetQueue = messageQueue[message.targetAgentId]
-            ?: return Result.failure(IllegalArgumentException("Target agent not found: ${message.targetAgentId}"))
-        
-        targetQueue.add(message)
-        updateMetrics()
-        Result.success(Unit)
-    } catch (e: Exception) {
-        Result.failure(e)
+    suspend fun sendMessage(message: MCPMessage): Result<Unit> {
+        return try {
+            val targetQueue = messageQueue[message.targetAgentId]
+                ?: return Result.failure(IllegalArgumentException("Target agent not found: ${message.targetAgentId}"))
+            
+            targetQueue.add(message)
+            updateMetrics()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
     
     private fun initializeResourceRegistry() {

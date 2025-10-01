@@ -91,40 +91,42 @@ class IntuitiveNavigationManager {
         departmentId: String, 
         featureId: String, 
         subFeatureId: String? = null
-    ): Result<Unit> = try {
-        val currentStack = _navigationStack.value.toMutableList()
-        
-        // Tap 1: Department (if not already there)
-        if (_currentDepartment.value?.id != departmentId) {
-            val department = getDepartmentById(departmentId)
-                ?: return Result.failure(IllegalArgumentException("Department not found: $departmentId"))
-            navigateToDepartment(department)
-            currentStack.clear()
-            currentStack.add(NavigationNode(department.name, department.id))
-        }
-        
-        // Tap 2: Feature
-        currentStack.add(NavigationNode(featureId, "$departmentId.$featureId"))
-        
-        // Tap 3: Sub-feature (optional)
-        subFeatureId?.let { subId ->
-            currentStack.add(NavigationNode(subId, "$departmentId.$featureId.$subId"))
-        }
-        
-        _navigationStack.value = currentStack
-        
-        Log.d("NavigationManager", "Navigated to feature: $departmentId.$featureId${subFeatureId?.let { ".$it" } ?: ""}")
-        Log.d("NavigationManager", "Total navigation depth: ${currentStack.size} taps")
-        
-        if (currentStack.size > 3) {
-            Log.w("NavigationManager", "Navigation depth exceeded 3 taps - optimizing...")
+    ): Result<Unit> {
+        return try {
+            val currentStack = _navigationStack.value.toMutableList()
+            
+            // Tap 1: Department (if not already there)
+            if (_currentDepartment.value?.id != departmentId) {
+                val department = getDepartmentById(departmentId)
+                    ?: return Result.failure(IllegalArgumentException("Department not found: $departmentId"))
+                navigateToDepartment(department)
+                currentStack.clear()
+                currentStack.add(NavigationNode(department.name, department.id))
+            }
+            
+            // Tap 2: Feature
+            currentStack.add(NavigationNode(featureId, "$departmentId.$featureId"))
+            
+            // Tap 3: Sub-feature (optional)
+            subFeatureId?.let { subId ->
+                currentStack.add(NavigationNode(subId, "$departmentId.$featureId.$subId"))
+            }
+            
+            _navigationStack.value = currentStack
+            
+            Log.d("NavigationManager", "Navigated to feature: $departmentId.$featureId${subFeatureId?.let { ".$it" } ?: ""}")
+            Log.d("NavigationManager", "Total navigation depth: ${currentStack.size} taps")
+            
+            if (currentStack.size > 3) {
+                Log.w("NavigationManager", "Navigation depth exceeded 3 taps - optimizing...")
             optimizeNavigationPath()
         }
         
         Result.success(Unit)
-    } catch (e: Exception) {
-        Log.e("NavigationManager", "Navigation failed", e)
-        Result.failure(e)
+        } catch (e: Exception) {
+            Log.e("NavigationManager", "Navigation failed", e)
+            Result.failure(e)
+        }
     }
     
     /**
