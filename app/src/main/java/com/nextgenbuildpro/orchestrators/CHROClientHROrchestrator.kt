@@ -13,12 +13,15 @@ import java.time.LocalDateTime
 /**
  * CHRO/CMO (Chief Human Resources & Marketing Officer) Orchestrator
  * 
- * C-suite executive managing client relationships and human resources:
+ * C-suite executive managing client relationships, marketing, and human resources
+ * with industry-leading tools and construction-specific expertise.
  * 
  * CLIENT RELATIONS & MARKETING:
- * - CRM and contact management
- * - Lead scoring and client engagement
- * - Marketing campaigns and proposals
+ * - CRM and contact management with AI-powered lead scoring
+ * - Geo-targeted marketing campaigns for completed projects
+ * - Professional branding and logo design
+ * - Flyer generation and multi-channel marketing automation
+ * - Social media management and content creation
  * - Client satisfaction and quality (client-facing)
  * 
  * HUMAN RESOURCES:
@@ -27,10 +30,25 @@ import java.time.LocalDateTime
  * - Time tracking and attendance
  * - Employee performance management
  * 
+ * CONSTRUCTION MARKETING KNOWLEDGE:
+ * - Project portfolio showcasing and before/after photography
+ * - Geo-targeted advertising (e.g., 2-mile radius around completed projects)
+ * - Construction-specific branding and messaging
+ * - Referral program management and customer testimonials
+ * - Trade show and industry event marketing
+ * 
+ * MULTI-LLM SYSTEM:
+ * - Reasoning Model (o1): Complex marketing strategy, brand positioning, ROI optimization
+ * - Agent Workflow Model (GPT-4): Campaign coordination, content creation, client communications
+ * - Creative Models (DALL-E, Midjourney): Logo design, flyer generation, visual branding
+ * 
  * Operational Agents (Sub-Agents):
  * - Contact Manager Agent (CRM)
  * - Lead Scoring Agent (qualification)
- * - Marketing Manager Agent (campaigns)
+ * - Marketing Strategist Agent (campaigns, geo-targeting)
+ * - Brand Designer Agent (logos, visual identity)
+ * - Content Creator Agent (flyers, social media, proposals)
+ * - Social Media Manager Agent (multi-platform engagement)
  * - Proposal Writer Agent (bids, proposals)
  * - Client Satisfaction Agent (quality, punch lists)
  * - Recruiter Agent (hiring)
@@ -61,7 +79,62 @@ class CHROClientHROrchestrator(
     private val mutex = Mutex()
     private val knowledgeBase = mutableMapOf<String, Any>()
     
+    // Multi-LLM configuration for marketing and HR intelligence
+    private val multiLLMConfig = initializeMultiLLMSystem()
+    
+    // Construction marketing knowledge base
+    private val marketingKnowledge = initializeMarketingKnowledge()
+    
     override val subAgents: List<SubAgent> = emptyList()
+    
+    private fun initializeMultiLLMSystem(): MultiLLMConfig {
+        return MultiLLMConfig(
+            systemId = "chro-multi-llm",
+            reasoningModel = LLMModel(
+                modelId = "o1-2024-12-17",
+                modelName = "OpenAI o1",
+                provider = LLMProvider.OPENAI,
+                modelType = LLMModelType.REASONING,
+                contextWindow = 128000,
+                temperature = 1.0,
+                maxTokens = 32768,
+                capabilities = listOf(LLMCapability.REASONING)
+            ),
+            agentWorkflowModel = LLMModel(
+                modelId = "gpt-4-turbo",
+                modelName = "GPT-4 Turbo",
+                provider = LLMProvider.OPENAI,
+                modelType = LLMModelType.AGENT_WORKFLOW,
+                contextWindow = 128000,
+                temperature = 0.7,
+                maxTokens = 4096,
+                capabilities = listOf(LLMCapability.FUNCTION_CALLING)
+            ),
+            routingStrategy = LLMRoutingStrategy.TASK_BASED
+        )
+    }
+    
+    private fun initializeMarketingKnowledge(): MarketingKnowledgeBase {
+        return MarketingKnowledgeBase(
+            constructionMarketingBestPractices = mapOf(
+                "geo_targeting" to "Target 2-mile radius around completed projects for similar work",
+                "social_proof" to "Before/after photos, client testimonials, project portfolio",
+                "seasonal_campaigns" to "Spring/Fall for exterior, Winter for interior projects",
+                "referral_programs" to "Incentivize past clients for referrals"
+            ),
+            brandingGuidelines = mapOf(
+                "professional_identity" to "High-quality, trustworthy, experienced contractor",
+                "visual_consistency" to "Logo, color scheme, typography across all materials",
+                "messaging" to "Quality craftsmanship, on-time delivery, competitive pricing"
+            ),
+            targetAudiences = listOf(
+                "homeowners_local",
+                "commercial_property_managers",
+                "real_estate_developers",
+                "architects_engineers"
+            )
+        )
+    }
     
     override val toolsets = listOf(
         // CRM Tools
@@ -83,18 +156,169 @@ class CHROClientHROrchestrator(
             toolType = ToolType.COMMUNICATION,
             permissions = listOf(Permission.MAKE_CALLS, Permission.SEND_SMS, Permission.INTERNET_ACCESS)
         ),
-        // Marketing Tools
+        // Geo-Targeted Marketing Tools
+        OrchestratorTool(
+            name = "Geo-Targeting Engine",
+            description = "Target marketing campaigns within radius of completed projects (e.g., 2-mile radius for similar work)",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.ACCESS_LOCATION, Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Location-Based Ad Manager",
+            description = "Google Ads, Facebook Local, Nextdoor campaigns targeting specific neighborhoods",
+            toolType = ToolType.THIRD_PARTY_API,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_LOCATION)
+        ),
+        OrchestratorTool(
+            name = "Project Portfolio Mapper",
+            description = "Map completed projects with before/after photos for geo-marketing",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.ACCESS_LOCATION, Permission.ACCESS_STORAGE)
+        ),
+        // Professional Branding & Design Tools
+        OrchestratorTool(
+            name = "Logo Designer AI",
+            description = "AI-powered professional logo design and brand identity creation",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Brand Identity System",
+            description = "Complete brand guidelines: colors, typography, voice, visual style",
+            toolType = ToolType.DESIGN_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Business Card & Letterhead Designer",
+            description = "Professional print materials with consistent branding",
+            toolType = ToolType.DESIGN_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        // Flyer & Marketing Material Generation
+        OrchestratorTool(
+            name = "Flyer Generation Engine",
+            description = "AI-powered flyer creation with project photos, testimonials, and compelling design",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Door Hanger Designer",
+            description = "Create professional door hangers for neighborhood canvassing after project completion",
+            toolType = ToolType.DESIGN_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Postcard Campaign Manager",
+            description = "Direct mail postcards to targeted neighborhoods showcasing recent work",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_LOCATION)
+        ),
+        OrchestratorTool(
+            name = "Vehicle Wrap Designer",
+            description = "Design professional truck and vehicle wraps for mobile advertising",
+            toolType = ToolType.DESIGN_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        // Social Media & Content Creation
+        OrchestratorTool(
+            name = "Social Media Manager",
+            description = "Multi-platform management (Facebook, Instagram, LinkedIn, TikTok) with post scheduling",
+            toolType = ToolType.THIRD_PARTY_API,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Content Calendar Planner",
+            description = "Strategic content planning with optimal posting times and engagement tracking",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.READ_CALENDAR)
+        ),
+        OrchestratorTool(
+            name = "Before/After Photo Enhancer",
+            description = "AI photo enhancement and professional presentation of project transformations",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Video Content Creator",
+            description = "Create project timelapse videos, client testimonials, and promotional content",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE)
+        ),
+        // Campaign Management
+        OrchestratorTool(
+            name = "Multi-Channel Campaign Orchestrator",
+            description = "Coordinate campaigns across digital ads, social media, direct mail, and email",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Marketing ROI Tracker",
+            description = "Track campaign performance, lead sources, and marketing spend effectiveness",
+            toolType = ToolType.DATA_ANALYSIS,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "A/B Testing Engine",
+            description = "Test different marketing messages, designs, and targeting strategies",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        // Professional Proposals & Sales Tools
         OrchestratorTool(
             name = "Proposal Generation",
-            description = "Automated professional proposal creation",
+            description = "Automated professional proposal creation with branding and project portfolio",
             toolType = ToolType.AUTOMATION_TOOL,
             permissions = listOf(Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
         ),
         OrchestratorTool(
-            name = "Marketing Campaigns",
-            description = "Multi-channel marketing campaign management",
+            name = "Presentation Deck Builder",
+            description = "Create compelling sales presentations with project showcase and testimonials",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Testimonial Manager",
+            description = "Collect, organize, and showcase client testimonials and reviews",
+            toolType = ToolType.SYSTEM_INTEGRATION,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Referral Program Engine",
+            description = "Automated referral tracking and incentive management",
             toolType = ToolType.AUTOMATION_TOOL,
             permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        // Website & Digital Presence
+        OrchestratorTool(
+            name = "Website Content Manager",
+            description = "Update website with latest projects, blog posts, and service offerings",
+            toolType = ToolType.THIRD_PARTY_API,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "SEO Optimization Engine",
+            description = "Local SEO for construction keywords and service area targeting",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Google Business Profile Manager",
+            description = "Optimize and update Google Business Profile with photos, posts, and reviews",
+            toolType = ToolType.THIRD_PARTY_API,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_LOCATION)
+        ),
+        // Email Marketing
+        OrchestratorTool(
+            name = "Email Campaign Manager",
+            description = "Segmented email campaigns with personalization and automation",
+            toolType = ToolType.THIRD_PARTY_API,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Newsletter Generator",
+            description = "Create professional newsletters showcasing recent projects and company updates",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_STORAGE)
         ),
         // HR Tools
         OrchestratorTool(
@@ -115,6 +339,12 @@ class CHROClientHROrchestrator(
             toolType = ToolType.AUTOMATION_TOOL,
             permissions = listOf(Permission.READ_CALENDAR)
         ),
+        OrchestratorTool(
+            name = "Employee Performance Analytics",
+            description = "Track and analyze employee performance metrics and productivity",
+            toolType = ToolType.DATA_ANALYSIS,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
         // Quality Control - Client Details Tools
         OrchestratorTool(
             name = "Client Punch Lists",
@@ -124,9 +354,28 @@ class CHROClientHROrchestrator(
         ),
         OrchestratorTool(
             name = "Client Satisfaction",
-            description = "Client feedback and satisfaction tracking",
+            description = "Client feedback and satisfaction tracking with NPS surveys",
             toolType = ToolType.AI_SERVICE,
             permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        // Multi-LLM Tools
+        OrchestratorTool(
+            name = "Reasoning Engine (o1)",
+            description = "Complex marketing strategy, brand positioning, ROI optimization, competitive analysis",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Agent Workflow Coordinator (GPT-4)",
+            description = "Campaign coordination, content creation, client communications, HR workflows",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Creative AI (DALL-E/Midjourney)",
+            description = "Logo design, flyer creation, visual branding, marketing imagery",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_STORAGE)
         )
     )
     
@@ -146,7 +395,43 @@ class CHROClientHROrchestrator(
             outputTypes = listOf("EngagementReport", "NextBestAction", "Recommendations"),
             skillLevel = SkillLevel.ADVANCED
         ),
-        // Marketing Capabilities
+        // Advanced Marketing Capabilities
+        AgentCapability(
+            name = "Geo-Targeted Marketing",
+            description = "Location-based campaigns targeting specific neighborhoods and radii",
+            inputTypes = listOf("CompletedProjects", "TargetRadius", "Demographics"),
+            outputTypes = listOf("GeoTargetedCampaign", "AudienceSegments", "AdPlacements"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Professional Branding",
+            description = "Complete brand identity design and management",
+            inputTypes = listOf("BrandVision", "CompanyValues", "TargetMarket"),
+            outputTypes = listOf("BrandGuidelines", "LogoDesign", "VisualIdentity"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Marketing Material Design",
+            description = "Flyers, door hangers, postcards, and promotional materials",
+            inputTypes = listOf("ProjectPhotos", "Messaging", "BrandAssets"),
+            outputTypes = listOf("Flyer", "DoorHanger", "Postcard", "PrintReady"),
+            skillLevel = SkillLevel.ADVANCED
+        ),
+        AgentCapability(
+            name = "Social Media Management",
+            description = "Multi-platform social media strategy and execution",
+            inputTypes = listOf("Content", "Schedule", "TargetAudience"),
+            outputTypes = listOf("SocialPosts", "EngagementMetrics", "GrowthAnalysis"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Content Creation",
+            description = "Engaging marketing content across all channels",
+            inputTypes = listOf("ProjectInfo", "BrandVoice", "ContentType"),
+            outputTypes = listOf("BlogPost", "Video", "Infographic", "Newsletter"),
+            skillLevel = SkillLevel.ADVANCED
+        ),
+        // Proposal & Sales Capabilities
         AgentCapability(
             name = "Proposal Creation",
             description = "Professional proposal and bid document generation",
@@ -156,10 +441,17 @@ class CHROClientHROrchestrator(
         ),
         AgentCapability(
             name = "Campaign Management",
-            description = "Marketing campaign planning and execution",
+            description = "Multi-channel marketing campaign planning and execution",
             inputTypes = listOf("TargetAudience", "Budget", "Goals"),
-            outputTypes = listOf("CampaignPlan", "Content", "Metrics"),
-            skillLevel = SkillLevel.ADVANCED
+            outputTypes = listOf("CampaignPlan", "Content", "ROIMetrics"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Marketing Analytics",
+            description = "ROI tracking, lead attribution, and campaign performance",
+            inputTypes = listOf("CampaignData", "LeadSources", "ConversionMetrics"),
+            outputTypes = listOf("ROIReport", "AttributionAnalysis", "Optimization"),
+            skillLevel = SkillLevel.EXPERT
         ),
         // HR Capabilities
         AgentCapability(
