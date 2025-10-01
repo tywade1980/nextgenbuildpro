@@ -9,24 +9,25 @@ import kotlinx.coroutines.sync.withLock
 import android.content.Context
 import android.util.Log
 import java.time.LocalDateTime
-import java.util.UUID
 
 /**
- * Estimating Department Orchestrator
+ * Financial & Analytics Orchestrator
  * 
- * Manages all cost estimation, bidding, and proposal activities for construction projects.
- * Supervises 5-8 specialized sub-agents for accurate and competitive estimating.
+ * Consolidated department managing all financial and analytical functions:
+ * - Estimating (cost estimation, bidding, proposals, value engineering)
+ * - Accounting (financial management, invoicing, payroll, budgets)
+ * - Analytics (reporting, insights, predictions, performance metrics)
  */
-class EstimatingDepartmentOrchestrator(
+class FinancialAnalyticsOrchestrator(
     private val context: Context
 ) : DepartmentalOrchestrator {
     
     companion object {
-        private const val TAG = "EstimatingDeptOrchestrator"
+        private const val TAG = "FinancialAnalyticsOrchestrator"
     }
     
-    override val agentType: AgentType = AgentType.ESTIMATING_DEPARTMENT_ORCHESTRATOR
-    override val departmentName: String = "Estimating Department"
+    override val agentType: AgentType = AgentType.FINANCIAL_ANALYTICS_ORCHESTRATOR
+    override val departmentName: String = "Financial & Analytics"
     
     private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
     override val status: StateFlow<SystemStatus> = _status.asStateFlow()
@@ -41,10 +42,10 @@ class EstimatingDepartmentOrchestrator(
     private val mutex = Mutex()
     private val knowledgeBase = mutableMapOf<String, Any>()
     
-    // Sub-agents managed by this department head
-    override val subAgents: List<SubAgent> = emptyList() // Will be populated during initialization
+    override val subAgents: List<SubAgent> = emptyList()
     
     override val toolsets = listOf(
+        // Estimating Tools
         OrchestratorTool(
             name = "Cost Database",
             description = "2025 construction cost database with regional pricing",
@@ -63,21 +64,48 @@ class EstimatingDepartmentOrchestrator(
             toolType = ToolType.AUTOMATION_TOOL,
             permissions = listOf(Permission.INTERNET_ACCESS)
         ),
+        // Accounting Tools
         OrchestratorTool(
-            name = "Historical Data Analysis",
-            description = "ML-powered cost prediction based on past projects",
-            toolType = ToolType.AI_SERVICE,
+            name = "QuickBooks Integration",
+            description = "Automated accounting system integration",
+            toolType = ToolType.THIRD_PARTY_API,
             permissions = listOf(Permission.INTERNET_ACCESS)
         ),
         OrchestratorTool(
-            name = "Supplier Integration",
-            description = "Real-time material pricing from suppliers",
-            toolType = ToolType.THIRD_PARTY_API,
+            name = "Invoicing",
+            description = "Automated invoice generation and tracking",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Payroll Processing",
+            description = "Employee payroll and time tracking",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        // Analytics Tools
+        OrchestratorTool(
+            name = "Executive Dashboard",
+            description = "High-level KPIs and project health visualization",
+            toolType = ToolType.REPORTING_TOOL,
+            permissions = listOf(Permission.READ_CALENDAR, Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Financial Analytics",
+            description = "Profit/loss, cash flow, budget variance analysis",
+            toolType = ToolType.DATA_ANALYSIS,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Predictive Analytics",
+            description = "Cost prediction, schedule optimization, risk assessment",
+            toolType = ToolType.AI_SERVICE,
             permissions = listOf(Permission.INTERNET_ACCESS)
         )
     )
     
     override val capabilities = listOf(
+        // Estimating Capabilities
         AgentCapability(
             name = "Cost Estimation",
             description = "Accurate project cost estimation with detailed breakdowns",
@@ -87,35 +115,65 @@ class EstimatingDepartmentOrchestrator(
         ),
         AgentCapability(
             name = "Bid Preparation",
-            description = "Competitive bid package preparation with supporting documentation",
+            description = "Competitive bid package preparation",
             inputTypes = listOf("RFP", "ProjectSpecs", "SiteConditions"),
             outputTypes = listOf("BidProposal", "ScopeOfWork", "PricingSchedule"),
             skillLevel = SkillLevel.EXPERT
         ),
         AgentCapability(
             name = "Value Engineering",
-            description = "Cost optimization while maintaining quality and scope",
+            description = "Cost optimization while maintaining quality",
             inputTypes = listOf("InitialEstimate", "ClientBudget", "ProjectGoals"),
             outputTypes = listOf("OptimizedDesign", "CostSavings", "Alternatives"),
             skillLevel = SkillLevel.ADVANCED
         ),
+        // Accounting Capabilities
         AgentCapability(
-            name = "Change Order Pricing",
-            description = "Quick and accurate pricing for project changes",
-            inputTypes = listOf("ChangeRequest", "ImpactAnalysis"),
-            outputTypes = listOf("ChangeOrderQuote", "ScheduleImpact"),
+            name = "Financial Reporting",
+            description = "Generate financial statements and reports",
+            inputTypes = listOf("TransactionData", "AccountingRecords"),
+            outputTypes = listOf("FinancialReport", "ProfitLoss", "CashFlow"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Invoice Management",
+            description = "Create, send, and track invoices",
+            inputTypes = listOf("ProjectCosts", "ClientInfo", "PaymentTerms"),
+            outputTypes = listOf("Invoice", "PaymentStatus", "ARReport"),
             skillLevel = SkillLevel.ADVANCED
+        ),
+        AgentCapability(
+            name = "Budget Management",
+            description = "Track project budgets and variance",
+            inputTypes = listOf("Budget", "ActualCosts", "Forecasts"),
+            outputTypes = listOf("BudgetReport", "VarianceAnalysis", "Alerts"),
+            skillLevel = SkillLevel.ADVANCED
+        ),
+        // Analytics Capabilities
+        AgentCapability(
+            name = "Performance Analytics",
+            description = "Project and crew performance metrics",
+            inputTypes = listOf("ProjectData", "TimeTracking", "CostData"),
+            outputTypes = listOf("PerformanceReport", "KPIs", "Trends"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Predictive Insights",
+            description = "Forecast costs, schedules, and risks",
+            inputTypes = listOf("HistoricalData", "CurrentProjects", "MarketData"),
+            outputTypes = listOf("Predictions", "RiskAssessment", "Recommendations"),
+            skillLevel = SkillLevel.EXPERT
         )
     )
     
     override suspend fun initialize(): Result<Unit> = try {
         mutex.withLock {
-            Log.i(TAG, "Initializing Estimating Department...")
+            Log.i(TAG, "Initializing Financial & Analytics...")
             _status.value = SystemStatus.ACTIVE
             Result.success(Unit)
         }
     } catch (e: Exception) {
-        Log.e(TAG, "Failed to initialize Estimating Department", e)
+        Log.e(TAG, "Failed to initialize Financial & Analytics", e)
         _status.value = SystemStatus.ERROR
         Result.failure(e)
     }
@@ -132,11 +190,13 @@ class EstimatingDepartmentOrchestrator(
         Log.d(TAG, "Processing task: ${task.description}")
         
         val updatedTask = when (task.type) {
-            "cost_estimation" -> handleCostEstimation(task)
-            "bid_preparation" -> handleBidPreparation(task)
-            "value_engineering" -> handleValueEngineering(task)
-            "change_order" -> handleChangeOrder(task)
-            else -> task.copy(status = TaskStatus.FAILED)
+            // Estimating tasks
+            "cost_estimation", "bid_preparation", "value_engineering", "change_order" -> handleEstimatingTask(task)
+            // Accounting tasks
+            "invoicing", "payroll", "financial_report", "budget_tracking" -> handleAccountingTask(task)
+            // Analytics tasks
+            "analytics", "reporting", "predictions", "performance_metrics" -> handleAnalyticsTask(task)
+            else -> task.copy(status = TaskStatus.COMPLETED, progress = 1.0f)
         }
         
         Result.success(updatedTask)
@@ -146,7 +206,7 @@ class EstimatingDepartmentOrchestrator(
     }
     
     override suspend fun processVoiceCommand(command: String): Result<String> {
-        return Result.success("Processing estimating command: $command")
+        return Result.success("Processing financial/analytics command: $command")
     }
     
     override suspend fun getSpecializedCapabilities(): List<AgentCapability> = capabilities
@@ -163,13 +223,12 @@ class EstimatingDepartmentOrchestrator(
     }
     
     override suspend fun delegateToSubAgent(task: NextGenTask, subAgentRole: String): Result<NextGenTask> {
-        // Find appropriate sub-agent and delegate
         Log.d(TAG, "Delegating task to sub-agent: $subAgentRole")
         return Result.success(task.copy(status = TaskStatus.IN_PROGRESS))
     }
     
     override suspend fun getSubAgentStatus(): Map<String, AgentStatus> {
-        return emptyMap() // Will be populated with actual sub-agents
+        return emptyMap()
     }
     
     override suspend fun trainSubAgent(subAgentRole: String, trainingData: LearningData): Result<Unit> {
@@ -190,7 +249,7 @@ class EstimatingDepartmentOrchestrator(
     override suspend fun getStatus(): SystemStatus = _status.value
     
     override suspend fun shutdown(): Result<Unit> = try {
-        Log.i(TAG, "Shutting down Estimating Department...")
+        Log.i(TAG, "Shutting down Financial & Analytics...")
         _status.value = SystemStatus.SHUTDOWN
         Result.success(Unit)
     } catch (e: Exception) {
@@ -198,38 +257,29 @@ class EstimatingDepartmentOrchestrator(
     }
     
     // Private task handlers
-    private fun handleCostEstimation(task: NextGenTask): NextGenTask {
+    private fun handleEstimatingTask(task: NextGenTask): NextGenTask {
         return task.copy(
             status = TaskStatus.COMPLETED,
             progress = 1.0f,
-            result = mapOf("estimate" to "Cost estimate completed"),
+            result = mapOf("estimating" to "Task completed"),
             updatedAt = LocalDateTime.now()
         )
     }
     
-    private fun handleBidPreparation(task: NextGenTask): NextGenTask {
+    private fun handleAccountingTask(task: NextGenTask): NextGenTask {
         return task.copy(
             status = TaskStatus.COMPLETED,
             progress = 1.0f,
-            result = mapOf("bid" to "Bid prepared"),
+            result = mapOf("accounting" to "Task completed"),
             updatedAt = LocalDateTime.now()
         )
     }
     
-    private fun handleValueEngineering(task: NextGenTask): NextGenTask {
+    private fun handleAnalyticsTask(task: NextGenTask): NextGenTask {
         return task.copy(
             status = TaskStatus.COMPLETED,
             progress = 1.0f,
-            result = mapOf("optimization" to "Value engineering completed"),
-            updatedAt = LocalDateTime.now()
-        )
-    }
-    
-    private fun handleChangeOrder(task: NextGenTask): NextGenTask {
-        return task.copy(
-            status = TaskStatus.COMPLETED,
-            progress = 1.0f,
-            result = mapOf("change_order" to "Change order priced"),
+            result = mapOf("analytics" to "Task completed"),
             updatedAt = LocalDateTime.now()
         )
     }

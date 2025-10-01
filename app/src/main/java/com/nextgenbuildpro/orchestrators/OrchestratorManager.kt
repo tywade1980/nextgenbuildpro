@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.*
 /**
  * Orchestrator Manager for NextGen BuildPro v2.0
  * 
- * Manages all 12 departmental orchestrators and their specialized agents.
+ * Manages all 6 consolidated departmental orchestrators and their specialized agents.
  * Provides centralized coordination, MCP integration, and navigation management.
  */
 class OrchestratorManager(private val context: Context) {
@@ -21,21 +21,13 @@ class OrchestratorManager(private val context: Context) {
     private val mcpServer = MCPServer.getInstance()
     private val navigationManager = IntuitiveNavigationManager()
     
-    // Orchestrators (Department Heads)
+    // Consolidated Orchestrators (Department Heads)
     private lateinit var personalAssistantOrchestrator: PersonalAssistantOrchestrator
-    private lateinit var crmOrchestrator: CRMOrchestrator
-    private lateinit var projectManagementOrchestrator: ProjectManagementOrchestrator
-    private lateinit var analyticsOrchestrator: AnalyticsOrchestrator
+    private lateinit var operationsProjectManagementOrchestrator: OperationsProjectManagementOrchestrator
+    private lateinit var financialAnalyticsOrchestrator: FinancialAnalyticsOrchestrator
+    private lateinit var clientRelationsHROrchestrator: ClientRelationsHROrchestrator
     private lateinit var designDepartmentOrchestrator: DesignDepartmentOrchestrator
-    private lateinit var marketingOrchestrator: MarketingOrchestrator
-    // New Department Orchestrators
-    private lateinit var estimatingDepartmentOrchestrator: EstimatingDepartmentOrchestrator
-    private lateinit var fieldOperationsOrchestrator: FieldOperationsOrchestrator
     private lateinit var safetyComplianceOrchestrator: SafetyComplianceOrchestrator
-    private lateinit var accountingDepartmentOrchestrator: AccountingDepartmentOrchestrator
-    private lateinit var hrDepartmentOrchestrator: HRDepartmentOrchestrator
-    private lateinit var equipmentManagementOrchestrator: EquipmentManagementOrchestrator
-    private lateinit var qualityControlOrchestrator: QualityControlOrchestrator
     
     // Specialized agents registry (5-8 per orchestrator)
     private val specializedAgents = mutableMapOf<String, SpecializedAgent>()
@@ -138,7 +130,7 @@ class OrchestratorManager(private val context: Context) {
         }
         
         return SystemMetrics(
-            totalOrchestrators = 13, // 13 department heads
+            totalOrchestrators = 6, // 6 consolidated department heads
             totalSpecializedAgents = specializedAgents.size,
             activeAgents = activeAgents,
             systemStatus = _systemStatus.value,
@@ -148,38 +140,22 @@ class OrchestratorManager(private val context: Context) {
     }
     
     private suspend fun initializeOrchestrators() {
-        // Original 6 orchestrators
+        // 6 consolidated orchestrators
         personalAssistantOrchestrator = PersonalAssistantOrchestrator(context)
-        crmOrchestrator = CRMOrchestrator(context)
-        projectManagementOrchestrator = ProjectManagementOrchestrator(context)
-        analyticsOrchestrator = AnalyticsOrchestrator(context)
+        operationsProjectManagementOrchestrator = OperationsProjectManagementOrchestrator(context)
+        financialAnalyticsOrchestrator = FinancialAnalyticsOrchestrator(context)
+        clientRelationsHROrchestrator = ClientRelationsHROrchestrator(context)
         designDepartmentOrchestrator = DesignDepartmentOrchestrator(context)
-        marketingOrchestrator = MarketingOrchestrator(context)
-        
-        // New 7 department orchestrators
-        estimatingDepartmentOrchestrator = EstimatingDepartmentOrchestrator(context)
-        fieldOperationsOrchestrator = FieldOperationsOrchestrator(context)
         safetyComplianceOrchestrator = SafetyComplianceOrchestrator(context)
-        accountingDepartmentOrchestrator = AccountingDepartmentOrchestrator(context)
-        hrDepartmentOrchestrator = HRDepartmentOrchestrator(context)
-        equipmentManagementOrchestrator = EquipmentManagementOrchestrator(context)
-        qualityControlOrchestrator = QualityControlOrchestrator(context)
         
-        // Initialize all orchestrators (13 total department heads)
+        // Initialize all orchestrators (6 total department heads)
         listOf(
             personalAssistantOrchestrator,
-            crmOrchestrator,
-            projectManagementOrchestrator,
-            analyticsOrchestrator,
+            operationsProjectManagementOrchestrator,
+            financialAnalyticsOrchestrator,
+            clientRelationsHROrchestrator,
             designDepartmentOrchestrator,
-            marketingOrchestrator,
-            estimatingDepartmentOrchestrator,
-            fieldOperationsOrchestrator,
-            safetyComplianceOrchestrator,
-            accountingDepartmentOrchestrator,
-            hrDepartmentOrchestrator,
-            equipmentManagementOrchestrator,
-            qualityControlOrchestrator
+            safetyComplianceOrchestrator
         ).forEach { orchestrator ->
             orchestrator.initialize()
         }
@@ -192,14 +168,14 @@ class OrchestratorManager(private val context: Context) {
             // Add 7 more specialized agents for Personal Assistant
         )
         
-        // CRM Orchestrator Agents (8)
-        val crmAgents = listOf(
+        // Client Relations & HR Orchestrator Agents (includes CRM, Marketing, HR, QC-client)
+        val clientRelationsAgents = listOf(
             ContactManagementAgent(),
-            // Add 7 more specialized agents for CRM
+            // Add more specialized agents for Client Relations & HR
         )
         
         // Initialize all agents
-        val allAgents = personalAssistantAgents + crmAgents
+        val allAgents = personalAssistantAgents + clientRelationsAgents
         
         allAgents.forEach { agent ->
             try {
@@ -220,19 +196,24 @@ class OrchestratorManager(private val context: Context) {
     private fun getOrchestratorForTask(task: NextGenTask): DepartmentalOrchestrator {
         return when (task.type) {
             "voice_command", "emergency_response" -> personalAssistantOrchestrator
-            "contact_management", "lead_management" -> crmOrchestrator
-            "project_creation", "scheduling", "cost_estimation" -> projectManagementOrchestrator
-            "analytics", "reporting", "predictions" -> analyticsOrchestrator
+            // Operations & PM tasks (field ops, equipment, PM, field quality)
+            "crew_scheduling", "material_delivery", "field_issue",
+            "equipment_tracking", "maintenance", "rental", "tool_receipt",
+            "project_creation", "scheduling", "resource_allocation",
+            "field_inspection", "progress_report", "quality_check" -> operationsProjectManagementOrchestrator
+            // Financial & Analytics tasks (estimating, accounting, analytics)
+            "cost_estimation", "bid_preparation", "value_engineering", "change_order",
+            "invoicing", "payroll", "financial_report", "budget_tracking",
+            "analytics", "reporting", "predictions", "performance_metrics" -> financialAnalyticsOrchestrator
+            // Client Relations & HR tasks (CRM, marketing, HR, client quality)
+            "contact_management", "lead_management", "client_communication",
+            "proposal_creation", "marketing_campaign", "content_creation",
+            "recruitment", "onboarding", "training", "time_tracking",
+            "client_punch_list", "client_satisfaction", "defect_resolution" -> clientRelationsHROrchestrator
+            // Design tasks
             "design", "3d_modeling", "blueprints" -> designDepartmentOrchestrator
-            "marketing", "proposals", "campaigns" -> marketingOrchestrator
-            // New department task routing
-            "cost_estimation", "bid_preparation", "value_engineering", "change_order" -> estimatingDepartmentOrchestrator
-            "crew_scheduling", "material_delivery", "progress_report", "field_issue" -> fieldOperationsOrchestrator
+            // Safety & Compliance tasks
             "safety_inspection", "permit_application", "compliance_check" -> safetyComplianceOrchestrator
-            "invoicing", "payroll", "financial_report" -> accountingDepartmentOrchestrator
-            "recruitment", "onboarding", "training" -> hrDepartmentOrchestrator
-            "equipment_tracking", "maintenance", "rental" -> equipmentManagementOrchestrator
-            "quality_inspection", "defect_tracking", "punch_list" -> qualityControlOrchestrator
             else -> personalAssistantOrchestrator // Default to personal assistant
         }
     }

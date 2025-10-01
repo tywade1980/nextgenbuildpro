@@ -40,19 +40,12 @@ enum class AgentType {
     ORCHESTRATOR,
     // Main Personal Assistant (directs the orchestrator)
     PERSONAL_ASSISTANT_ORCHESTRATOR,
-    // Departmental Orchestrators (Department Heads)
-    CRM_ORCHESTRATOR,
-    PROJECT_MANAGEMENT_ORCHESTRATOR,
-    ANALYTICS_ORCHESTRATOR,
+    // Consolidated Departmental Orchestrators (Department Heads)
+    OPERATIONS_PROJECT_MANAGEMENT_ORCHESTRATOR,  // Field ops + Equipment + PM + QC field metrics
+    FINANCIAL_ANALYTICS_ORCHESTRATOR,            // Estimating + Accounting + Analytics
+    CLIENT_RELATIONS_HR_ORCHESTRATOR,            // CRM + Marketing + HR + QC client details
     DESIGN_DEPARTMENT_ORCHESTRATOR,
-    MARKETING_ORCHESTRATOR,
-    ESTIMATING_DEPARTMENT_ORCHESTRATOR,
-    FIELD_OPERATIONS_ORCHESTRATOR,
     SAFETY_COMPLIANCE_ORCHESTRATOR,
-    ACCOUNTING_DEPARTMENT_ORCHESTRATOR,
-    HR_DEPARTMENT_ORCHESTRATOR,
-    EQUIPMENT_MANAGEMENT_ORCHESTRATOR,
-    QUALITY_CONTROL_ORCHESTRATOR,
     // Sub-Agent Types (specialized agents under department heads)
     SUB_AGENT
 }
