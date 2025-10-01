@@ -1,5 +1,6 @@
 package com.nextgenbuildpro.orchestrators
 
+import android.content.Context
 import android.util.Log
 import com.nextgenbuildpro.shared.*
 import com.nextgenbuildpro.mcp.MCPServer
@@ -15,7 +16,9 @@ import kotlinx.coroutines.flow.*
  * Manages all 6 departmental orchestrators and their 48 specialized agents.
  * Provides centralized coordination, MCP integration, and navigation management.
  */
-class OrchestratorManager {
+class OrchestratorManager(
+    private val context: Context
+) {
     
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val mcpServer = MCPServer.getInstance()
@@ -107,14 +110,19 @@ class OrchestratorManager {
         
         val task = NextGenTask(
             id = "voice_${System.currentTimeMillis()}",
-            type = "voice_command",
+            title = "Voice Command",
             description = "Process voice command: $voiceInput",
-            parameters = mapOf("voice_input" to voiceInput),
-            priority = Priority.HIGH
+            assignedAgent = AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR,
+            priority = Priority.HIGH,
+            status = TaskStatus.PENDING,
+            metadata = mapOf(
+                "type" to "voice_command",
+                "voice_input" to voiceInput
+            )
         )
         
         val result = voiceAgent.processTask(task).getOrThrow()
-        val response = result.result?.get("execution_result") as? String ?: "Command processed"
+        val response = result.metadata["execution_result"] as? String ?: "Command processed"
         
         Result.success(response)
     } catch (e: Exception) {
@@ -140,12 +148,12 @@ class OrchestratorManager {
     }
     
     private suspend fun initializeOrchestrators() {
-        personalAssistantOrchestrator = PersonalAssistantOrchestrator()
-        crmOrchestrator = CRMOrchestrator()
-        projectManagementOrchestrator = ProjectManagementOrchestrator()
-        analyticsOrchestrator = AnalyticsOrchestrator()
-        designDepartmentOrchestrator = DesignDepartmentOrchestrator()
-        marketingOrchestrator = MarketingOrchestrator()
+        personalAssistantOrchestrator = PersonalAssistantOrchestrator(context)
+        crmOrchestrator = CRMOrchestrator(context)
+        projectManagementOrchestrator = ProjectManagementOrchestrator(context)
+        analyticsOrchestrator = AnalyticsOrchestrator(context)
+        designDepartmentOrchestrator = DesignDepartmentOrchestrator(context)
+        marketingOrchestrator = MarketingOrchestrator(context)
         
         // Initialize each orchestrator
         listOf(
@@ -193,7 +201,8 @@ class OrchestratorManager {
     }
     
     private fun getOrchestratorForTask(task: NextGenTask): DepartmentalOrchestrator {
-        return when (task.type) {
+        val taskType = task.metadata["type"] as? String ?: "unknown"
+        return when (taskType) {
             "voice_command", "emergency_response" -> personalAssistantOrchestrator
             "contact_management", "lead_management" -> crmOrchestrator
             "project_creation", "scheduling", "cost_estimation" -> projectManagementOrchestrator
@@ -219,8 +228,8 @@ class OrchestratorManager {
             }
         }
         
-        // Stop MCP server
-        mcpServer.stop()
+        // TODO: Stop MCP server - method not yet implemented
+        // mcpServer.stop()
         
         _systemStatus.value = SystemStatus.SHUTDOWN
         _isInitialized.value = false

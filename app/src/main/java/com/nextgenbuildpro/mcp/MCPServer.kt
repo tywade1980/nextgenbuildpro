@@ -5,7 +5,6 @@ import com.nextgenbuildpro.shared.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlinx.serialization.*
 
 /**
  * MCP (Model Context Protocol) Server for NextGen BuildPro v2.0
@@ -58,10 +57,11 @@ class MCPServer private constructor() {
         Result.failure(e)
     }
     
-    suspend fun createConnection(agentId: String, agentType: AgentType): Result<MCPConnection> = try {
-        if (activeConnections.containsKey(agentId)) {
-            return Result.failure(IllegalStateException("Agent $agentId already connected"))
-        }
+    suspend fun createConnection(agentId: String, agentType: AgentType): Result<MCPConnection> {
+        return try {
+            if (activeConnections.containsKey(agentId)) {
+                return Result.failure(IllegalStateException("Agent $agentId already connected"))
+            }
         
         val connection = MCPConnection(
             agentId = agentId,
@@ -77,9 +77,10 @@ class MCPServer private constructor() {
         updateMetrics()
         
         Result.success(connection)
-    } catch (e: Exception) {
-        Log.e("MCPServer", "Failed to create connection for agent: $agentId", e)
-        Result.failure(e)
+        } catch (e: Exception) {
+            Log.e("MCPServer", "Failed to create connection for agent: $agentId", e)
+            Result.failure(e)
+        }
     }
     
     suspend fun sendMessage(message: MCPMessage): Result<Unit> = try {
@@ -157,7 +158,7 @@ enum class MCPServerStatus {
     STOPPED, STARTING, RUNNING, STOPPING, ERROR
 }
 
-@Serializable
+// TODO: Add kotlinx.serialization dependency for proper serialization support
 data class MCPMessage(
     val id: String,
     val sourceAgentId: String,
@@ -167,7 +168,6 @@ data class MCPMessage(
     val timestamp: Long
 )
 
-@Serializable  
 data class MCPResource(
     val id: String,
     val name: String,
@@ -178,4 +178,12 @@ data class MCPResource(
 data class MCPMetrics(
     val activeConnections: Int = 0,
     val registeredResources: Int = 0
+)
+
+// TODO: Complete implementation of MCPSession
+data class MCPSession(
+    val id: String,
+    val agentId: String,
+    val createdAt: Long,
+    val lastActivity: Long = createdAt
 )

@@ -230,10 +230,10 @@ class ProjectManagementOrchestrator(
         address: String,
         projectType: String,
         squareFootage: Double
-    ): Result<ConstructionProject> = try {
-        
-        val template = projectTemplates["residential_new_construction"]
-            ?: return Result.failure(Exception("Residential template not found"))
+    ): Result<ConstructionProject> {
+        return try {
+            val template = projectTemplates["residential_new_construction"]
+                ?: return Result.failure(Exception("Residential template not found"))
         
         val phases = createResidentialPhases(squareFootage)
         val costEstimate = calculateProjectCost(projectType, squareFootage)
@@ -258,9 +258,10 @@ class ProjectManagementOrchestrator(
         Log.i(TAG, "Created new residential project: ${project.name}")
         Result.success(project)
         
-    } catch (e: Exception) {
-        Log.e(TAG, "Failed to create new residential project", e)
-        Result.failure(e)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to create new residential project", e)
+            Result.failure(e)
+        }
     }
     
     suspend fun generateCostEstimate(
