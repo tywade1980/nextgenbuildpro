@@ -228,9 +228,12 @@ class OrchestratorManager(
             }
         }
         
-        // TODO: Stop MCP server - method not yet implemented
-        // mcpServer.stop()
-        
+        // Stop MCP server if initialized
+        try {
+            mcpServer?.stop()
+        } catch (e: Exception) {
+            Log.w("OrchestratorManager", "Error shutting down MCP server", e)
+        }
         _systemStatus.value = SystemStatus.SHUTDOWN
         _isInitialized.value = false
         
