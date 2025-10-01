@@ -285,8 +285,6 @@ class EstimateAPIService(private val context: Context) {
             Result.failure(e)
         }
     }
-        }
-    }
     
     /**
      * Helper method to convert JSON array to list

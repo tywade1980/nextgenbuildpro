@@ -64,7 +64,8 @@ class OpenRouterService(
         prompt: String,
         context: LLMContext?,
         agentType: AgentType
-    ): Result<LLMResponse> = try {
+    ): Result<LLMResponse> {
+        return try {
         Log.d(TAG, "Generating response for agent: $agentType")
         
         val conversationId = context?.conversationId ?: UUID.randomUUID().toString()
@@ -139,14 +140,16 @@ class OpenRouterService(
         Log.d(TAG, "Response generated successfully using model: ${openRouterResponse.model}")
         Result.success(llmResponse)
         
-    } catch (e: Exception) {
-        Log.e(TAG, "Error generating response", e)
-        Result.failure(e)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error generating response", e)
+            Result.failure(e)
+        }
     }
     
     override suspend fun generateCoordinationResponse(
         request: MultiAgentCoordinationRequest
-    ): Result<MultiAgentCoordinationResponse> = try {
+    ): Result<MultiAgentCoordinationResponse> {
+        return try {
         Log.d(TAG, "Generating coordination response for: ${request.requestingAgent}")
         
         // Build coordination prompt
@@ -177,9 +180,10 @@ class OpenRouterService(
         Log.d(TAG, "Coordination response generated successfully")
         Result.success(response)
         
-    } catch (e: Exception) {
-        Log.e(TAG, "Error generating coordination response", e)
-        Result.failure(e)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error generating coordination response", e)
+            Result.failure(e)
+        }
     }
     
     override suspend fun storeConversation(conversation: LLMConversation): Result<Unit> = try {
