@@ -585,7 +585,7 @@ class CTODesignOrchestrator(
     
     suspend fun create3DModelFromBlueprint(
         blueprintId: String
-    ): Result<ThreeDModel> = try {
+    ): Result<ThreeDModel> { return try {
         
         val blueprint = blueprintLibrary[blueprintId]
             ?: return Result.failure(Exception("Blueprint not found: $blueprintId"))
@@ -613,11 +613,12 @@ class CTODesignOrchestrator(
         Log.e(TAG, "Failed to create 3D model", e)
         Result.failure(e)
     }
+    }
     
     suspend fun generateShopDrawings(
         blueprintId: String,
         tradeType: String
-    ): Result<List<ShopDrawing>> = try {
+    ): Result<List<ShopDrawing>> { return try {
         
         val blueprint = blueprintLibrary[blueprintId]
             ?: return Result.failure(Exception("Blueprint not found: $blueprintId"))
@@ -643,10 +644,11 @@ class CTODesignOrchestrator(
         Log.e(TAG, "Failed to generate shop drawings", e)
         Result.failure(e)
     }
+    }
     
     suspend fun calculateMaterialTakeoff(
         blueprintId: String
-    ): Result<MaterialTakeoff> = try {
+    ): Result<MaterialTakeoff> { return try {
         
         val blueprint = blueprintLibrary[blueprintId]
             ?: return Result.failure(Exception("Blueprint not found: $blueprintId"))
@@ -671,6 +673,7 @@ class CTODesignOrchestrator(
     } catch (e: Exception) {
         Log.e(TAG, "Failed to calculate material takeoff", e)
         Result.failure(e)
+    }
     }
     
     // Implementation methods
