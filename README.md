@@ -1,7 +1,7 @@
 # NextGen BuildPro - AI OS Architecture
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/tywade1980/nextgenbuildpro)
-[![AI Agents](https://img.shields.io/badge/ai%20agents-5-blue.svg)](#ai-agents)
+[![AI Orchestrators](https://img.shields.io/badge/orchestrators-13-blue.svg)](#department-head-orchestrators-13-total)
 [![Platform](https://img.shields.io/badge/platform-android-green.svg)](https://developer.android.com)
 [![License](https://img.shields.io/badge/license-proprietary-red.svg)](#license)
 
@@ -18,58 +18,163 @@ The NextGen AI OS is built on a revolutionary multi-agent architecture that comb
 ### 🧠 Core AI Agent Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    NextGen AI OS                            │
-├─────────────────────────────────────────────────────────────┤
-│                 Living Environment Mesh                     │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
-│  │   CRM       │ │  Personal   │ │  Project    │           │
-│  │Orchestrator │ │  Assistant  │ │ Management  │           │
-│  └─────────────┘ └─────────────┘ └─────────────┘           │
-│  ┌─────────────┐ ┌─────────────┐                           │
-│  │ Analytics   │ │   Design    │                           │
-│  │Orchestrator │ │ Department  │                           │
-│  └─────────────┘ └─────────────┘                           │
-├─────────────────────────────────────────────────────────────┤
-│               Main Orchestrator                             │
-├─────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
-│  │CallScreen   │ │ DialerApp   │ │Construction │           │
-│  │  Service    │ │             │ │ Platform    │           │
-│  └─────────────┘ └─────────────┘ └─────────────┘           │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                       NextGen AI OS v2.0                            │
+├─────────────────────────────────────────────────────────────────────┤
+│                     Living Environment Mesh                         │
+│                                                                     │
+│  ┌────────────────────────────────────────────────────────────┐    │
+│  │             Personal Assistant (Primary Interface)          │    │
+│  │      Directs all operations via voice/chat commands         │    │
+│  └────────────────────────────────────────────────────────────┘    │
+│                              ↓                                      │
+│  ┌────────────────────────────────────────────────────────────┐    │
+│  │                  Main Orchestrator                          │    │
+│  │        Coordinates 13 Department Head Orchestrators         │    │
+│  └────────────────────────────────────────────────────────────┘    │
+│                              ↓                                      │
+│  ┌──────────┬──────────┬──────────┬──────────┬──────────────┐     │
+│  │Estimating│  Field   │ Safety & │Accounting│      HR      │     │
+│  │  Dept    │Operations│Compliance│   Dept   │     Dept     │     │
+│  └──────────┴──────────┴──────────┴──────────┴──────────────┘     │
+│  ┌──────────┬──────────┬──────────┬──────────┬──────────────┐     │
+│  │Equipment │ Quality  │   CRM    │ Project  │    Design    │     │
+│  │   Mgmt   │ Control  │          │   Mgmt   │    Dept      │     │
+│  └──────────┴──────────┴──────────┴──────────┴──────────────┘     │
+│  ┌──────────┬──────────┐                                           │
+│  │Analytics │Marketing │                                           │
+│  └──────────┴──────────┘                                           │
+│                              ↓                                      │
+│  Each Department Head manages 5-8 specialized Sub-Agents           │
+│  with ML models, MCP tools, and API integrations                   │
+├─────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                  │
+│  │CallScreen   │ │ DialerApp   │ │Construction │                  │
+│  │  Service    │ │             │ │ Platform    │                  │
+│  └─────────────┘ └─────────────┘ └─────────────┘                  │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
-## 🤖 Specialized Agents
+## 🤖 Department Head Orchestrators (13 Total)
 
-The system uses specialized departmental orchestrators that follow the SpecializedAgent framework:
+The system is organized around construction company departments, with each department head managing 5-8 specialized sub-agents.
 
-### CRM Orchestrator
+### 1. Personal Assistant Orchestrator (Primary Interface)
+**Role**: Main human interface - directs the orchestrator via voice/chat
+- **Capabilities**: Voice recognition (English/Spanish), hands-free operation, natural language understanding
+- **Sub-Agents**: Voice processing, context awareness, emergency response, scheduling assistance, etc.
+- **Key Feature**: She handles directing the orchestrator which talks to department heads
+
+### 2. Estimating Department Orchestrator
+**Role**: Cost estimation, bidding, and proposals
+- **Capabilities**: Cost database integration, quantity takeoff, bid management, value engineering
+- **Sub-Agents**: Cost calculator, bid analyzer, material pricer, labor estimator, historical analyzer, etc.
+- **Tools**: 2025 construction cost database, ML-powered predictions, supplier API integrations
+- **Human-in-Loop**: Bid approval, final pricing review, contract negotiations
+
+### 3. Field Operations Orchestrator
+**Role**: Crew management, site logistics, and daily operations
+- **Capabilities**: Crew scheduling, GPS tracking, material ordering, weather integration
+- **Sub-Agents**: Crew scheduler, site supervisor, material coordinator, progress tracker, etc.
+- **Tools**: GPS tracking, weather APIs, material supplier integrations
+- **Human-in-Loop**: Daily crew assignments, safety concerns, schedule changes
+
+### 4. Safety & Compliance Orchestrator
+**Role**: OSHA compliance, safety protocols, permits, and inspections
+- **Capabilities**: Compliance monitoring, safety inspections, permit coordination
+- **Sub-Agents**: OSHA specialist, permit coordinator, inspection scheduler, incident reporter, etc.
+- **Tools**: OSHA database, permit tracking systems, safety training platforms
+- **Human-in-Loop**: Safety incident response, permit applications, compliance decisions
+
+### 5. Accounting Department Orchestrator
+**Role**: Financial management, invoicing, and payroll
+- **Capabilities**: Financial reporting, invoice management, payroll processing
+- **Sub-Agents**: Invoice generator, payment tracker, payroll processor, financial analyst, etc.
+- **Tools**: QuickBooks integration, banking APIs, payroll systems
+- **Human-in-Loop**: Invoice approval, payroll review, financial decisions
+
+### 6. HR Department Orchestrator
+**Role**: Human resources, recruitment, and training
+- **Capabilities**: Recruitment, onboarding, training management, time tracking
+- **Sub-Agents**: Recruiter, onboarding specialist, training coordinator, time keeper, etc.
+- **Tools**: Applicant tracking systems, training platforms, time clock integrations
+- **Human-in-Loop**: Hiring decisions, disciplinary actions, training approval
+
+### 7. Equipment Management Orchestrator
+**Role**: Fleet tracking, maintenance, and rentals
+- **Capabilities**: Asset tracking, maintenance planning, rental management
+- **Sub-Agents**: Fleet tracker, maintenance scheduler, rental coordinator, utilization analyzer, etc.
+- **Tools**: GPS tracking, maintenance systems, rental company APIs
+- **Human-in-Loop**: Major repairs, equipment purchases, rental decisions
+
+### 8. Quality Control Orchestrator
+**Role**: Inspections, defect tracking, and punch lists
+- **Capabilities**: Quality inspections, defect tracking, documentation
+- **Sub-Agents**: Inspector, defect analyst, photo documenter, punch list manager, etc.
+- **Tools**: AI-powered defect detection, digital checklists, photo documentation
+- **Human-in-Loop**: Final inspections, defect resolution approval, client walkthrough
+
+### 9. CRM Orchestrator
 **Role**: Customer relationship and contact management
 - **Capabilities**: Smart contact creation from calls/SMS, lead scoring, client engagement tracking
+- **Sub-Agents**: Contact manager, lead scorer, communication tracker, follow-up scheduler, etc.
 - **Implementation**: ContactManagementAgent.kt
 - **Key Feature**: Automated contact enrichment from multiple sources
 
-### Personal Assistant Orchestrator
-**Role**: Voice command processing and personal assistance
-- **Capabilities**: Bilingual voice recognition (English/Spanish), construction-specific vocabulary
-- **Implementation**: VoiceCommandAgent.kt
-- **Key Feature**: Natural language understanding for construction tasks
-
-### Project Management Orchestrator  
+### 10. Project Management Orchestrator  
 **Role**: Project planning and resource coordination
 - **Capabilities**: Timeline management, resource allocation, task coordination
+- **Sub-Agents**: Project planner, resource allocator, schedule optimizer, risk manager, etc.
 - **Key Feature**: Integrated construction project lifecycle management
 
-### Design Department Orchestrator
+### 11. Design Department Orchestrator
 **Role**: Design coordination and blueprint management
 - **Capabilities**: Design workflow coordination, visual planning support
+- **Sub-Agents**: CAD specialist, 3D modeler, blueprint reviewer, specification writer, etc.
 - **Key Feature**: Streamlined design-to-construction handoff
 
-### Analytics Orchestrator
+### 12. Analytics Orchestrator
 **Role**: Data analysis and reporting
 - **Capabilities**: Project analytics, performance insights, predictive modeling
+- **Sub-Agents**: Data analyst, report generator, performance tracker, predictor, etc.
 - **Key Feature**: Real-time construction metrics and KPI tracking
+
+### 13. Marketing Orchestrator
+**Role**: Marketing, proposals, and business development
+- **Capabilities**: Proposal generation, marketing campaigns, brand management
+- **Sub-Agents**: Proposal writer, marketing manager, social media coordinator, brand specialist, etc.
+- **Key Feature**: Automated proposal and marketing content generation
+
+## 🔄 Human-in-the-Loop Framework
+
+The system preserves human control and expertise through a progressive automation model:
+
+### Automation Levels
+1. **MANUAL** - Requires human execution
+2. **HUMAN_IN_LOOP** - AI assists, human approves (default for new tasks)
+3. **SUPERVISED** - AI executes, human reviews
+4. **AUTOMATED** - Fully automated (only after proven consistency)
+5. **LEARNING** - System is actively learning task patterns
+
+### Automation Progression
+- All new tasks start as HUMAN_IN_LOOP
+- System tracks task patterns: occurrences, success rate, review time, outcome consistency
+- When a task shows consistent results with fast review times, it's flagged for automation
+- Human approval required before moving to AUTOMATED level
+- Any failures or concerns revert tasks to higher supervision levels
+
+### Sub-Agent Architecture
+Each department head manages 5-8 specialized sub-agents:
+- **ML Models**: Fine-tuned for specific tasks (NLP, classification, prediction, etc.)
+- **MCP Tools**: Model Context Protocol integration for enhanced capabilities
+- **API Integrations**: Third-party system connections (suppliers, accounting, etc.)
+- **Human Approval**: Built-in approval workflows for critical decisions
+
+### Department Head Coordination
+- Department heads work together for common goals
+- Inter-departmental requests handled automatically
+- Escalation to Personal Assistant for conflicts
+- Main Orchestrator coordinates complex multi-department tasks
 
 ## 🌐 Living Environment Mesh
 
