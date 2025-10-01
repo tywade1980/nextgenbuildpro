@@ -49,7 +49,7 @@ class LLMServiceTest {
         // Given
         val request = MultiAgentCoordinationRequest(
             requestingAgent = AgentType.ORCHESTRATOR,
-            targetAgents = listOf(AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR, AgentType.CRM_ORCHESTRATOR),
+            targetAgents = listOf(AgentType.COO_OPERATIONS_ORCHESTRATOR, AgentType.CHRO_CLIENT_HR_ORCHESTRATOR),
             task = "Coordinate resource allocation for new project",
             context = "High priority construction project with tight deadline"
         )
@@ -109,7 +109,7 @@ class LLMServiceTest {
     fun testLLMConversationCreation() {
         // Given
         val conversationId = "test-conversation-123"
-        val participants = listOf(AgentType.ORCHESTRATOR, AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR)
+        val participants = listOf(AgentType.ORCHESTRATOR, AgentType.COO_OPERATIONS_ORCHESTRATOR)
         val messages = listOf(
             LLMMessage("user", "Start coordination"),
             LLMMessage("assistant", "Coordination initiated")
@@ -136,7 +136,7 @@ class LLMServiceTest {
     fun testMultiAgentCoordinationRequest() {
         // Given
         val requestingAgent = AgentType.ORCHESTRATOR
-        val targetAgents = listOf(AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR, AgentType.CRM_ORCHESTRATOR, AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR)
+        val targetAgents = listOf(AgentType.COO_OPERATIONS_ORCHESTRATOR, AgentType.CHRO_CLIENT_HR_ORCHESTRATOR, AgentType.CTO_DESIGN_ORCHESTRATOR)
         val task = "Setup new construction project"
         val context = "Large commercial building project"
         
@@ -154,5 +154,41 @@ class LLMServiceTest {
         assertEquals(task, request.task)
         assertEquals(context, request.context)
         assertEquals("MEDIUM", request.priority)
+    }
+    
+    @Test
+    fun testOpenRouterChatMessage() {
+        // Given
+        val role = "user"
+        val content = "Help me coordinate agents"
+        
+        // When
+        val message = ChatMessage(role, content)
+        
+        // Then
+        assertEquals(role, message.role)
+        assertEquals(content, message.content)
+    }
+    
+    @Test
+    fun testOpenRouterResponse() {
+        // Given
+        val id = "chatcmpl-123"
+        val model = "openai/gpt-3.5-turbo"
+        val content = "I'll help coordinate the agents"
+        val role = "assistant"
+        val finishReason = "stop"
+        val usage = com.nextgenbuildpro.ai.llm.TokenUsage(10, 20, 30)
+        
+        // When
+        val response = OpenRouterResponse(id, model, content, role, finishReason, usage)
+        
+        // Then
+        assertEquals(id, response.id)
+        assertEquals(model, response.model)
+        assertEquals(content, response.content)
+        assertEquals(role, response.role)
+        assertEquals(finishReason, response.finishReason)
+        assertEquals(30, response.usage.totalTokens)
     }
 }

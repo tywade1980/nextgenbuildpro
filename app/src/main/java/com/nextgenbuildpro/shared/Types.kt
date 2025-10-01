@@ -125,7 +125,7 @@ data class LLMModel(
 )
 
 enum class LLMProvider {
-    OPENAI, ANTHROPIC, GOOGLE, META, MISTRAL, LOCAL, CUSTOM
+    OPENAI, ANTHROPIC, GOOGLE, META, MISTRAL, OPENROUTER, LOCAL, CUSTOM
 }
 
 enum class LLMModelType {
