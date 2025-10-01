@@ -780,7 +780,6 @@ data class LaborRate(
     val tradeName: String? = null,
     val description: String? = null
 )
-)
 
 data class MaterialCost(
     val name: String,
