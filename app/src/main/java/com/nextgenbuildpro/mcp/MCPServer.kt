@@ -175,6 +175,14 @@ data class MCPResource(
     val description: String
 )
 
+data class MCPSession(
+    val sessionId: String,
+    val agentId: String,
+    val createdAt: Long,
+    val lastAccessedAt: Long = createdAt,
+    val metadata: Map<String, Any> = emptyMap()
+)
+
 data class MCPMetrics(
     val activeConnections: Int = 0,
     val registeredResources: Int = 0
