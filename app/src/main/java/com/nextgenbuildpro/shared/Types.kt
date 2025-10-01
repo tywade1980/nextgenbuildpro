@@ -1039,7 +1039,7 @@ data class MaterialTakeoff(
 data class MaterialItem(
     val itemId: String,
     val description: String,
-    val category: MaterialCategory? = null,
+    val category: Any? = null,  // Can be MaterialCategory enum or String
     val quantity: Double = 0.0,
     val unit: String = "",
     val unitCost: Double = 0.0,

@@ -683,19 +683,22 @@ class CTODesignOrchestrator(
         
         designTemplates.putAll(mapOf(
             "residential_single_story" to DesignTemplate(
-                "Single Story Residential",
-                "Standard single-story home design template",
-                TemplateType.RESIDENTIAL
+                templateId = "residential_single_story",
+                name = "Single Story Residential",
+                description = "Standard single-story home design template",
+                templateType = TemplateType.RESIDENTIAL
             ),
             "residential_two_story" to DesignTemplate(
-                "Two Story Residential", 
-                "Standard two-story home design template",
-                TemplateType.RESIDENTIAL
+                templateId = "residential_two_story",
+                name = "Two Story Residential", 
+                description = "Standard two-story home design template",
+                templateType = TemplateType.RESIDENTIAL
             ),
             "commercial_office" to DesignTemplate(
-                "Commercial Office",
-                "Standard commercial office design template",
-                TemplateType.COMMERCIAL
+                templateId = "commercial_office",
+                name = "Commercial Office",
+                description = "Standard commercial office design template",
+                templateType = TemplateType.COMMERCIAL
             )
         ))
         
