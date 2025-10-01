@@ -176,13 +176,13 @@ class CSOSafetyOrchestrator(
             name = "AI Hazard Detection",
             description = "Computer vision analysis of site photos to identify safety hazards",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
         ),
         OrchestratorTool(
             name = "PPE Compliance Checker",
             description = "AI verification that workers are wearing required personal protective equipment",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.CAMERA, Permission.INTERNET_ACCESS)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.INTERNET_ACCESS)
         ),
         OrchestratorTool(
             name = "Risk Assessment AI",
@@ -201,13 +201,13 @@ class CSOSafetyOrchestrator(
             name = "Digital Safety Inspection",
             description = "Mobile safety inspection checklists with photo documentation",
             toolType = ToolType.AUTOMATION_TOOL,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE, Permission.ACCESS_LOCATION)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE, Permission.ACCESS_LOCATION)
         ),
         OrchestratorTool(
             name = "Jobsite Safety Audit",
             description = "Comprehensive site safety audits covering all OSHA standards",
             toolType = ToolType.AUTOMATION_TOOL,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE)
         ),
         OrchestratorTool(
             name = "Equipment Inspection Tracker",
@@ -219,7 +219,7 @@ class CSOSafetyOrchestrator(
             name = "Fall Protection Inspection",
             description = "Specialized checklists for fall protection systems and equipment",
             toolType = ToolType.AUTOMATION_TOOL,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE)
         ),
         // Incident Management
         OrchestratorTool(
@@ -414,7 +414,7 @@ class CSOSafetyOrchestrator(
             name = "Vision AI (GPT-4V)",
             description = "Hazard detection from site photos, PPE compliance verification",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
         )
     )
     

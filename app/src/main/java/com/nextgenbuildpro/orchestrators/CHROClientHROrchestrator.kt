@@ -236,13 +236,13 @@ class CHROClientHROrchestrator(
             name = "Before/After Photo Enhancer",
             description = "AI photo enhancement and professional presentation of project transformations",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE)
         ),
         OrchestratorTool(
             name = "Video Content Creator",
             description = "Create project timelapse videos, client testimonials, and promotional content",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE)
         ),
         // Campaign Management
         OrchestratorTool(

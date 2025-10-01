@@ -308,7 +308,7 @@ class CTODesignOrchestrator(
             name = "As-Built Documentation",
             description = "Track and document field changes to create accurate as-built drawings",
             toolType = ToolType.SYSTEM_INTEGRATION,
-            permissions = listOf(Permission.ACCESS_STORAGE, Permission.CAMERA)
+            permissions = listOf(Permission.ACCESS_STORAGE, Permission.ACCESS_CAMERA)
         ),
         OrchestratorTool(
             name = "Submittal Manager",
@@ -352,7 +352,7 @@ class CTODesignOrchestrator(
             name = "Site Analysis AI",
             description = "Analyze site photos/surveys to optimize building placement and design",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_LOCATION, Permission.INTERNET_ACCESS)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_LOCATION, Permission.INTERNET_ACCESS)
         ),
         // Collaboration & Client Presentation
         OrchestratorTool(
@@ -390,7 +390,7 @@ class CTODesignOrchestrator(
             name = "Vision AI (GPT-4V)",
             description = "Blueprint analysis, photo interpretation, progress verification from site photos",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
         )
     )
     
