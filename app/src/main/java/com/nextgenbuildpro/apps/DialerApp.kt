@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.ExperimentalMaterial3Api
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -631,13 +632,13 @@ fun DialerAppUI(
         // Tab Content
         when (selectedTab) {
             0 -> KeypadTab(dialerApp, dialedNumber)
-            1 -> RecentCallsTab(recentCalls) { recordId -> 
+            1 -> RecentCallsTab(recentCalls) { recordId: String -> 
                 coroutineScope.launch { dialerApp.dialFromHistory(recordId) }
             }
-            2 -> ContactsTab(contacts) { contactId -> 
+            2 -> ContactsTab(contacts) { contactId: String -> 
                 coroutineScope.launch { dialerApp.dialContact(contactId) }
             }
-            3 -> SmartSuggestionsTab(smartSuggestions) { suggestion -> 
+            3 -> SmartSuggestionsTab(smartSuggestions) { suggestion: DialerApp.SmartContact -> 
                 coroutineScope.launch { dialerApp.dialContact(suggestion.contact) }
             }
         }
@@ -801,7 +802,7 @@ private fun DialerKeypadButton(
 @Composable
 private fun RecentCallsTab(
     recentCalls: List<DialerApp.CallRecord>,
-    onCallSelected: (CallRecord) -> Unit
+    onCallSelected: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -814,14 +815,15 @@ private fun RecentCallsTab(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CallRecordItem(
-    call: CallRecord,
-    onCallSelected: (CallRecord) -> Unit
+    call: DialerApp.CallRecord,
+    onCallSelected: (String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        onClick = { onCallSelected(call) }
+        onClick = { onCallSelected(call.id) }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -871,7 +873,7 @@ private fun CallRecordItem(
 @Composable
 private fun ContactsTab(
     contacts: List<DialerApp.Contact>,
-    onContactSelected: (Contact) -> Unit
+    onContactSelected: (String) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -884,14 +886,15 @@ private fun ContactsTab(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ContactItem(
     contact: DialerApp.Contact,
-    onContactSelected: (Contact) -> Unit
+    onContactSelected: (String) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        onClick = { onContactSelected(contact) }
+        onClick = { onContactSelected(contact.id) }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -933,7 +936,7 @@ private fun ContactItem(
 @Composable
 private fun SmartSuggestionsTab(
     suggestions: List<DialerApp.SmartContact>,
-    onSuggestionSelected: (SmartContact) -> Unit
+    onSuggestionSelected: (DialerApp.SmartContact) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -955,10 +958,11 @@ private fun SmartSuggestionsTab(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SmartSuggestionItem(
-    suggestion: SmartContact,
-    onSuggestionSelected: (SmartContact) -> Unit
+    suggestion: DialerApp.SmartContact,
+    onSuggestionSelected: (DialerApp.SmartContact) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),

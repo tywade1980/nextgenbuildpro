@@ -149,7 +149,7 @@ class CostDatabaseAgent : SubAgent {
             Result.success(updatedTask)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to execute specialized task", e)
-            recordTaskExecution(task, mapOf("error" to e.message), 0, success = false)
+            recordTaskExecution(task, mapOf("error" to (e.message ?: "Unknown error")), 0, success = false)
             Result.failure(e)
         }
     }

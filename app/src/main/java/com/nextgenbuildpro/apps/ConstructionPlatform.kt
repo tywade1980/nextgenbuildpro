@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.ExperimentalMaterial3Api
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -392,8 +393,15 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
                 budget = 5000000.0,
                 currentCost = 1200000.0,
                 phases = listOf(
-                    ProjectPhase("phase_1", "Foundation", "Foundation and basement work", 
-                        LocalDateTime.now().minusDays(30), LocalDateTime.now().plusDays(30), TaskStatus.IN_PROGRESS, listOf("Excavation", "Concrete pour"))
+                    ProjectPhaseDetails(
+                        id = "phase_1",
+                        name = "Foundation",
+                        description = "Foundation and basement work",
+                        startDate = LocalDateTime.now().minusDays(30),
+                        endDate = LocalDateTime.now().plusDays(30),
+                        status = TaskStatus.IN_PROGRESS,
+                        milestones = listOf("Excavation", "Concrete pour")
+                    )
                 ),
                 tasks = emptyList(),
                 documents = emptyList()
@@ -419,8 +427,8 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         _safetyAlerts.value = emptyList()
     }
     
-    private fun createProjectPhase(phaseData: PhaseCreationData): ProjectPhase {
-        return ProjectPhase(
+    private fun createProjectPhase(phaseData: PhaseCreationData): ProjectPhaseDetails {
+        return ProjectPhaseDetails(
             id = UUID.randomUUID().toString(),
             name = phaseData.name,
             description = phaseData.description,
@@ -904,6 +912,7 @@ private fun SafetyAlertsSection(alerts: List<ConstructionPlatform.SafetyAlert>) 
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SafetyAlertItem(alert: ConstructionPlatform.SafetyAlert) {
     Row(
@@ -1024,6 +1033,7 @@ private fun ProjectsTab(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProjectItem(
     project: ConstructionProject,
@@ -1121,6 +1131,7 @@ private fun TasksTab(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskItem(
     task: ConstructionPlatform.ConstructionTask,
@@ -1194,6 +1205,7 @@ private fun ResourcesTab(resources: List<ConstructionPlatform.Resource>) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ResourceItem(resource: ConstructionPlatform.Resource) {
     Card(modifier = Modifier.fillMaxWidth()) {
@@ -1292,8 +1304,9 @@ private fun SafetyTab(safetyAlerts: List<ConstructionPlatform.SafetyAlert>) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SafetyAlertDetailItem(alert: SafetyAlert) {
+private fun SafetyAlertDetailItem(alert: ConstructionPlatform.SafetyAlert) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(

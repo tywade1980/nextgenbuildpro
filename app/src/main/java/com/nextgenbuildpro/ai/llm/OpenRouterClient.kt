@@ -94,11 +94,11 @@ class OpenRouterClient {
             val responseCode = connection.responseCode
             
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                val response = BufferedReader(InputStreamReader(connection.inputStream)).use { reader ->
+                val responseText = BufferedReader(InputStreamReader(connection.inputStream)).use { reader ->
                     reader.readText()
                 }
                 
-                val responseJson = JSONObject(response)
+                val responseJson = JSONObject(responseText)
                 val response = parseResponse(responseJson)
                 
                 Log.d(TAG, "OpenRouter request successful. Tokens used: ${response.usage.totalTokens}")
