@@ -15,29 +15,48 @@ import java.util.UUID
  * CEO Personal Assistant Orchestrator
  * 
  * Highest-level executive interface that directs the Main Orchestrator
- * and coordinates with all C-suite department heads (COO, CFO, CHRO, CTO, CSO).
+ * and coordinates with all C-suite department heads (COO, CFO, CHRO, CTO, CSO)
+ * with strategic intelligence and comprehensive business oversight.
  * 
  * PRIMARY FUNCTIONS:
  * - Voice and chat interface for human interaction
  * - Direct communication with Main Orchestrator
  * - Cross-department coordination and prioritization
- * - Executive decision support
+ * - Executive decision support and strategic planning
  * - Emergency response coordination
+ * - Business intelligence and analytics
  * 
  * OPERATIONAL SCOPE:
  * - Hands-free operation and voice commands
  * - Natural language understanding (English/Spanish)
- * - Context awareness across all departments
- * - Strategic oversight and reporting
+ * - Context awareness across all departments and projects
+ * - Strategic oversight and executive reporting
+ * - Real-time business metrics and KPI tracking
+ * - Automated executive workflows
+ * 
+ * EXECUTIVE KNOWLEDGE:
+ * - Business strategy and competitive analysis
+ * - Financial performance and growth metrics
+ * - Market trends and industry intelligence
+ * - Risk management and mitigation
+ * - Leadership and organizational management
+ * 
+ * MULTI-LLM SYSTEM:
+ * - Reasoning Model (o1): Strategic planning, complex business decisions, risk analysis
+ * - Agent Workflow Model (GPT-4): Department coordination, task delegation, executive communications
+ * - Specialized Models: Voice recognition, sentiment analysis, predictive analytics
  * 
  * Operational Agents (Sub-Agents):
- * - Voice Command Processor Agent
- * - Executive Assistant Agent
- * - Context Manager Agent
- * - Emergency Response Agent
- * - Cross-Department Coordinator Agent
- * - Decision Support Agent
- * - Communication Hub Agent
+ * - Voice Command Processor Agent (natural language understanding)
+ * - Executive Assistant Agent (scheduling, communications, task management)
+ * - Strategic Planning Agent (business strategy, goal setting)
+ * - Context Manager Agent (situational awareness, proactive assistance)
+ * - Emergency Response Agent (crisis management, urgent escalation)
+ * - Cross-Department Coordinator Agent (C-suite integration)
+ * - Decision Support Agent (data analysis, recommendations)
+ * - Communication Hub Agent (email, calls, meetings)
+ * - Business Intelligence Agent (metrics, analytics, reporting)
+ * - Performance Monitor Agent (KPI tracking, alerts)
  */
 class CEOPersonalAssistantOrchestrator(
     private val context: Context
@@ -66,39 +85,327 @@ class CEOPersonalAssistantOrchestrator(
     private val userPreferences = mutableMapOf<String, Any>()
     private val activeConversations = mutableMapOf<String, Conversation>()
     
+    // Multi-LLM configuration for executive intelligence
+    private val multiLLMConfig = initializeMultiLLMSystem()
+    
+    // Executive knowledge base
+    private val executiveKnowledge = initializeExecutiveKnowledge()
+    
     // Sub-agents for Personal Assistant department
     override val subAgents: List<SubAgent> = emptyList() // Will be populated with 5-8 specialized agents
     
+    private fun initializeMultiLLMSystem(): MultiLLMConfig {
+        return MultiLLMConfig(
+            systemId = "ceo-multi-llm",
+            reasoningModel = LLMModel(
+                modelId = "o1-2024-12-17",
+                modelName = "OpenAI o1",
+                provider = LLMProvider.OPENAI,
+                modelType = LLMModelType.REASONING,
+                contextWindow = 128000,
+                temperature = 1.0,
+                maxTokens = 32768,
+                capabilities = listOf(LLMCapability.REASONING)
+            ),
+            agentWorkflowModel = LLMModel(
+                modelId = "gpt-4-turbo",
+                modelName = "GPT-4 Turbo",
+                provider = LLMProvider.OPENAI,
+                modelType = LLMModelType.AGENT_WORKFLOW,
+                contextWindow = 128000,
+                temperature = 0.7,
+                maxTokens = 4096,
+                capabilities = listOf(LLMCapability.FUNCTION_CALLING)
+            ),
+            routingStrategy = LLMRoutingStrategy.TASK_BASED
+        )
+    }
+    
+    private fun initializeExecutiveKnowledge(): ExecutiveKnowledgeBase {
+        return ExecutiveKnowledgeBase(
+            strategicPriorities = listOf(
+                "Revenue growth and profitability",
+                "Customer satisfaction and retention",
+                "Operational efficiency and quality",
+                "Safety and compliance excellence",
+                "Team development and culture"
+            ),
+            keyMetrics = mapOf(
+                "financial" to listOf("revenue", "profit_margin", "cash_flow", "backlog"),
+                "operational" to listOf("project_count", "on_time_delivery", "quality_score"),
+                "safety" to listOf("incident_rate", "training_compliance", "safety_score"),
+                "customer" to listOf("satisfaction_nps", "referral_rate", "repeat_business")
+            ),
+            decisionFrameworks = mapOf(
+                "strategic" to "Long-term impact, alignment with vision, resource requirements",
+                "operational" to "Efficiency gains, cost-benefit analysis, implementation complexity",
+                "emergency" to "Immediate safety, legal compliance, reputation protection"
+            )
+        )
+    }
+    
     override val toolsets = listOf(
+        // Voice & Natural Language Interface
         OrchestratorTool(
-            name = "Voice Recognition",
-            description = "Advanced voice command processing with natural language understanding",
+            name = "Advanced Voice Recognition",
+            description = "State-of-the-art voice command processing with natural language understanding",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.ACCESS_MICROPHONE)
+            permissions = listOf(Permission.ACCESS_MICROPHONE, Permission.INTERNET_ACCESS)
         ),
         OrchestratorTool(
             name = "Hands-Free Operation",
-            description = "Complete app control without touching device",
+            description = "Complete app control without touching device - eyes-free, hands-free",
             toolType = ToolType.VOICE_COMMAND,
             permissions = listOf(Permission.ACCESS_MICROPHONE, Permission.SYSTEM_ADMIN)
         ),
         OrchestratorTool(
+            name = "Multi-Language Support",
+            description = "Bilingual Spanish/English voice command processing and translation",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.ACCESS_MICROPHONE, Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Conversational AI",
+            description = "Natural dialogue with context retention and proactive suggestions",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Sentiment Analysis",
+            description = "Detect tone and urgency in communications for appropriate response",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        // Executive Assistant Functions
+        OrchestratorTool(
+            name = "Smart Calendar Management",
+            description = "Intelligent scheduling with conflict resolution and travel time consideration",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.READ_CALENDAR, Permission.WRITE_CALENDAR)
+        ),
+        OrchestratorTool(
+            name = "Email Management",
+            description = "Priority inbox, smart replies, automated follow-ups",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
             name = "Contact Management",
-            description = "Smart contact creation and management from calls/SMS",
+            description = "Smart contact creation and management from calls/SMS/email",
             toolType = ToolType.SYSTEM_INTEGRATION,
             permissions = listOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS, Permission.MAKE_CALLS, Permission.SEND_SMS)
         ),
         OrchestratorTool(
-            name = "Context Awareness",
-            description = "Understanding current project and task context for intelligent responses",
+            name = "Meeting Preparation Assistant",
+            description = "Auto-generate meeting agendas, briefings, and follow-up action items",
             toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.READ_CALENDAR, Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Document Management",
+            description = "Organize, search, and retrieve documents with AI-powered search",
+            toolType = ToolType.SYSTEM_INTEGRATION,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        // Strategic Planning & Decision Support
+        OrchestratorTool(
+            name = "Strategic Planning Dashboard",
+            description = "Visual dashboard for company goals, OKRs, and strategic initiatives",
+            toolType = ToolType.REPORTING_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Decision Support AI",
+            description = "AI-powered recommendations based on data, trends, and scenarios",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Scenario Planning",
+            description = "Model different business scenarios and their potential outcomes",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Competitive Intelligence",
+            description = "Track competitors, market trends, and industry developments",
+            toolType = ToolType.THIRD_PARTY_API,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Risk Assessment Dashboard",
+            description = "Real-time risk monitoring across all departments and projects",
+            toolType = ToolType.DATA_ANALYSIS,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        // Business Intelligence & Analytics
+        OrchestratorTool(
+            name = "Executive KPI Dashboard",
+            description = "Real-time business metrics: revenue, profit, backlog, cash flow",
+            toolType = ToolType.REPORTING_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Predictive Analytics Engine",
+            description = "Forecast revenue, project pipeline, resource needs",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Performance Analytics",
+            description = "Track department and individual performance against goals",
+            toolType = ToolType.DATA_ANALYSIS,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Business Intelligence Reports",
+            description = "Automated daily/weekly/monthly executive reports",
+            toolType = ToolType.REPORTING_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Custom Dashboard Builder",
+            description = "Create personalized dashboards for specific metrics and views",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        // Cross-Department Coordination
+        OrchestratorTool(
+            name = "Department Orchestration Hub",
+            description = "Coordinate tasks and workflows across COO, CFO, CHRO, CTO, CSO",
+            toolType = ToolType.SYSTEM_INTEGRATION,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Priority Task Manager",
+            description = "Intelligent task prioritization and delegation to department heads",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Cross-Functional Project Tracker",
+            description = "Monitor projects that span multiple departments",
+            toolType = ToolType.SYSTEM_INTEGRATION,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Resource Allocation Optimizer",
+            description = "Optimize resource distribution across departments and projects",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        // Context Awareness & Proactive Assistance
+        OrchestratorTool(
+            name = "Context Awareness Engine",
+            description = "Understand current project, location, and situation for intelligent responses",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.ACCESS_LOCATION, Permission.READ_CALENDAR, Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Proactive Alerts",
+            description = "Smart notifications for important events, deadlines, and opportunities",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Smart Recommendations",
+            description = "AI-powered suggestions based on context and historical patterns",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Routine Automation",
+            description = "Automate repetitive executive tasks and workflows",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        // Emergency Response & Crisis Management
+        OrchestratorTool(
+            name = "Emergency Response Coordinator",
+            description = "Rapid response to safety incidents, legal issues, reputation threats",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.MAKE_CALLS, Permission.SEND_SMS)
+        ),
+        OrchestratorTool(
+            name = "Crisis Communication Manager",
+            description = "Manage internal and external communications during crises",
+            toolType = ToolType.COMMUNICATION,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.SEND_SMS)
+        ),
+        OrchestratorTool(
+            name = "Escalation Protocol Manager",
+            description = "Automated escalation based on severity and impact",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.MAKE_CALLS)
+        ),
+        // Communication & Collaboration
+        OrchestratorTool(
+            name = "Unified Communications Hub",
+            description = "Integrate calls, SMS, email, video conferencing",
+            toolType = ToolType.COMMUNICATION,
+            permissions = listOf(Permission.MAKE_CALLS, Permission.SEND_SMS, Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Video Conferencing Integration",
+            description = "Schedule and join video meetings with one command",
+            toolType = ToolType.THIRD_PARTY_API,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.CAMERA)
+        ),
+        OrchestratorTool(
+            name = "Team Collaboration Platform",
+            description = "Slack/Teams integration for company-wide communication",
+            toolType = ToolType.THIRD_PARTY_API,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Voice Notes & Transcription",
+            description = "Record voice notes with automatic transcription and organization",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.ACCESS_MICROPHONE, Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
+        ),
+        // Personal Productivity
+        OrchestratorTool(
+            name = "Smart Reminders",
+            description = "Context-aware reminders based on location, time, and project",
+            toolType = ToolType.AUTOMATION_TOOL,
             permissions = listOf(Permission.ACCESS_LOCATION, Permission.READ_CALENDAR)
         ),
         OrchestratorTool(
-            name = "Multi-Language Support",
-            description = "Spanish and English voice command processing",
+            name = "Focus Time Manager",
+            description = "Block calendar for deep work, minimize interruptions",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.READ_CALENDAR, Permission.WRITE_CALENDAR)
+        ),
+        OrchestratorTool(
+            name = "Travel Assistant",
+            description = "Trip planning, itinerary management, travel time in calendar",
+            toolType = ToolType.THIRD_PARTY_API,
+            permissions = listOf(Permission.ACCESS_LOCATION, Permission.READ_CALENDAR, Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Personal Goal Tracker",
+            description = "Track personal and professional development goals",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        // Multi-LLM Tools
+        OrchestratorTool(
+            name = "Reasoning Engine (o1)",
+            description = "Strategic planning, complex business decisions, risk analysis, scenario modeling",
             toolType = ToolType.AI_SERVICE,
-            permissions = listOf(Permission.ACCESS_MICROPHONE)
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Agent Workflow Coordinator (GPT-4)",
+            description = "Department coordination, task delegation, executive communications, workflow automation",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Executive Intelligence AI",
+            description = "Synthesize information from all departments for comprehensive executive insights",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
         )
     )
     
@@ -106,36 +413,71 @@ class CEOPersonalAssistantOrchestrator(
         AgentCapability(
             name = "Voice Command Processing",
             description = "Natural language voice command understanding and execution",
-            inputTypes = listOf("VoiceCommand", "AudioStream"),
-            outputTypes = listOf("CommandResponse", "ActionExecution"),
+            inputTypes = listOf("VoiceCommand", "AudioStream", "MultiLanguageInput"),
+            outputTypes = listOf("CommandResponse", "ActionExecution", "ProactiveSuggestion"),
             skillLevel = SkillLevel.EXPERT
         ),
         AgentCapability(
             name = "Hands-Free Navigation",
-            description = "Complete app navigation without manual input",
-            inputTypes = listOf("VoiceNavigation", "GestureCommand"),
-            outputTypes = listOf("UINavigation", "ActionExecution"),
+            description = "Complete app navigation without manual input - eyes-free, hands-free",
+            inputTypes = listOf("VoiceNavigation", "GestureCommand", "ContextualTrigger"),
+            outputTypes = listOf("UINavigation", "ActionExecution", "StatusFeedback"),
             skillLevel = SkillLevel.EXPERT
         ),
         AgentCapability(
-            name = "Smart Contact Creation",
-            description = "Intelligent contact creation from various sources",
-            inputTypes = listOf("CallLog", "SMSMessage", "VoiceCommand"),
-            outputTypes = listOf("ContactRecord", "ContactUpdate"),
-            skillLevel = SkillLevel.ADVANCED
+            name = "Executive Decision Support",
+            description = "AI-powered recommendations for strategic and operational decisions",
+            inputTypes = listOf("BusinessData", "Scenarios", "StrategicGoals"),
+            outputTypes = listOf("Recommendations", "RiskAnalysis", "ImpactAssessment"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Business Intelligence",
+            description = "Real-time metrics, analytics, and predictive insights",
+            inputTypes = listOf("FinancialData", "OperationalData", "MarketTrends"),
+            outputTypes = listOf("KPIDashboard", "PredictiveForecasts", "ExecutiveReports"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Cross-Department Coordination",
+            description = "Orchestrate work across all C-suite departments",
+            inputTypes = listOf("DepartmentRequests", "ResourceNeeds", "Priorities"),
+            outputTypes = listOf("CoordinationPlan", "TaskDelegation", "StatusUpdates"),
+            skillLevel = SkillLevel.EXPERT
         ),
         AgentCapability(
             name = "Context-Aware Assistance",
-            description = "Contextual help based on current project and location",
-            inputTypes = listOf("UserQuery", "LocationContext", "ProjectContext"),
-            outputTypes = listOf("ContextualResponse", "ProactiveAssistance"),
+            description = "Proactive help based on current situation, location, and patterns",
+            inputTypes = listOf("UserQuery", "LocationContext", "ProjectContext", "TimeContext"),
+            outputTypes = listOf("ContextualResponse", "ProactiveAlerts", "SmartSuggestions"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Emergency Response Coordination",
+            description = "Rapid response to crises with appropriate escalation and communication",
+            inputTypes = listOf("EmergencyAlert", "IncidentDetails", "StakeholderInfo"),
+            outputTypes = listOf("ResponsePlan", "EmergencyCommunications", "EscalationActions"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Smart Contact & Communication",
+            description = "Intelligent contact management and communication across all channels",
+            inputTypes = listOf("CallLog", "SMSMessage", "EmailThread", "VoiceCommand"),
+            outputTypes = listOf("ContactRecord", "SmartReply", "CommunicationInsights"),
+            skillLevel = SkillLevel.ADVANCED
+        ),
+        AgentCapability(
+            name = "Strategic Planning",
+            description = "Long-term planning, goal setting, and progress tracking",
+            inputTypes = listOf("BusinessGoals", "MarketConditions", "Resources"),
+            outputTypes = listOf("StrategicPlan", "OKRs", "ActionItems"),
             skillLevel = SkillLevel.EXPERT
         ),
         AgentCapability(
             name = "Multi-Language Communication",
-            description = "Bilingual Spanish/English voice processing",
-            inputTypes = listOf("SpanishVoiceCommand", "EnglishVoiceCommand"),
-            outputTypes = listOf("LocalizedResponse", "TranslatedAction"),
+            description = "Bilingual Spanish/English voice processing and translation",
+            inputTypes = listOf("SpanishVoiceCommand", "EnglishVoiceCommand", "MixedLanguage"),
+            outputTypes = listOf("LocalizedResponse", "TranslatedAction", "BilingualCommunication"),
             skillLevel = SkillLevel.ADVANCED
         )
     )
