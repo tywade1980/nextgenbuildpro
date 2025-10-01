@@ -12,22 +12,43 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 /**
- * Personal Assistant Orchestrator
+ * CEO Personal Assistant Orchestrator
  * 
- * Handles direct human interaction, voice commands, hands-free operation,
- * and general support across all construction management activities.
- * This orchestrator serves as the primary interface between users and the system.
+ * Highest-level executive interface that directs the Main Orchestrator
+ * and coordinates with all C-suite department heads (COO, CFO, CHRO, CTO, CSO).
+ * 
+ * PRIMARY FUNCTIONS:
+ * - Voice and chat interface for human interaction
+ * - Direct communication with Main Orchestrator
+ * - Cross-department coordination and prioritization
+ * - Executive decision support
+ * - Emergency response coordination
+ * 
+ * OPERATIONAL SCOPE:
+ * - Hands-free operation and voice commands
+ * - Natural language understanding (English/Spanish)
+ * - Context awareness across all departments
+ * - Strategic oversight and reporting
+ * 
+ * Operational Agents (Sub-Agents):
+ * - Voice Command Processor Agent
+ * - Executive Assistant Agent
+ * - Context Manager Agent
+ * - Emergency Response Agent
+ * - Cross-Department Coordinator Agent
+ * - Decision Support Agent
+ * - Communication Hub Agent
  */
-class PersonalAssistantOrchestrator(
+class CEOPersonalAssistantOrchestrator(
     private val context: Context
 ) : DepartmentalOrchestrator {
     
     companion object {
-        private const val TAG = "PersonalAssistantOrchestrator"
+        private const val TAG = "CEOPersonalAssistantOrchestrator"
     }
     
-    override val agentType: AgentType = AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR
-    override val departmentName: String = "Personal Assistant"
+    override val agentType: AgentType = AgentType.CEO_PERSONAL_ASSISTANT
+    override val departmentName: String = "CEO - Personal Assistant"
     
     private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
     override val status: StateFlow<SystemStatus> = _status.asStateFlow()
@@ -44,6 +65,9 @@ class PersonalAssistantOrchestrator(
     private val voiceCommandHistory = mutableListOf<VoiceCommand>()
     private val userPreferences = mutableMapOf<String, Any>()
     private val activeConversations = mutableMapOf<String, Conversation>()
+    
+    // Sub-agents for Personal Assistant department
+    override val subAgents: List<SubAgent> = emptyList() // Will be populated with 5-8 specialized agents
     
     override val toolsets = listOf(
         OrchestratorTool(
@@ -444,6 +468,24 @@ class PersonalAssistantOrchestrator(
     private fun learnFromInteraction(data: LearningData) {
         Log.d(TAG, "Learning from interaction")
         knowledgeBase["interaction_${System.currentTimeMillis()}"] = data.input
+    }
+    
+    // New DepartmentalOrchestrator interface methods
+    override suspend fun delegateToSubAgent(task: NextGenTask, subAgentRole: String): Result<NextGenTask> {
+        Log.d(TAG, "Delegating task to sub-agent: $subAgentRole")
+        // Find the appropriate sub-agent and delegate the task
+        return Result.success(task.copy(status = TaskStatus.IN_PROGRESS))
+    }
+    
+    override suspend fun getSubAgentStatus(): Map<String, AgentStatus> {
+        // Return status of all sub-agents
+        return emptyMap() // Will be populated when sub-agents are initialized
+    }
+    
+    override suspend fun trainSubAgent(subAgentRole: String, trainingData: LearningData): Result<Unit> {
+        Log.d(TAG, "Training sub-agent: $subAgentRole")
+        // Train specific sub-agent with new data
+        return Result.success(Unit)
     }
 }
 

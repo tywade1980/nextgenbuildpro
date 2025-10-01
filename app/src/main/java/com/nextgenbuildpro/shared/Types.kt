@@ -35,16 +35,21 @@ enum class SystemStatus {
 
 /**
  * Agent types in the NextGen ecosystem
+ * Structured as corporate C-suite executives with operational agents beneath
  */
 enum class AgentType {
     ORCHESTRATOR,
-    // Departmental Orchestrators
-    PERSONAL_ASSISTANT_ORCHESTRATOR,
-    CRM_ORCHESTRATOR,
-    PROJECT_MANAGEMENT_ORCHESTRATOR,
-    ANALYTICS_ORCHESTRATOR,
-    DESIGN_DEPARTMENT_ORCHESTRATOR,
-    MARKETING_ORCHESTRATOR
+    // CEO Level - Main Personal Assistant (directs the orchestrator)
+    CEO_PERSONAL_ASSISTANT,
+    // C-Suite Department Heads (Orchestrators)
+    COO_OPERATIONS_ORCHESTRATOR,      // COO: Operations & Project Management
+    CFO_FINANCIAL_ORCHESTRATOR,        // CFO: Financial & Analytics
+    CHRO_CLIENT_HR_ORCHESTRATOR,       // CHRO/CMO: Client Relations & HR
+    CTO_DESIGN_ORCHESTRATOR,           // CTO: Design & Technology
+    CSO_SAFETY_ORCHESTRATOR,           // CSO: Safety & Compliance
+    // Operational Agent Types (specialized agents under C-suite)
+    OPERATIONAL_AGENT,
+    SUB_AGENT
 }
 
 /**
@@ -60,6 +65,130 @@ interface SpecializedAgent {
     suspend fun processTask(task: NextGenTask): Result<NextGenTask>
     suspend fun shutdown(): Result<Unit>
 }
+
+/**
+ * Sub-Agent Interface for fine-tuned specialized agents under department heads
+ * These are the 5-8 agents per department with specific tooling and ML capabilities
+ */
+interface SubAgent : SpecializedAgent {
+    val departmentHead: AgentType
+    val subAgentRole: String
+    val mlModel: MLModelConfig?
+    val mcpTools: List<MCPTool>
+    val apiIntegrations: List<APIIntegration>
+    
+    suspend fun executeSpecializedTask(task: NextGenTask): Result<NextGenTask>
+    suspend fun requestHumanApproval(task: NextGenTask, reason: String): Result<HumanApprovalRecord>
+    suspend fun learnFromFeedback(feedback: TaskFeedback): Result<Unit>
+}
+
+/**
+ * ML Model configuration for sub-agents
+ */
+data class MLModelConfig(
+    val modelName: String,
+    val modelType: MLModelType,
+    val version: String,
+    val trainedOn: String,
+    val accuracy: Double = 0.0,
+    val lastUpdated: LocalDateTime = LocalDateTime.now()
+)
+
+enum class MLModelType {
+    CLASSIFICATION, REGRESSION, NLP, COMPUTER_VISION, 
+    REINFORCEMENT_LEARNING, ENSEMBLE, CUSTOM, REASONING, AGENT_WORKFLOW
+}
+
+/**
+ * Multi-LLM System Configuration
+ * Supports specialized LLM models for different task types
+ */
+data class MultiLLMConfig(
+    val systemId: String,
+    val reasoningModel: LLMModel,      // For complex reasoning tasks
+    val agentWorkflowModel: LLMModel,  // For agent orchestration
+    val routingStrategy: LLMRoutingStrategy = LLMRoutingStrategy.TASK_BASED
+)
+
+/**
+ * LLM Model configuration
+ */
+data class LLMModel(
+    val modelId: String,
+    val modelName: String,
+    val provider: LLMProvider,
+    val modelType: LLMModelType,
+    val contextWindow: Int,
+    val temperature: Double = 0.7,
+    val maxTokens: Int = 4096,
+    val capabilities: List<LLMCapability>
+)
+
+enum class LLMProvider {
+    OPENAI, ANTHROPIC, GOOGLE, META, MISTRAL, LOCAL, CUSTOM
+}
+
+enum class LLMModelType {
+    REASONING,          // o1, o3-mini for complex reasoning
+    AGENT_WORKFLOW,     // GPT-4, Claude for agent coordination
+    FAST_INFERENCE,     // GPT-3.5-turbo for quick tasks
+    SPECIALIZED         // Domain-specific models
+}
+
+enum class LLMCapability {
+    REASONING, FUNCTION_CALLING, CODE_GENERATION, 
+    VISION, AUDIO, MULTIMODAL, LONG_CONTEXT
+}
+
+enum class LLMRoutingStrategy {
+    TASK_BASED,         // Route based on task complexity
+    LOAD_BALANCED,      // Distribute across models
+    COST_OPTIMIZED,     // Use cheaper models when possible
+    QUALITY_FIRST       // Always use best model
+}
+
+/**
+ * MCP Tool configuration
+ */
+data class MCPTool(
+    val toolId: String,
+    val toolName: String,
+    val description: String,
+    val capabilities: List<String>,
+    val isActive: Boolean = true
+)
+
+/**
+ * API Integration configuration
+ */
+data class APIIntegration(
+    val apiId: String,
+    val apiName: String,
+    val endpoint: String,
+    val authType: APIAuthType,
+    val rateLimits: APIRateLimits? = null
+)
+
+enum class APIAuthType {
+    API_KEY, OAUTH2, BASIC_AUTH, JWT, NONE
+}
+
+data class APIRateLimits(
+    val requestsPerMinute: Int,
+    val requestsPerDay: Int
+)
+
+/**
+ * Task feedback for learning
+ */
+data class TaskFeedback(
+    val taskId: EntityId,
+    val wasSuccessful: Boolean,
+    val humanCorrections: Map<String, Any> = emptyMap(),
+    val executionTime: Long,
+    val qualityScore: Double, // 0.0 to 1.0
+    val notes: String = ""
+)
 
 // ===== DATA MODELS =====
 
@@ -92,7 +221,8 @@ enum class MessageType {
  */
 data class NextGenTask(
     val id: EntityId = UUID.randomUUID().toString(),
-    val title: String,
+    val title: String = "",
+    val type: String = "",
     val description: String,
     val assignedAgent: AgentType,
     val priority: Priority,
@@ -102,7 +232,11 @@ data class NextGenTask(
     val dueDate: LocalDateTime? = null,
     val dependencies: List<EntityId> = emptyList(),
     val metadata: Map<String, Any> = emptyMap(),
-    val progress: Float = 0f // 0.0 to 1.0
+    val parameters: Map<String, Any> = emptyMap(),
+    val result: Map<String, Any>? = null,
+    val progress: Float = 0f, // 0.0 to 1.0
+    val requiresHumanApproval: Boolean = false,
+    val automationLevel: AutomationLevel = AutomationLevel.HUMAN_IN_LOOP
 )
 
 /**
@@ -111,6 +245,42 @@ data class NextGenTask(
 enum class TaskStatus {
     PENDING, IN_PROGRESS, PAUSED, COMPLETED, FAILED, CANCELLED
 }
+
+/**
+ * Automation level for tasks - tracks human-in-the-loop progression
+ */
+enum class AutomationLevel {
+    MANUAL,              // Requires human execution
+    HUMAN_IN_LOOP,       // AI assists, human approves
+    SUPERVISED,          // AI executes, human reviews
+    AUTOMATED,           // Fully automated, no approval needed
+    LEARNING             // System is learning this task pattern
+}
+
+/**
+ * Human approval tracking for tasks
+ */
+data class HumanApprovalRecord(
+    val taskId: EntityId,
+    val approver: String,
+    val approved: Boolean,
+    val comments: String = "",
+    val timestamp: LocalDateTime = LocalDateTime.now(),
+    val reviewTime: Long = 0L // milliseconds
+)
+
+/**
+ * Task pattern for automation detection
+ */
+data class TaskPattern(
+    val patternId: EntityId = UUID.randomUUID().toString(),
+    val taskType: String,
+    val occurrences: Int = 0,
+    val successRate: Double = 0.0,
+    val averageReviewTime: Long = 0L,
+    val consistentOutcomes: Boolean = false,
+    val readyForAutomation: Boolean = false
+)
 
 /**
  * Agent capability definition
@@ -391,17 +561,34 @@ data class PerformanceMetrics(
 // ===== DEPARTMENTAL ORCHESTRATOR TYPES =====
 
 /**
- * Base interface for departmental orchestrators
+ * Base interface for departmental orchestrators (Department Heads)
+ * Department heads manage 5-8 sub-agents with specialized capabilities
  */
 interface DepartmentalOrchestrator : LearningAgent {
     val departmentName: String
     val toolsets: List<OrchestratorTool>
     val sharedContext: StateFlow<SharedContext>
+    val subAgents: List<SubAgent>
     
     suspend fun processVoiceCommand(command: String): Result<String>
     suspend fun getSpecializedCapabilities(): List<AgentCapability>
     suspend fun coordinateWithOtherDepartments(request: InterDepartmentalRequest): Result<InterDepartmentalResponse>
+    suspend fun delegateToSubAgent(task: NextGenTask, subAgentRole: String): Result<NextGenTask>
+    suspend fun getSubAgentStatus(): Map<String, AgentStatus>
+    suspend fun trainSubAgent(subAgentRole: String, trainingData: LearningData): Result<Unit>
 }
+
+/**
+ * Agent status information
+ */
+data class AgentStatus(
+    val agentId: String,
+    val isActive: Boolean,
+    val currentTasks: Int,
+    val completedTasks: Int,
+    val successRate: Double,
+    val lastActivity: LocalDateTime?
+)
 
 /**
  * Shared context across all orchestrators
@@ -587,4 +774,130 @@ data class EquipmentRate(
     val weeklyRate: Double,
     val monthlyRate: Double,
     val category: String
+)
+
+// ===== CONSTRUCTION KNOWLEDGE BASE =====
+
+/**
+ * Construction-specific pricing data (2025+ data)
+ * Used by CFO's Estimator Agent for accurate job costing
+ */
+data class ConstructionPricingData(
+    val costDatabase: CostDatabase2025,
+    val laborRates: Map<String, LaborRate>,
+    val materialPrices: Map<String, MaterialPrice>,
+    val equipmentRates: Map<String, EquipmentRentalRate>,
+    val assemblyTimes: Map<String, AssemblyTime>,
+    val lastUpdated: LocalDateTime
+)
+
+data class CostDatabase2025(
+    val source: String,  // "RSMeans", "BLS", "regional"
+    val version: String,
+    val regionalFactors: Map<String, Double>,  // Regional cost multipliers
+    val inflationRate: Double,
+    val categories: Map<String, CostCategory>
+)
+
+data class CostCategory(
+    val categoryId: String,
+    val name: String,
+    val baseUnit: String,
+    val averageCost: Double,
+    val costRange: CostRange,
+    val laborComponent: Double,  // Percentage
+    val materialComponent: Double  // Percentage
+)
+
+data class AssemblyTime(
+    val assemblyId: String,
+    val description: String,
+    val crewSize: Int,
+    val crewComposition: Map<String, Int>,  // Trade -> count
+    val hoursPerUnit: Double,
+    val unitsPerDay: Double,
+    val difficultyFactor: Double = 1.0
+)
+
+data class MaterialPrice(
+    val materialId: String,
+    val name: String,
+    val unit: String,
+    val pricePerUnit: Double,
+    val supplier: String,
+    val leadTime: Int,  // Days
+    val minimumOrder: Double,
+    val availability: MaterialAvailability
+)
+
+enum class MaterialAvailability {
+    IN_STOCK, LOW_STOCK, BACKORDER, SPECIAL_ORDER, DISCONTINUED
+}
+
+data class EquipmentRentalRate(
+    val equipmentId: String,
+    val name: String,
+    val hourlyRate: Double,
+    val dailyRate: Double,
+    val weeklyRate: Double,
+    val monthlyRate: Double,
+    val deliveryFee: Double,
+    val operator: OperatorRequirement
+)
+
+enum class OperatorRequirement {
+    INCLUDED, NOT_INCLUDED, OPTIONAL, CERTIFIED_ONLY
+}
+
+/**
+ * Project lifecycle data flow structure
+ * Enables natural workflow between C-suite executives
+ */
+data class ProjectLifecycleFlow(
+    val projectId: String,
+    val currentPhase: ProjectPhase,
+    val flowSteps: List<FlowStep>,
+    val dependencies: Map<String, List<String>>
+)
+
+enum class ProjectPhase {
+    ESTIMATING, SCHEDULING, PROCUREMENT, EXECUTION, CLOSEOUT
+}
+
+data class FlowStep(
+    val stepId: String,
+    val executiveOwner: AgentType,  // Which C-suite executive
+    val operationalAgent: String,   // Which sub-agent
+    val action: String,
+    val inputs: List<DataArtifact>,
+    val outputs: List<DataArtifact>,
+    val nextSteps: List<String>,
+    val automationLevel: AutomationLevel
+)
+
+data class DataArtifact(
+    val artifactId: String,
+    val artifactType: ArtifactType,
+    val data: Map<String, Any>,
+    val producedBy: String,
+    val consumedBy: List<String>,
+    val timestamp: LocalDateTime
+)
+
+enum class ArtifactType {
+    ESTIMATE, LABOR_DATA, SCHEDULE, GANTT_CHART, 
+    MATERIAL_LIST, CREW_ASSIGNMENT, PROGRESS_REPORT,
+    INVOICE, BUDGET, ANALYTICS_REPORT
+}
+
+/**
+ * Example workflow: Estimate → Schedule → Execute
+ * CFO Estimator → COO Field Operations → Analytics
+ */
+data class WorkflowHandoff(
+    val fromExecutive: AgentType,
+    val toExecutive: AgentType,
+    val artifact: DataArtifact,
+    val handoffReason: String,
+    val completionCriteria: List<String>
 )

@@ -1,7 +1,7 @@
 # NextGen BuildPro - AI OS Architecture
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/tywade1980/nextgenbuildpro)
-[![AI Agents](https://img.shields.io/badge/ai%20agents-5-blue.svg)](#ai-agents)
+[![C-Suite Executives](https://img.shields.io/badge/c--suite-6-blue.svg)](#corporate-c-suite-executive-structure)
 [![Platform](https://img.shields.io/badge/platform-android-green.svg)](https://developer.android.com)
 [![License](https://img.shields.io/badge/license-proprietary-red.svg)](#license)
 
@@ -18,58 +18,220 @@ The NextGen AI OS is built on a revolutionary multi-agent architecture that comb
 ### 🧠 Core AI Agent Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    NextGen AI OS                            │
-├─────────────────────────────────────────────────────────────┤
-│                 Living Environment Mesh                     │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
-│  │   CRM       │ │  Personal   │ │  Project    │           │
-│  │Orchestrator │ │  Assistant  │ │ Management  │           │
-│  └─────────────┘ └─────────────┘ └─────────────┘           │
-│  ┌─────────────┐ ┌─────────────┐                           │
-│  │ Analytics   │ │   Design    │                           │
-│  │Orchestrator │ │ Department  │                           │
-│  └─────────────┘ └─────────────┘                           │
-├─────────────────────────────────────────────────────────────┤
-│               Main Orchestrator                             │
-├─────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
-│  │CallScreen   │ │ DialerApp   │ │Construction │           │
-│  │  Service    │ │             │ │ Platform    │           │
-│  └─────────────┘ └─────────────┘ └─────────────┘           │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                       NextGen AI OS v2.0                            │
+│                  Corporate C-Suite Architecture                     │
+├─────────────────────────────────────────────────────────────────────┤
+│                     Living Environment Mesh                         │
+│                                                                     │
+│  ┌────────────────────────────────────────────────────────────┐    │
+│  │          CEO (Personal Assistant - Executive Interface)     │    │
+│  │         Directs Main Orchestrator & C-Suite                 │    │
+│  └────────────────────────────────────────────────────────────┘    │
+│                              ↓                                      │
+│  ┌────────────────────────────────────────────────────────────┐    │
+│  │                  Main Orchestrator                          │    │
+│  │           Coordinates C-Suite Executives                    │    │
+│  └────────────────────────────────────────────────────────────┘    │
+│                              ↓                                      │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │              C-Suite Executives (Department Heads)           │   │
+│  ├─────────────────────────────────────────────────────────────┤   │
+│  │  COO    │   CFO   │  CHRO/CMO  │   CTO   │    CSO         │   │
+│  │ (Ops)   │ (Finance)│ (Client/HR)│ (Design)│  (Safety)      │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                              ↓                                      │
+│  Each C-Suite Executive manages 5-8 Operational Agents             │
+│  (Sub-Agents with ML models, MCP tools, API integrations)          │
+├─────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                  │
+│  │CallScreen   │ │ DialerApp   │ │Construction │                  │
+│  │  Service    │ │             │ │ Platform    │                  │
+│  └─────────────┘ └─────────────┘ └─────────────┘                  │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
-## 🤖 Specialized Agents
+## 🤖 Corporate C-Suite Executive Structure
 
-The system uses specialized departmental orchestrators that follow the SpecializedAgent framework:
+The system mirrors a corporate hierarchy with C-suite executives managing operational agents in their domains.
 
-### CRM Orchestrator
-**Role**: Customer relationship and contact management
-- **Capabilities**: Smart contact creation from calls/SMS, lead scoring, client engagement tracking
-- **Implementation**: ContactManagementAgent.kt
-- **Key Feature**: Automated contact enrichment from multiple sources
+### CEO Level
 
-### Personal Assistant Orchestrator
-**Role**: Voice command processing and personal assistance
-- **Capabilities**: Bilingual voice recognition (English/Spanish), construction-specific vocabulary
-- **Implementation**: VoiceCommandAgent.kt
-- **Key Feature**: Natural language understanding for construction tasks
+#### CEO (Personal Assistant - Executive Interface)
+**Role**: Highest-level executive directing Main Orchestrator and coordinating C-suite
+- **Primary Functions**: Voice/chat interface, cross-department coordination, executive decisions, emergency response
+- **Operational Agents**: Voice Command Processor, Executive Assistant, Context Manager, Emergency Response, Cross-Department Coordinator, Decision Support, Communication Hub
+- **Key Feature**: She directs the orchestrator which coordinates with C-suite executives
 
-### Project Management Orchestrator  
-**Role**: Project planning and resource coordination
-- **Capabilities**: Timeline management, resource allocation, task coordination
-- **Key Feature**: Integrated construction project lifecycle management
+### C-Suite Executives (Department Heads)
 
-### Design Department Orchestrator
-**Role**: Design coordination and blueprint management
-- **Capabilities**: Design workflow coordination, visual planning support
-- **Key Feature**: Streamlined design-to-construction handoff
+#### 1. COO (Chief Operating Officer) - Operations
+**Role**: All operational aspects with office and field branches
 
-### Analytics Orchestrator
-**Role**: Data analysis and reporting
-- **Capabilities**: Project analytics, performance insights, predictive modeling
-- **Key Feature**: Real-time construction metrics and KPI tracking
+**OFFICE OPERATIONS:**
+- Project management and planning
+- Resource allocation and scheduling  
+- Equipment management (fleet, maintenance, tool receipts for insurance)
+
+**FIELD OPERATIONS:**
+- Crew management and site logistics
+- Daily field operations and material delivery
+- Field quality control and progress tracking
+
+**Operational Agents (Sub-Agents):**
+- Project Manager Agent
+- Resource Coordinator Agent
+- Equipment Manager Agent
+- Field Supervisor Agent
+- Crew Scheduler Agent
+- Site Logistics Agent
+- Field Quality Inspector Agent
+- Progress Tracker Agent
+
+**Human-in-Loop**: Daily crew assignments, equipment purchases, major project decisions, quality issues
+
+#### 2. CFO (Chief Financial Officer) - Financial
+**Role**: All financial and analytical functions
+
+**FINANCIAL OPERATIONS:**
+- Cost estimation and bidding
+- Accounting and bookkeeping
+- Invoicing and payroll
+- Budget management
+
+**ANALYTICS & REPORTING:**
+- Performance analytics and KPIs
+- Financial reporting and insights
+- Predictive analytics and forecasting
+
+**Operational Agents (Sub-Agents):**
+- Estimator Agent (cost analysis, bidding)
+- Accountant Agent (bookkeeping)
+- Payroll Agent (compensation)
+- Invoice Manager Agent (AR/AP)
+- Budget Analyst Agent (tracking)
+- Financial Analyst Agent (reporting)
+- Data Analyst Agent (performance)
+- Predictive Analytics Agent (forecasting)
+
+**Human-in-Loop**: Bid approval, final pricing, payroll review, financial decisions
+
+#### 3. CHRO/CMO (Chief HR & Marketing Officer) - Client Relations & HR
+**Role**: Client relationships and human resources
+
+**CLIENT RELATIONS & MARKETING:**
+- CRM and contact management
+- Lead scoring and engagement
+- Marketing campaigns and proposals
+- Client satisfaction (quality, punch lists)
+
+**HUMAN RESOURCES:**
+- Recruitment and onboarding
+- Training and certifications
+- Time tracking and attendance
+- Performance management
+
+**Operational Agents (Sub-Agents):**
+- Contact Manager Agent (CRM)
+- Lead Scoring Agent (qualification)
+- Marketing Manager Agent (campaigns)
+- Proposal Writer Agent (bids)
+- Client Satisfaction Agent (quality)
+- Recruiter Agent (hiring)
+- Training Coordinator Agent (certifications)
+- HR Administrator Agent (time tracking)
+
+**Human-in-Loop**: Hiring decisions, client proposals, major client issues, training approval
+
+#### 4. CTO (Chief Technology Officer) - Design & Technology
+**Role**: Design and technical functions
+
+**DESIGN & ENGINEERING:**
+- 3D modeling and visualization
+- Blueprint generation and management
+- Shop drawings and technical specs
+
+**TECHNICAL DELIVERABLES:**
+- CAD and technical drawings
+- Material quantity analysis
+- Design modification tracking
+
+**Operational Agents (Sub-Agents):**
+- CAD Specialist Agent (2D drafting)
+- 3D Modeler Agent (visualization)
+- Blueprint Manager Agent (plan management)
+- Specification Writer Agent (technical specs)
+- Shop Drawing Agent (detailed drawings)
+- Rendering Agent (photo-realistic)
+- Design Coordinator Agent (change tracking)
+
+**Human-in-Loop**: Design approvals, client presentations, major design changes
+
+#### 5. CSO (Chief Safety Officer) - Safety & Compliance
+**Role**: Safety, compliance, and regulatory functions
+
+**SAFETY MANAGEMENT:**
+- OSHA compliance monitoring
+- Safety inspections and protocols
+- Incident reporting and investigation
+- Safety training and certification
+
+**COMPLIANCE & PERMITS:**
+- Permit applications and tracking
+- Regulatory compliance monitoring
+- Code compliance verification
+
+**Operational Agents (Sub-Agents):**
+- OSHA Compliance Agent (regulations)
+- Safety Inspector Agent (site inspections)
+- Permit Coordinator Agent (applications)
+- Incident Response Agent (safety incidents)
+- Training Administrator Agent (certifications)
+- Compliance Monitor Agent (regulatory)
+- Hazard Assessment Agent (risk identification)
+
+**Human-in-Loop**: Safety incident response, permit applications, compliance decisions
+
+## 🔄 Human-in-the-Loop Framework
+
+The system preserves human control and expertise through a progressive automation model:
+
+### Automation Levels
+1. **MANUAL** - Requires human execution
+2. **HUMAN_IN_LOOP** - AI assists, human approves (default for new tasks)
+3. **SUPERVISED** - AI executes, human reviews
+4. **AUTOMATED** - Fully automated (only after proven consistency)
+5. **LEARNING** - System is actively learning task patterns
+
+### Automation Progression
+- All new tasks start as HUMAN_IN_LOOP
+- System tracks task patterns: occurrences, success rate, review time, outcome consistency
+- When a task shows consistent results with fast review times, it's flagged for automation
+- Human approval required before moving to AUTOMATED level
+- Any failures or concerns revert tasks to higher supervision levels
+
+### Sub-Agent Architecture
+Each department head manages 5-8 specialized sub-agents:
+- **ML Models**: Fine-tuned for specific tasks (NLP, classification, prediction, etc.)
+- **MCP Tools**: Model Context Protocol integration for enhanced capabilities
+- **API Integrations**: Third-party system connections (suppliers, accounting, etc.)
+- **Human Approval**: Built-in approval workflows for critical decisions
+
+### C-Suite Executive Coordination
+- CEO coordinates with all C-suite executives for strategic alignment
+- Inter-departmental requests handled automatically between executives
+- Escalation to CEO for conflicts or cross-department priorities
+- Main Orchestrator facilitates complex multi-executive initiatives
+
+## 🎯 Corporate Architecture Benefits
+
+1. **Mirrors Real Companies** - C-suite structure (CEO, COO, CFO, etc.) universally understood
+2. **Clear Hierarchy** - Executive → Operational Agent structure is intuitive
+3. **Operational Agents = Roles** - Former departments become specialized operational agents
+4. **Branch Structure** - Executives can manage multiple operational branches (e.g., COO → Office + Field)
+5. **Professional Terminology** - Corporate titles recognized across industries
+6. **Scalable** - Easy to add VPs or directors under C-suite as needed
+7. **No Lost Functionality** - All roles preserved as operational agents under appropriate executives
 
 ## 🌐 Living Environment Mesh
 

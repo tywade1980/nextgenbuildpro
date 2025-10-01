@@ -12,24 +12,25 @@ import kotlinx.coroutines.flow.*
 /**
  * Orchestrator Manager for NextGen BuildPro v2.0
  * 
- * Manages all 6 departmental orchestrators and their 48 specialized agents.
- * Provides centralized coordination, MCP integration, and navigation management.
+ * Manages C-suite executive orchestrators and their operational agents.
+ * Structured as a corporate hierarchy: CEO coordinates with COO, CFO, CHRO, CTO, CSO.
+ * Each C-suite executive manages 5-8 operational agents (sub-agents) in their domain.
  */
-class OrchestratorManager {
+class OrchestratorManager(private val context: Context) {
     
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val mcpServer = MCPServer.getInstance()
     private val navigationManager = IntuitiveNavigationManager()
     
-    // Orchestrators
-    private lateinit var personalAssistantOrchestrator: PersonalAssistantOrchestrator
-    private lateinit var crmOrchestrator: CRMOrchestrator
-    private lateinit var projectManagementOrchestrator: ProjectManagementOrchestrator
-    private lateinit var analyticsOrchestrator: AnalyticsOrchestrator
-    private lateinit var designDepartmentOrchestrator: DesignDepartmentOrchestrator
-    private lateinit var marketingOrchestrator: MarketingOrchestrator
+    // C-Suite Executive Orchestrators
+    private lateinit var ceoPersonalAssistantOrchestrator: CEOPersonalAssistantOrchestrator
+    private lateinit var cooOperationsOrchestrator: COOOperationsOrchestrator
+    private lateinit var cfoFinancialOrchestrator: CFOFinancialOrchestrator
+    private lateinit var chroClientHROrchestrator: CHROClientHROrchestrator
+    private lateinit var ctoDesignOrchestrator: CTODesignOrchestrator
+    private lateinit var csoSafetyOrchestrator: CSOSafetyOrchestrator
     
-    // Specialized agents registry (8 per orchestrator = 48 total)
+    // Operational agents registry (5-8 per C-suite executive)
     private val specializedAgents = mutableMapOf<String, SpecializedAgent>()
     
     private val _isInitialized = MutableStateFlow(false)
@@ -130,7 +131,7 @@ class OrchestratorManager {
         }
         
         return SystemMetrics(
-            totalOrchestrators = 6,
+            totalOrchestrators = 6, // 6 C-suite executives
             totalSpecializedAgents = specializedAgents.size,
             activeAgents = activeAgents,
             systemStatus = _systemStatus.value,
@@ -140,47 +141,48 @@ class OrchestratorManager {
     }
     
     private suspend fun initializeOrchestrators() {
-        personalAssistantOrchestrator = PersonalAssistantOrchestrator()
-        crmOrchestrator = CRMOrchestrator()
-        projectManagementOrchestrator = ProjectManagementOrchestrator()
-        analyticsOrchestrator = AnalyticsOrchestrator()
-        designDepartmentOrchestrator = DesignDepartmentOrchestrator()
-        marketingOrchestrator = MarketingOrchestrator()
+        // C-Suite Executive Orchestrators
+        ceoPersonalAssistantOrchestrator = CEOPersonalAssistantOrchestrator(context)
+        cooOperationsOrchestrator = COOOperationsOrchestrator(context)
+        cfoFinancialOrchestrator = CFOFinancialOrchestrator(context)
+        chroClientHROrchestrator = CHROClientHROrchestrator(context)
+        ctoDesignOrchestrator = CTODesignOrchestrator(context)
+        csoSafetyOrchestrator = CSOSafetyOrchestrator(context)
         
-        // Initialize each orchestrator
+        // Initialize all C-suite executives (6 total)
         listOf(
-            personalAssistantOrchestrator,
-            crmOrchestrator,
-            projectManagementOrchestrator,
-            analyticsOrchestrator,
-            designDepartmentOrchestrator,
-            marketingOrchestrator
+            ceoPersonalAssistantOrchestrator,
+            cooOperationsOrchestrator,
+            cfoFinancialOrchestrator,
+            chroClientHROrchestrator,
+            ctoDesignOrchestrator,
+            csoSafetyOrchestrator
         ).forEach { orchestrator ->
             orchestrator.initialize()
         }
     }
     
     private suspend fun initializeSpecializedAgents() {
-        // Personal Assistant Orchestrator Agents (8)
-        val personalAssistantAgents = listOf(
+        // CEO Personal Assistant Operational Agents
+        val ceoAgents = listOf(
             VoiceCommandAgent(),
-            // Add 7 more specialized agents for Personal Assistant
+            // Add more specialized agents for CEO
         )
         
-        // CRM Orchestrator Agents (8)
-        val crmAgents = listOf(
+        // CHRO Client Relations & HR Operational Agents
+        val chroAgents = listOf(
             ContactManagementAgent(),
-            // Add 7 more specialized agents for CRM
+            // Add more specialized agents for CHRO
         )
         
-        // Initialize all agents
-        val allAgents = personalAssistantAgents + crmAgents
+        // Initialize all operational agents
+        val allAgents = ceoAgents + chroAgents
         
         allAgents.forEach { agent ->
             try {
                 agent.initialize().getOrThrow()
                 specializedAgents[agent.agentId] = agent
-                Log.d("OrchestratorManager", "Initialized agent: ${agent.agentId}")
+                Log.d("OrchestratorManager", "Initialized operational agent: ${agent.agentId}")
             } catch (e: Exception) {
                 Log.e("OrchestratorManager", "Failed to initialize agent: ${agent.agentId}", e)
             }
@@ -194,13 +196,26 @@ class OrchestratorManager {
     
     private fun getOrchestratorForTask(task: NextGenTask): DepartmentalOrchestrator {
         return when (task.type) {
-            "voice_command", "emergency_response" -> personalAssistantOrchestrator
-            "contact_management", "lead_management" -> crmOrchestrator
-            "project_creation", "scheduling", "cost_estimation" -> projectManagementOrchestrator
-            "analytics", "reporting", "predictions" -> analyticsOrchestrator
-            "design", "3d_modeling", "blueprints" -> designDepartmentOrchestrator
-            "marketing", "proposals", "campaigns" -> marketingOrchestrator
-            else -> personalAssistantOrchestrator // Default to personal assistant
+            "voice_command", "emergency_response", "executive_decision" -> ceoPersonalAssistantOrchestrator
+            // COO: Operations & PM tasks (field ops, equipment, PM, field quality)
+            "crew_scheduling", "material_delivery", "field_issue",
+            "equipment_tracking", "maintenance", "rental", "tool_receipt",
+            "project_creation", "scheduling", "resource_allocation",
+            "field_inspection", "progress_report", "quality_check" -> cooOperationsOrchestrator
+            // CFO: Financial & Analytics tasks (estimating, accounting, analytics)
+            "cost_estimation", "bid_preparation", "value_engineering", "change_order",
+            "invoicing", "payroll", "financial_report", "budget_tracking",
+            "analytics", "reporting", "predictions", "performance_metrics" -> cfoFinancialOrchestrator
+            // CHRO: Client Relations & HR tasks (CRM, marketing, HR, client quality)
+            "contact_management", "lead_management", "client_communication",
+            "proposal_creation", "marketing_campaign", "content_creation",
+            "recruitment", "onboarding", "training", "time_tracking",
+            "client_punch_list", "client_satisfaction", "defect_resolution" -> chroClientHROrchestrator
+            // CTO: Design tasks
+            "design", "3d_modeling", "blueprints", "cad", "technical_drawing" -> ctoDesignOrchestrator
+            // CSO: Safety & Compliance tasks
+            "safety_inspection", "permit_application", "compliance_check", "incident_report" -> csoSafetyOrchestrator
+            else -> ceoPersonalAssistantOrchestrator // Default to CEO
         }
     }
     
