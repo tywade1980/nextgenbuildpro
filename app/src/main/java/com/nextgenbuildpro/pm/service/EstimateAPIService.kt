@@ -102,7 +102,7 @@ class EstimateAPIService(private val context: Context) {
      */
     suspend fun searchAssemblies(query: String): Result<List<JSONObject>> {
         return try {
-            val catalogueResult = catalogueService.getCompleteCatalogue()
+            val catalogueResult = catalogueService.getCategoriesWithChildren()
             if (catalogueResult.isFailure) {
                 return Result.failure(catalogueResult.exceptionOrNull()!!)
             }
@@ -111,10 +111,10 @@ class EstimateAPIService(private val context: Context) {
             val matchingAssemblies = mutableListOf<JSONObject>()
             
             // Search through all assemblies in all categories
-            categories.forEach { categoryWithChildren ->
-                categoryWithChildren.trades.forEach { tradeWithChildren ->
-                    tradeWithChildren.scopes.forEach { scopeWithChildren ->
-                        scopeWithChildren.assemblies.forEach { assemblyWithChildren ->
+            categories.forEach { categoryWithChildren: CategoryWithChildren ->
+                categoryWithChildren.trades.forEach { tradeWithChildren: TradeWithChildren ->
+                    tradeWithChildren.scopes.forEach { scopeWithChildren: ScopeWithChildren ->
+                        scopeWithChildren.assemblies.forEach { assemblyWithChildren: AssemblyWithChildren ->
                             val assembly = assemblyWithChildren.assembly
                             
                             // Check if query matches assembly name or description
@@ -125,8 +125,8 @@ class EstimateAPIService(private val context: Context) {
                                     put("id", assembly.id)
                                     put("name", assembly.name)
                                     put("description", assembly.description)
-                                    put("estimatedCost", assembly.totalCost)
-                                    put("unit", assembly.unit)
+                                    put("estimatedCost", assembly.estimatedCost)
+                                    put("unit", assembly.unitOfMeasure)
                                     put("laborHours", assembly.laborHours)
                                     put("materialCost", assembly.materialCost)
                                     put("laborCost", assembly.laborCost)
@@ -155,7 +155,7 @@ class EstimateAPIService(private val context: Context) {
     ): Result<JSONObject> {
         return try {
             // Fetch the assembly from catalogue
-            val catalogueResult = catalogueService.getCompleteCatalogue()
+            val catalogueResult = catalogueService.getCategoriesWithChildren()
             if (catalogueResult.isFailure) {
                 return Result.failure(catalogueResult.exceptionOrNull()!!)
             }
@@ -164,10 +164,10 @@ class EstimateAPIService(private val context: Context) {
             var foundAssembly: com.nextgenbuildpro.pm.data.model.Assembly? = null
             
             // Find the assembly by ID
-            categories.forEach { categoryWithChildren ->
-                categoryWithChildren.trades.forEach { tradeWithChildren ->
-                    tradeWithChildren.scopes.forEach { scopeWithChildren ->
-                        scopeWithChildren.assemblies.forEach { assemblyWithChildren ->
+            categories.forEach { categoryWithChildren: CategoryWithChildren ->
+                categoryWithChildren.trades.forEach { tradeWithChildren: TradeWithChildren ->
+                    tradeWithChildren.scopes.forEach { scopeWithChildren: ScopeWithChildren ->
+                        scopeWithChildren.assemblies.forEach { assemblyWithChildren: AssemblyWithChildren ->
                             if (assemblyWithChildren.assembly.id == assemblyId) {
                                 foundAssembly = assemblyWithChildren.assembly
                             }
@@ -188,9 +188,9 @@ class EstimateAPIService(private val context: Context) {
                 put("name", assembly.name)
                 put("description", assembly.description)
                 put("quantity", quantity)
-                put("unit", assembly.unit)
-                put("unitCost", assembly.totalCost)
-                put("totalCost", assembly.totalCost * quantity)
+                put("unit", assembly.unitOfMeasure)
+                put("unitCost", assembly.estimatedCost)
+                put("totalCost", assembly.estimatedCost * quantity)
                 put("laborHours", assembly.laborHours * quantity)
                 put("materialCost", assembly.materialCost * quantity)
                 put("laborCost", assembly.laborCost * quantity)
@@ -213,7 +213,7 @@ class EstimateAPIService(private val context: Context) {
             val estimate = TemplateEstimate(
                 id = estimateData.optString("id", java.util.UUID.randomUUID().toString()),
                 projectId = estimateData.optString("projectId", ""),
-                contextMode = com.nextgenbuildpro.pm.data.model.ContextMode.SINGLE_FAMILY_NEW_CONSTRUCTION,
+                contextMode = com.nextgenbuildpro.pm.data.model.ContextMode.NEW_CONSTRUCTION,
                 assemblies = mutableListOf(), // Will be populated from sections
                 subtotalLabor = 0.0,
                 subtotalMaterial = 0.0,
@@ -283,6 +283,8 @@ class EstimateAPIService(private val context: Context) {
             }
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
         }
     }
     
