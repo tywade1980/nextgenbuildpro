@@ -78,7 +78,7 @@ class OrchestratorManager(
      */
     suspend fun processTask(task: NextGenTask): Result<NextGenTask> = try {
         val orchestrator = getOrchestratorForTask(task)
-        orchestrator.processTask(task)
+        orchestrator.executeTask(task)
     } catch (e: Exception) {
         Log.e("OrchestratorManager", "Failed to process task: ${task.description}", e)
         Result.failure(e)

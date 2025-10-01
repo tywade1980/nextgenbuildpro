@@ -611,4 +611,3 @@ data class ProjectDetails(
     var location: String = "",
     var specialRequirements: List<String> = emptyList()
 )
-)
