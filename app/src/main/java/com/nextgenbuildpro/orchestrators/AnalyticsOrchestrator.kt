@@ -42,6 +42,8 @@ class AnalyticsOrchestrator(
     
     private val mutex = Mutex()
     private val knowledgeBase = mutableMapOf<String, Any>()
+    override val subAgents: List<SubAgent> = emptyList() // Will be populated with specialized agents
+
     private val metricsDatabase = mutableMapOf<String, AnalyticsMetric>()
     private val reportTemplates = mutableMapOf<String, ReportTemplate>()
     private val dashboards = mutableMapOf<String, Dashboard>()
@@ -610,129 +612,17 @@ class AnalyticsOrchestrator(
     } catch (e: Exception) {
         Result.failure(e)
     }
+    
+    // DepartmentalOrchestrator interface methods for sub-agent management
+    override suspend fun delegateToSubAgent(task: NextGenTask, subAgentRole: String): Result<NextGenTask> {
+        return Result.success(task.copy(status = TaskStatus.IN_PROGRESS))
+    }
+    
+    override suspend fun getSubAgentStatus(): Map<String, AgentStatus> {
+        return emptyMap()
+    }
+    
+    override suspend fun trainSubAgent(subAgentRole: String, trainingData: LearningData): Result<Unit> {
+        return Result.success(Unit)
+    }
 }
-
-// Supporting data classes for Analytics
-data class AnalyticsMetric(
-    val name: String,
-    val value: Double,
-    val unit: String,
-    val timestamp: LocalDateTime
-)
-
-data class ReportTemplate(
-    val name: String,
-    val description: String,
-    val type: ReportType,
-    val sections: List<String>
-)
-
-enum class ReportType {
-    EXECUTIVE, FINANCIAL, PERFORMANCE, COMPLIANCE, CUSTOM
-}
-
-data class Dashboard(
-    val id: String,
-    val name: String,
-    val type: DashboardType,
-    val components: List<String>
-)
-
-enum class DashboardType {
-    EXECUTIVE, OPERATIONAL, FINANCIAL, PROJECT_SPECIFIC
-}
-
-data class PredictiveModel(
-    val name: String,
-    val description: String,
-    val version: String,
-    val accuracy: Double
-)
-
-data class KPIDefinition(
-    val name: String,
-    val description: String,
-    val unit: String,
-    val target: Double
-)
-
-data class KPIValue(
-    val current: Double,
-    val target: Double,
-    val unit: String
-)
-
-data class DataProcessor(
-    val name: String,
-    val description: String,
-    val isActive: Boolean = true
-)
-
-data class ExecutiveDashboard(
-    val id: String,
-    val generatedAt: LocalDateTime,
-    val kpis: Map<String, KPIValue>,
-    val projectHealth: ProjectHealthSummary,
-    val financialSummary: FinancialSummary,
-    val performanceMetrics: Map<String, Double>,
-    val alerts: List<Alert>
-)
-
-data class ProjectHealthSummary(
-    val totalProjects: Int,
-    val onTrackProjects: Int,
-    val delayedProjects: Int,
-    val atRiskProjects: Int,
-    val overallHealth: Double
-)
-
-data class FinancialSummary(
-    val totalRevenue: Double,
-    val totalCosts: Double,
-    val grossProfit: Double,
-    val profitMargin: Double,
-    val cashFlow: Double
-)
-
-data class Alert(
-    val message: String,
-    val severity: AlertSeverity,
-    val timestamp: LocalDateTime = LocalDateTime.now()
-)
-
-enum class AlertSeverity {
-    LOW, MEDIUM, HIGH, CRITICAL
-}
-
-data class CostPrediction(
-    val projectId: String,
-    val predictedCost: Double,
-    val confidenceLevel: Double,
-    val variance: Double,
-    val factors: List<PredictionFactor>,
-    val modelVersion: String,
-    val createdAt: LocalDateTime
-)
-
-data class PredictionFactor(
-    val name: String,
-    val value: Any,
-    val weight: Double
-)
-
-data class ProductivityAnalysis(
-    val timeframe: String,
-    val crewMetrics: Map<String, ProductivityMetrics>,
-    val averageEfficiency: Double,
-    val topPerformers: List<String>,
-    val improvementAreas: List<String>,
-    val recommendations: List<String>,
-    val generatedAt: LocalDateTime
-)
-
-data class ProductivityMetrics(
-    val efficiency: Double, // percentage
-    val hoursPerTask: Double,
-    val qualityScore: Double, // percentage
-    val projectsCompleted: Int
-)

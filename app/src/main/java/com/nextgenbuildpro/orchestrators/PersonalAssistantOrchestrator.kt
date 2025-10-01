@@ -45,6 +45,9 @@ class PersonalAssistantOrchestrator(
     private val userPreferences = mutableMapOf<String, Any>()
     private val activeConversations = mutableMapOf<String, Conversation>()
     
+    // Sub-agents for Personal Assistant department
+    override val subAgents: List<SubAgent> = emptyList() // Will be populated with 5-8 specialized agents
+    
     override val toolsets = listOf(
         OrchestratorTool(
             name = "Voice Recognition",
@@ -444,6 +447,24 @@ class PersonalAssistantOrchestrator(
     private fun learnFromInteraction(data: LearningData) {
         Log.d(TAG, "Learning from interaction")
         knowledgeBase["interaction_${System.currentTimeMillis()}"] = data.input
+    }
+    
+    // New DepartmentalOrchestrator interface methods
+    override suspend fun delegateToSubAgent(task: NextGenTask, subAgentRole: String): Result<NextGenTask> {
+        Log.d(TAG, "Delegating task to sub-agent: $subAgentRole")
+        // Find the appropriate sub-agent and delegate the task
+        return Result.success(task.copy(status = TaskStatus.IN_PROGRESS))
+    }
+    
+    override suspend fun getSubAgentStatus(): Map<String, AgentStatus> {
+        // Return status of all sub-agents
+        return emptyMap() // Will be populated when sub-agents are initialized
+    }
+    
+    override suspend fun trainSubAgent(subAgentRole: String, trainingData: LearningData): Result<Unit> {
+        Log.d(TAG, "Training sub-agent: $subAgentRole")
+        // Train specific sub-agent with new data
+        return Result.success(Unit)
     }
 }
 

@@ -41,6 +41,8 @@ class MarketingOrchestrator(
     
     private val mutex = Mutex()
     private val knowledgeBase = mutableMapOf<String, Any>()
+    override val subAgents: List<SubAgent> = emptyList() // Will be populated with specialized agents
+
     private val leadDatabase = mutableMapOf<String, MarketingLead>()
     private val campaignTemplates = mutableMapOf<String, CampaignTemplate>()
     private val proposalTemplates = mutableMapOf<String, ProposalTemplate>()
@@ -717,214 +719,17 @@ class MarketingOrchestrator(
     } catch (e: Exception) {
         Result.failure(e)
     }
-}
-
-// Supporting data classes for Marketing
-data class MarketingLead(
-    val info: LeadInfo,
-    val qualification: QualifiedLead,
-    val interactions: MutableList<LeadInteraction>,
-    val campaigns: MutableList<String>
-)
-
-data class LeadInfo(
-    val id: String,
-    val name: String,
-    val phone: String,
-    val email: String,
-    val address: String,
-    val projectType: String,
-    val estimatedBudget: Double,
-    val timeframe: String,
-    val source: String,
-    val createdDate: LocalDateTime
-)
-
-data class QualifiedLead(
-    val leadId: String,
-    val score: Int,
-    val qualification: LeadQualification,
-    val projectPotential: ProjectPotential,
-    val recommendedActions: List<String>,
-    val priority: Priority,
-    val assignedTo: String,
-    val qualifiedDate: LocalDateTime
-)
-
-enum class LeadQualification {
-    HOT, WARM, QUALIFIED, COLD, UNQUALIFIED
-}
-
-data class ProjectPotential(
-    val estimatedValue: Double,
-    val complexity: ProjectComplexity,
-    val timeline: String,
-    val probability: Double
-)
-
-enum class ProjectComplexity {
-    LOW, MEDIUM, HIGH
-}
-
-data class Proposal(
-    val id: String,
-    val clientId: String,
-    val projectId: String,
-    val title: String,
-    val description: String,
-    val scope: List<String>,
-    val timeline: String,
-    val pricing: PricingSection,
-    val terms: List<String>,
-    val validUntil: LocalDateTime,
-    val status: ProposalStatus,
-    val createdDate: LocalDateTime
-)
-
-enum class ProposalStatus {
-    DRAFT, SENT, VIEWED, ACCEPTED, REJECTED, EXPIRED
-}
-
-data class PricingSection(
-    val basePrice: Double,
-    val contingency: Double,
-    val overhead: Double,
-    val profit: Double,
-    val totalPrice: Double,
-    val paymentTerms: String
-)
-
-data class MarketingCampaign(
-    val id: String,
-    val name: String,
-    val type: CampaignType,
-    val targetAudience: TargetAudience,
-    val goals: CampaignGoals,
-    val channels: List<MarketingChannel>,
-    val content: CampaignContent,
-    val schedule: CampaignSchedule,
-    val budget: Double,
-    val status: CampaignStatus,
-    val createdDate: LocalDateTime
-)
-
-enum class CampaignType {
-    LEAD_NURTURING, PROMOTIONAL, REFERRAL, RETARGETING
-}
-
-enum class CampaignStatus {
-    DRAFT, ACTIVE, PAUSED, COMPLETED
-}
-
-enum class MarketingChannel {
-    EMAIL, SMS, PHONE, SOCIAL_MEDIA, DIRECT_MAIL, ONLINE_ADS
-}
-
-data class TargetAudience(
-    val segment: String,
-    val demographicProfile: DemographicProfile,
-    val interests: List<String>,
-    val behaviors: List<String>
-)
-
-data class DemographicProfile(
-    val ageRange: String,
-    val incomeRange: String,
-    val location: String,
-    val homeOwnership: String
-)
-
-data class CampaignGoals(
-    val primaryGoal: String,
-    val targetMetrics: Map<String, Double>,
-    val budget: Double,
-    val duration: String
-)
-
-data class CampaignContent(
-    val emailTemplates: List<String>,
-    val smsTemplates: List<String>,
-    val phoneScripts: List<String>,
-    val directMailPieces: List<String>
-)
-
-data class CampaignSchedule(
-    val startDate: LocalDateTime,
-    val endDate: LocalDateTime,
-    val touchpoints: List<TouchPoint>
-)
-
-data class TouchPoint(
-    val dayOffset: Int,
-    val description: String
-)
-
-data class FollowUpSequence(
-    val id: String,
-    val name: String,
-    val description: String,
-    val steps: List<FollowUpSequenceStep>
-)
-
-data class FollowUpSequenceStep(
-    val type: FollowUpType,
-    val content: String,
-    val delayDays: Int
-)
-
-enum class FollowUpType {
-    EMAIL, SMS, PHONE_CALL, DIRECT_MAIL
-}
-
-data class FollowUpExecution(
-    val id: String,
-    val leadId: String,
-    val sequenceId: String,
-    val steps: List<FollowUpStep>,
-    val startDate: LocalDateTime,
-    val status: FollowUpExecutionStatus
-)
-
-data class FollowUpStep(
-    val id: String,
-    val type: FollowUpType,
-    val content: String,
-    val scheduledDate: LocalDateTime,
-    val status: FollowUpStepStatus
-)
-
-enum class FollowUpStepStatus {
-    SCHEDULED, SENT, COMPLETED, FAILED
-}
-
-enum class FollowUpExecutionStatus {
-    ACTIVE, PAUSED, COMPLETED, CANCELLED
-}
-
-data class LeadInteraction(
-    val id: String,
-    val type: InteractionType,
-    val description: String,
-    val outcome: String,
-    val timestamp: LocalDateTime
-)
-
-enum class InteractionType {
-    PHONE_CALL, EMAIL, SMS, MEETING, PROPOSAL_SENT
-}
-
-data class CampaignTemplate(
-    val name: String,
-    val description: String,
-    val type: CampaignType
-)
-
-data class ProposalTemplate(
-    val name: String,
-    val description: String,
-    val type: ProposalType
-)
-
-enum class ProposalType {
-    NEW_CONSTRUCTION, REMODEL, COMMERCIAL, REPAIR
+    
+    // DepartmentalOrchestrator interface methods for sub-agent management
+    override suspend fun delegateToSubAgent(task: NextGenTask, subAgentRole: String): Result<NextGenTask> {
+        return Result.success(task.copy(status = TaskStatus.IN_PROGRESS))
+    }
+    
+    override suspend fun getSubAgentStatus(): Map<String, AgentStatus> {
+        return emptyMap()
+    }
+    
+    override suspend fun trainSubAgent(subAgentRole: String, trainingData: LearningData): Result<Unit> {
+        return Result.success(Unit)
+    }
 }

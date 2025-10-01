@@ -41,6 +41,8 @@ class ProjectManagementOrchestrator(
     
     private val mutex = Mutex()
     private val knowledgeBase = mutableMapOf<String, Any>()
+    override val subAgents: List<SubAgent> = emptyList() // Will be populated with specialized agents
+
     private val activeProjects = mutableMapOf<String, ConstructionProject>()
     private val projectTemplates = mutableMapOf<String, ProjectTemplate>()
     private val costDatabase = initializeCostDatabase()
@@ -578,63 +580,17 @@ class ProjectManagementOrchestrator(
     } catch (e: Exception) {
         Result.failure(e)
     }
+    
+    // DepartmentalOrchestrator interface methods for sub-agent management
+    override suspend fun delegateToSubAgent(task: NextGenTask, subAgentRole: String): Result<NextGenTask> {
+        return Result.success(task.copy(status = TaskStatus.IN_PROGRESS))
+    }
+    
+    override suspend fun getSubAgentStatus(): Map<String, AgentStatus> {
+        return emptyMap()
+    }
+    
+    override suspend fun trainSubAgent(subAgentRole: String, trainingData: LearningData): Result<Unit> {
+        return Result.success(Unit)
+    }
 }
-
-// Supporting data classes
-data class ProjectTemplate(
-    val id: String,
-    val name: String,
-    val description: String,
-    val category: String,
-    val estimatedDuration: Int, // weeks
-    val phases: Int
-)
-
-data class DetailedCostEstimate(
-    val projectType: String,
-    val squareFootage: Double,
-    val region: String = "default",
-    val lineItems: MutableList<CostLineItem> = mutableListOf(),
-    var subtotal: Double = 0.0,
-    var contingency: Double = 0.0,
-    var overhead: Double = 0.0,
-    var profit: Double = 0.0,
-    var totalCost: Double = 0.0,
-    val createdAt: LocalDateTime = LocalDateTime.now()
-)
-
-data class CostLineItem(
-    val description: String,
-    val unitCost: Double,
-    val unit: String,
-    val quantity: Double,
-    val totalCost: Double = unitCost * quantity
-)
-
-data class ScheduleTemplate(
-    val id: String,
-    val name: String,
-    val phases: List<String>,
-    val dependencies: Map<String, List<String>>
-)
-
-data class QualityCheckpoint(
-    val id: String,
-    val name: String,
-    val phase: String,
-    val isRequired: Boolean = true
-)
-
-data class ResourceAllocation(
-    val projectId: String,
-    val resources: Map<String, List<String>>, // resource type -> list of resource IDs
-    val startDate: LocalDateTime,
-    val endDate: LocalDateTime
-)
-
-data class ProjectTimeline(
-    val startDate: LocalDateTime,
-    val endDate: LocalDateTime,
-    val totalWeeks: Int,
-    val criticalPath: List<String>
-)

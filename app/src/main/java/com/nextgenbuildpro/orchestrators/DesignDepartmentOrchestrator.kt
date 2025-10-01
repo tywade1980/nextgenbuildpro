@@ -41,6 +41,8 @@ class DesignDepartmentOrchestrator(
     
     private val mutex = Mutex()
     private val knowledgeBase = mutableMapOf<String, Any>()
+    override val subAgents: List<SubAgent> = emptyList() // Will be populated with specialized agents
+
     private val blueprintLibrary = mutableMapOf<String, Blueprint>()
     private val threeDModels = mutableMapOf<String, ThreeDModel>()
     private val shopDrawings = mutableMapOf<String, ShopDrawing>()
@@ -603,91 +605,17 @@ class DesignDepartmentOrchestrator(
     } catch (e: Exception) {
         Result.failure(e)
     }
-}
-
-// Supporting data classes for Design
-data class ProjectRequirements(
-    val projectId: String,
-    val projectType: String,
-    val squareFootage: Double,
-    val floors: Int,
-    val bedrooms: Int,
-    val bathrooms: Int,
-    val specialFeatures: List<String>
-)
-
-data class Blueprint(
-    val id: String,
-    val projectId: String,
-    val projectType: String,
-    val squareFootage: Double,
-    val floors: Int,
-    val bedrooms: Int,
-    val bathrooms: Int,
-    val specialFeatures: List<String>,
-    val floorPlans: List<String>,
-    val elevations: List<String>,
-    val sections: List<String>,
-    val createdDate: LocalDateTime,
-    val version: String
-)
-
-data class ThreeDModel(
-    val id: String,
-    val blueprintId: String,
-    val projectId: String,
-    val modelType: ModelType,
-    val renderQuality: RenderQuality,
-    val views: List<String>,
-    val materials: List<String>,
-    val lighting: String,
-    val createdDate: LocalDateTime
-)
-
-enum class ModelType {
-    EXTERIOR_ONLY, INTERIOR_ONLY, EXTERIOR_INTERIOR
-}
-
-enum class RenderQuality {
-    LOW, MEDIUM, HIGH, ULTRA
-}
-
-data class ShopDrawing(
-    val id: String,
-    val blueprintId: String,
-    val tradeType: String,
-    val drawingType: String,
-    val details: String,
-    val createdDate: LocalDateTime = LocalDateTime.now()
-)
-
-data class MaterialTakeoff(
-    val id: String,
-    val blueprintId: String,
-    val projectId: String,
-    val categories: Map<String, MaterialCategory>,
-    val totalQuantities: Map<String, Int>,
-    val estimatedCost: Double,
-    val createdDate: LocalDateTime
-)
-
-data class MaterialCategory(
-    val name: String,
-    val items: List<MaterialItem>
-)
-
-data class MaterialItem(
-    val name: String,
-    val quantity: Int,
-    val unit: String
-)
-
-data class DesignTemplate(
-    val name: String,
-    val description: String,
-    val type: TemplateType
-)
-
-enum class TemplateType {
-    RESIDENTIAL, COMMERCIAL, INDUSTRIAL
+    
+    // DepartmentalOrchestrator interface methods for sub-agent management
+    override suspend fun delegateToSubAgent(task: NextGenTask, subAgentRole: String): Result<NextGenTask> {
+        return Result.success(task.copy(status = TaskStatus.IN_PROGRESS))
+    }
+    
+    override suspend fun getSubAgentStatus(): Map<String, AgentStatus> {
+        return emptyMap()
+    }
+    
+    override suspend fun trainSubAgent(subAgentRole: String, trainingData: LearningData): Result<Unit> {
+        return Result.success(Unit)
+    }
 }

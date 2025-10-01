@@ -41,6 +41,8 @@ class CRMOrchestrator(
     
     private val mutex = Mutex()
     private val knowledgeBase = mutableMapOf<String, Any>()
+    override val subAgents: List<SubAgent> = emptyList() // Will be populated with specialized agents
+
     private val clientDatabase = mutableMapOf<String, ClientInfo>()
     private val leadPipeline = mutableMapOf<String, Lead>()
     private val communicationHistory = mutableListOf<CommunicationRecord>()
@@ -569,46 +571,17 @@ class CRMOrchestrator(
         Log.d(TAG, "Learning from client feedback: ${data.feedback}")
         knowledgeBase["client_feedback_${System.currentTimeMillis()}"] = data.feedback
     }
+    
+    // DepartmentalOrchestrator interface methods for sub-agent management
+    override suspend fun delegateToSubAgent(task: NextGenTask, subAgentRole: String): Result<NextGenTask> {
+        return Result.success(task.copy(status = TaskStatus.IN_PROGRESS))
+    }
+    
+    override suspend fun getSubAgentStatus(): Map<String, AgentStatus> {
+        return emptyMap()
+    }
+    
+    override suspend fun trainSubAgent(subAgentRole: String, trainingData: LearningData): Result<Unit> {
+        return Result.success(Unit)
+    }
 }
-
-// Supporting data classes for CRM
-data class Lead(
-    val id: String,
-    val name: String,
-    val phone: String,
-    val email: String,
-    val source: String,
-    val status: LeadStatus,
-    val score: Int,
-    val notes: String,
-    val createdAt: LocalDateTime
-)
-
-enum class LeadStatus {
-    NEW, CONTACTED, QUALIFIED, PROPOSAL_SENT, WON, LOST, NURTURING
-}
-
-data class AutomationRule(
-    val id: String,
-    val description: String,
-    val isActive: Boolean = true
-)
-
-data class CallRecord(
-    val id: String,
-    val contactName: String,
-    val phoneNumber: String,
-    val timestamp: LocalDateTime,
-    val duration: Int, // in seconds
-    val notes: String,
-    val type: String // "Incoming" or "Outgoing"
-)
-
-data class ProjectDetails(
-    var projectType: String = "",
-    var estimatedBudget: Double = 0.0,
-    var estimatedTimeline: String = "",
-    var location: String = "",
-    var specialRequirements: List<String> = emptyList()
-)
-)

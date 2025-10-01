@@ -12,24 +12,32 @@ import kotlinx.coroutines.flow.*
 /**
  * Orchestrator Manager for NextGen BuildPro v2.0
  * 
- * Manages all 6 departmental orchestrators and their 48 specialized agents.
+ * Manages all 12 departmental orchestrators and their specialized agents.
  * Provides centralized coordination, MCP integration, and navigation management.
  */
-class OrchestratorManager {
+class OrchestratorManager(private val context: Context) {
     
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val mcpServer = MCPServer.getInstance()
     private val navigationManager = IntuitiveNavigationManager()
     
-    // Orchestrators
+    // Orchestrators (Department Heads)
     private lateinit var personalAssistantOrchestrator: PersonalAssistantOrchestrator
     private lateinit var crmOrchestrator: CRMOrchestrator
     private lateinit var projectManagementOrchestrator: ProjectManagementOrchestrator
     private lateinit var analyticsOrchestrator: AnalyticsOrchestrator
     private lateinit var designDepartmentOrchestrator: DesignDepartmentOrchestrator
     private lateinit var marketingOrchestrator: MarketingOrchestrator
+    // New Department Orchestrators
+    private lateinit var estimatingDepartmentOrchestrator: EstimatingDepartmentOrchestrator
+    private lateinit var fieldOperationsOrchestrator: FieldOperationsOrchestrator
+    private lateinit var safetyComplianceOrchestrator: SafetyComplianceOrchestrator
+    private lateinit var accountingDepartmentOrchestrator: AccountingDepartmentOrchestrator
+    private lateinit var hrDepartmentOrchestrator: HRDepartmentOrchestrator
+    private lateinit var equipmentManagementOrchestrator: EquipmentManagementOrchestrator
+    private lateinit var qualityControlOrchestrator: QualityControlOrchestrator
     
-    // Specialized agents registry (8 per orchestrator = 48 total)
+    // Specialized agents registry (5-8 per orchestrator)
     private val specializedAgents = mutableMapOf<String, SpecializedAgent>()
     
     private val _isInitialized = MutableStateFlow(false)
@@ -130,7 +138,7 @@ class OrchestratorManager {
         }
         
         return SystemMetrics(
-            totalOrchestrators = 6,
+            totalOrchestrators = 13, // 13 department heads
             totalSpecializedAgents = specializedAgents.size,
             activeAgents = activeAgents,
             systemStatus = _systemStatus.value,
@@ -140,21 +148,38 @@ class OrchestratorManager {
     }
     
     private suspend fun initializeOrchestrators() {
-        personalAssistantOrchestrator = PersonalAssistantOrchestrator()
-        crmOrchestrator = CRMOrchestrator()
-        projectManagementOrchestrator = ProjectManagementOrchestrator()
-        analyticsOrchestrator = AnalyticsOrchestrator()
-        designDepartmentOrchestrator = DesignDepartmentOrchestrator()
-        marketingOrchestrator = MarketingOrchestrator()
+        // Original 6 orchestrators
+        personalAssistantOrchestrator = PersonalAssistantOrchestrator(context)
+        crmOrchestrator = CRMOrchestrator(context)
+        projectManagementOrchestrator = ProjectManagementOrchestrator(context)
+        analyticsOrchestrator = AnalyticsOrchestrator(context)
+        designDepartmentOrchestrator = DesignDepartmentOrchestrator(context)
+        marketingOrchestrator = MarketingOrchestrator(context)
         
-        // Initialize each orchestrator
+        // New 7 department orchestrators
+        estimatingDepartmentOrchestrator = EstimatingDepartmentOrchestrator(context)
+        fieldOperationsOrchestrator = FieldOperationsOrchestrator(context)
+        safetyComplianceOrchestrator = SafetyComplianceOrchestrator(context)
+        accountingDepartmentOrchestrator = AccountingDepartmentOrchestrator(context)
+        hrDepartmentOrchestrator = HRDepartmentOrchestrator(context)
+        equipmentManagementOrchestrator = EquipmentManagementOrchestrator(context)
+        qualityControlOrchestrator = QualityControlOrchestrator(context)
+        
+        // Initialize all orchestrators (13 total department heads)
         listOf(
             personalAssistantOrchestrator,
             crmOrchestrator,
             projectManagementOrchestrator,
             analyticsOrchestrator,
             designDepartmentOrchestrator,
-            marketingOrchestrator
+            marketingOrchestrator,
+            estimatingDepartmentOrchestrator,
+            fieldOperationsOrchestrator,
+            safetyComplianceOrchestrator,
+            accountingDepartmentOrchestrator,
+            hrDepartmentOrchestrator,
+            equipmentManagementOrchestrator,
+            qualityControlOrchestrator
         ).forEach { orchestrator ->
             orchestrator.initialize()
         }
@@ -200,6 +225,14 @@ class OrchestratorManager {
             "analytics", "reporting", "predictions" -> analyticsOrchestrator
             "design", "3d_modeling", "blueprints" -> designDepartmentOrchestrator
             "marketing", "proposals", "campaigns" -> marketingOrchestrator
+            // New department task routing
+            "cost_estimation", "bid_preparation", "value_engineering", "change_order" -> estimatingDepartmentOrchestrator
+            "crew_scheduling", "material_delivery", "progress_report", "field_issue" -> fieldOperationsOrchestrator
+            "safety_inspection", "permit_application", "compliance_check" -> safetyComplianceOrchestrator
+            "invoicing", "payroll", "financial_report" -> accountingDepartmentOrchestrator
+            "recruitment", "onboarding", "training" -> hrDepartmentOrchestrator
+            "equipment_tracking", "maintenance", "rental" -> equipmentManagementOrchestrator
+            "quality_inspection", "defect_tracking", "punch_list" -> qualityControlOrchestrator
             else -> personalAssistantOrchestrator // Default to personal assistant
         }
     }
