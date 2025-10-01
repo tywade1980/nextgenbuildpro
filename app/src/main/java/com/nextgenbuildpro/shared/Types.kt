@@ -96,7 +96,55 @@ data class MLModelConfig(
 
 enum class MLModelType {
     CLASSIFICATION, REGRESSION, NLP, COMPUTER_VISION, 
-    REINFORCEMENT_LEARNING, ENSEMBLE, CUSTOM
+    REINFORCEMENT_LEARNING, ENSEMBLE, CUSTOM, REASONING, AGENT_WORKFLOW
+}
+
+/**
+ * Multi-LLM System Configuration
+ * Supports specialized LLM models for different task types
+ */
+data class MultiLLMConfig(
+    val systemId: String,
+    val reasoningModel: LLMModel,      // For complex reasoning tasks
+    val agentWorkflowModel: LLMModel,  // For agent orchestration
+    val routingStrategy: LLMRoutingStrategy = LLMRoutingStrategy.TASK_BASED
+)
+
+/**
+ * LLM Model configuration
+ */
+data class LLMModel(
+    val modelId: String,
+    val modelName: String,
+    val provider: LLMProvider,
+    val modelType: LLMModelType,
+    val contextWindow: Int,
+    val temperature: Double = 0.7,
+    val maxTokens: Int = 4096,
+    val capabilities: List<LLMCapability>
+)
+
+enum class LLMProvider {
+    OPENAI, ANTHROPIC, GOOGLE, META, MISTRAL, LOCAL, CUSTOM
+}
+
+enum class LLMModelType {
+    REASONING,          // o1, o3-mini for complex reasoning
+    AGENT_WORKFLOW,     // GPT-4, Claude for agent coordination
+    FAST_INFERENCE,     // GPT-3.5-turbo for quick tasks
+    SPECIALIZED         // Domain-specific models
+}
+
+enum class LLMCapability {
+    REASONING, FUNCTION_CALLING, CODE_GENERATION, 
+    VISION, AUDIO, MULTIMODAL, LONG_CONTEXT
+}
+
+enum class LLMRoutingStrategy {
+    TASK_BASED,         // Route based on task complexity
+    LOAD_BALANCED,      // Distribute across models
+    COST_OPTIMIZED,     // Use cheaper models when possible
+    QUALITY_FIRST       // Always use best model
 }
 
 /**
@@ -726,4 +774,130 @@ data class EquipmentRate(
     val weeklyRate: Double,
     val monthlyRate: Double,
     val category: String
+)
+
+// ===== CONSTRUCTION KNOWLEDGE BASE =====
+
+/**
+ * Construction-specific pricing data (2025+ data)
+ * Used by CFO's Estimator Agent for accurate job costing
+ */
+data class ConstructionPricingData(
+    val costDatabase: CostDatabase2025,
+    val laborRates: Map<String, LaborRate>,
+    val materialPrices: Map<String, MaterialPrice>,
+    val equipmentRates: Map<String, EquipmentRentalRate>,
+    val assemblyTimes: Map<String, AssemblyTime>,
+    val lastUpdated: LocalDateTime
+)
+
+data class CostDatabase2025(
+    val source: String,  // "RSMeans", "BLS", "regional"
+    val version: String,
+    val regionalFactors: Map<String, Double>,  // Regional cost multipliers
+    val inflationRate: Double,
+    val categories: Map<String, CostCategory>
+)
+
+data class CostCategory(
+    val categoryId: String,
+    val name: String,
+    val baseUnit: String,
+    val averageCost: Double,
+    val costRange: CostRange,
+    val laborComponent: Double,  // Percentage
+    val materialComponent: Double  // Percentage
+)
+
+data class AssemblyTime(
+    val assemblyId: String,
+    val description: String,
+    val crewSize: Int,
+    val crewComposition: Map<String, Int>,  // Trade -> count
+    val hoursPerUnit: Double,
+    val unitsPerDay: Double,
+    val difficultyFactor: Double = 1.0
+)
+
+data class MaterialPrice(
+    val materialId: String,
+    val name: String,
+    val unit: String,
+    val pricePerUnit: Double,
+    val supplier: String,
+    val leadTime: Int,  // Days
+    val minimumOrder: Double,
+    val availability: MaterialAvailability
+)
+
+enum class MaterialAvailability {
+    IN_STOCK, LOW_STOCK, BACKORDER, SPECIAL_ORDER, DISCONTINUED
+}
+
+data class EquipmentRentalRate(
+    val equipmentId: String,
+    val name: String,
+    val hourlyRate: Double,
+    val dailyRate: Double,
+    val weeklyRate: Double,
+    val monthlyRate: Double,
+    val deliveryFee: Double,
+    val operator: OperatorRequirement
+)
+
+enum class OperatorRequirement {
+    INCLUDED, NOT_INCLUDED, OPTIONAL, CERTIFIED_ONLY
+}
+
+/**
+ * Project lifecycle data flow structure
+ * Enables natural workflow between C-suite executives
+ */
+data class ProjectLifecycleFlow(
+    val projectId: String,
+    val currentPhase: ProjectPhase,
+    val flowSteps: List<FlowStep>,
+    val dependencies: Map<String, List<String>>
+)
+
+enum class ProjectPhase {
+    ESTIMATING, SCHEDULING, PROCUREMENT, EXECUTION, CLOSEOUT
+}
+
+data class FlowStep(
+    val stepId: String,
+    val executiveOwner: AgentType,  // Which C-suite executive
+    val operationalAgent: String,   // Which sub-agent
+    val action: String,
+    val inputs: List<DataArtifact>,
+    val outputs: List<DataArtifact>,
+    val nextSteps: List<String>,
+    val automationLevel: AutomationLevel
+)
+
+data class DataArtifact(
+    val artifactId: String,
+    val artifactType: ArtifactType,
+    val data: Map<String, Any>,
+    val producedBy: String,
+    val consumedBy: List<String>,
+    val timestamp: LocalDateTime
+)
+
+enum class ArtifactType {
+    ESTIMATE, LABOR_DATA, SCHEDULE, GANTT_CHART, 
+    MATERIAL_LIST, CREW_ASSIGNMENT, PROGRESS_REPORT,
+    INVOICE, BUDGET, ANALYTICS_REPORT
+}
+
+/**
+ * Example workflow: Estimate → Schedule → Execute
+ * CFO Estimator → COO Field Operations → Analytics
+ */
+data class WorkflowHandoff(
+    val fromExecutive: AgentType,
+    val toExecutive: AgentType,
+    val artifact: DataArtifact,
+    val handoffReason: String,
+    val completionCriteria: List<String>
 )
