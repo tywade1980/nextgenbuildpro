@@ -12,22 +12,41 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 /**
- * Design Department Orchestrator
+ * CTO (Chief Technology Officer) Orchestrator
  * 
- * Handles 3D modeling, blueprint generation, design workflows, shop drawings,
- * and image generation for construction projects. Focused purely on design
- * deliverables that contribute to project completion.
+ * C-suite executive managing all design and technical functions:
+ * 
+ * DESIGN & ENGINEERING:
+ * - 3D modeling and visualization
+ * - Blueprint generation and management
+ * - Shop drawings and technical specifications
+ * - Design workflows and change management
+ * 
+ * TECHNICAL DELIVERABLES:
+ * - CAD and technical drawings
+ * - Material quantity analysis
+ * - Design modification tracking
+ * - Construction documentation
+ * 
+ * Operational Agents (Sub-Agents):
+ * - CAD Specialist Agent (2D drafting)
+ * - 3D Modeler Agent (visualization)
+ * - Blueprint Manager Agent (plan management)
+ * - Specification Writer Agent (technical specs)
+ * - Shop Drawing Agent (detailed drawings)
+ * - Rendering Agent (photo-realistic renders)
+ * - Design Coordinator Agent (change tracking)
  */
-class DesignDepartmentOrchestrator(
+class CTODesignOrchestrator(
     private val context: Context
 ) : DepartmentalOrchestrator {
     
     companion object {
-        private const val TAG = "DesignDepartmentOrchestrator"
+        private const val TAG = "CTODesignOrchestrator"
     }
     
-    override val agentType: AgentType = AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR
-    override val departmentName: String = "Design Department"
+    override val agentType: AgentType = AgentType.CTO_DESIGN_ORCHESTRATOR
+    override val departmentName: String = "CTO - Design & Technology"
     
     private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
     override val status: StateFlow<SystemStatus> = _status.asStateFlow()

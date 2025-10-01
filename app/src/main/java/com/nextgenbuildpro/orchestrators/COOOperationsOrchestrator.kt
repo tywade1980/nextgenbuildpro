@@ -11,24 +11,42 @@ import android.util.Log
 import java.time.LocalDateTime
 
 /**
- * Operations & Project Management Orchestrator
+ * COO (Chief Operating Officer) Orchestrator
  * 
- * Consolidated department managing all operational aspects including:
- * - Field operations (crew management, site logistics, daily operations)
- * - Equipment management (fleet tracking, maintenance, rentals)
- * - Project management (planning, resource coordination, scheduling)
- * - Quality control - Field metrics (inspections, progress tracking)
+ * C-suite executive managing all operational aspects with two primary branches:
+ * 
+ * OFFICE OPERATIONS:
+ * - Project management and planning
+ * - Resource allocation and scheduling
+ * - Equipment management (fleet, maintenance, tool receipts for insurance)
+ * - Office-based operational coordination
+ * 
+ * FIELD OPERATIONS:
+ * - Crew management and site logistics
+ * - Daily field operations and material delivery
+ * - Field quality control and progress tracking
+ * - On-site issue resolution
+ * 
+ * Operational Agents (Sub-Agents):
+ * - Project Manager Agent
+ * - Resource Coordinator Agent
+ * - Equipment Manager Agent
+ * - Field Supervisor Agent
+ * - Crew Scheduler Agent
+ * - Site Logistics Agent
+ * - Field Quality Inspector Agent
+ * - Progress Tracker Agent
  */
-class OperationsProjectManagementOrchestrator(
+class COOOperationsOrchestrator(
     private val context: Context
 ) : DepartmentalOrchestrator {
     
     companion object {
-        private const val TAG = "OperationsPMOrchestrator"
+        private const val TAG = "COOOperationsOrchestrator"
     }
     
-    override val agentType: AgentType = AgentType.OPERATIONS_PROJECT_MANAGEMENT_ORCHESTRATOR
-    override val departmentName: String = "Operations & Project Management"
+    override val agentType: AgentType = AgentType.COO_OPERATIONS_ORCHESTRATOR
+    override val departmentName: String = "COO - Operations"
     
     private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
     override val status: StateFlow<SystemStatus> = _status.asStateFlow()

@@ -11,24 +11,42 @@ import android.util.Log
 import java.time.LocalDateTime
 
 /**
- * Client Relations & HR Orchestrator
+ * CHRO/CMO (Chief Human Resources & Marketing Officer) Orchestrator
  * 
- * Consolidated department managing all client and human resource functions:
- * - CRM (client relationships, lead management, communication)
- * - Marketing (proposals, campaigns, branding)
- * - HR (recruitment, training, time tracking)
- * - Quality Control - Client details (client-facing quality, punch lists, satisfaction)
+ * C-suite executive managing client relationships and human resources:
+ * 
+ * CLIENT RELATIONS & MARKETING:
+ * - CRM and contact management
+ * - Lead scoring and client engagement
+ * - Marketing campaigns and proposals
+ * - Client satisfaction and quality (client-facing)
+ * 
+ * HUMAN RESOURCES:
+ * - Recruitment and onboarding
+ * - Training and certifications
+ * - Time tracking and attendance
+ * - Employee performance management
+ * 
+ * Operational Agents (Sub-Agents):
+ * - Contact Manager Agent (CRM)
+ * - Lead Scoring Agent (qualification)
+ * - Marketing Manager Agent (campaigns)
+ * - Proposal Writer Agent (bids, proposals)
+ * - Client Satisfaction Agent (quality, punch lists)
+ * - Recruiter Agent (hiring)
+ * - Training Coordinator Agent (certifications)
+ * - HR Administrator Agent (time tracking, performance)
  */
-class ClientRelationsHROrchestrator(
+class CHROClientHROrchestrator(
     private val context: Context
 ) : DepartmentalOrchestrator {
     
     companion object {
-        private const val TAG = "ClientRelationsHROrchestrator"
+        private const val TAG = "CHROClientHROrchestrator"
     }
     
-    override val agentType: AgentType = AgentType.CLIENT_RELATIONS_HR_ORCHESTRATOR
-    override val departmentName: String = "Client Relations & HR"
+    override val agentType: AgentType = AgentType.CHRO_CLIENT_HR_ORCHESTRATOR
+    override val departmentName: String = "CHRO - Client Relations & HR"
     
     private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
     override val status: StateFlow<SystemStatus> = _status.asStateFlow()

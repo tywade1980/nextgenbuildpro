@@ -11,21 +11,41 @@ import android.util.Log
 import java.time.LocalDateTime
 
 /**
- * Safety & Compliance Orchestrator
+ * CSO (Chief Safety Officer) Orchestrator
  * 
- * Manages OSHA compliance, safety protocols, permits, and inspections.
- * Ensures all construction activities meet regulatory requirements.
+ * C-suite executive managing safety, compliance, and regulatory functions:
+ * 
+ * SAFETY MANAGEMENT:
+ * - OSHA compliance and monitoring
+ * - Safety inspections and protocols
+ * - Incident reporting and investigation
+ * - Safety training and certification
+ * 
+ * COMPLIANCE & PERMITS:
+ * - Permit applications and tracking
+ * - Regulatory compliance monitoring
+ * - Code compliance verification
+ * - Documentation and reporting
+ * 
+ * Operational Agents (Sub-Agents):
+ * - OSHA Compliance Agent (regulations)
+ * - Safety Inspector Agent (site inspections)
+ * - Permit Coordinator Agent (applications, renewals)
+ * - Incident Response Agent (safety incidents)
+ * - Training Administrator Agent (safety certifications)
+ * - Compliance Monitor Agent (regulatory tracking)
+ * - Hazard Assessment Agent (risk identification)
  */
-class SafetyComplianceOrchestrator(
+class CSOSafetyOrchestrator(
     private val context: Context
 ) : DepartmentalOrchestrator {
     
     companion object {
-        private const val TAG = "SafetyComplianceOrchestrator"
+        private const val TAG = "CSOSafetyOrchestrator"
     }
     
-    override val agentType: AgentType = AgentType.SAFETY_COMPLIANCE_ORCHESTRATOR
-    override val departmentName: String = "Safety & Compliance"
+    override val agentType: AgentType = AgentType.CSO_SAFETY_ORCHESTRATOR
+    override val departmentName: String = "CSO - Safety & Compliance"
     
     private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
     override val status: StateFlow<SystemStatus> = _status.asStateFlow()

@@ -11,23 +11,42 @@ import android.util.Log
 import java.time.LocalDateTime
 
 /**
- * Financial & Analytics Orchestrator
+ * CFO (Chief Financial Officer) Orchestrator
  * 
- * Consolidated department managing all financial and analytical functions:
- * - Estimating (cost estimation, bidding, proposals, value engineering)
- * - Accounting (financial management, invoicing, payroll, budgets)
- * - Analytics (reporting, insights, predictions, performance metrics)
+ * C-suite executive managing all financial and analytical functions:
+ * 
+ * FINANCIAL OPERATIONS:
+ * - Cost estimation and bidding
+ * - Accounting and bookkeeping
+ * - Invoicing and payroll
+ * - Budget management and variance tracking
+ * 
+ * ANALYTICS & REPORTING:
+ * - Performance analytics and KPIs
+ * - Financial reporting and insights
+ * - Predictive analytics and forecasting
+ * - Risk assessment
+ * 
+ * Operational Agents (Sub-Agents):
+ * - Estimator Agent (cost analysis, bidding)
+ * - Accountant Agent (bookkeeping, financial management)
+ * - Payroll Agent (employee compensation)
+ * - Invoice Manager Agent (AR/AP)
+ * - Budget Analyst Agent (budget tracking)
+ * - Financial Analyst Agent (reporting, insights)
+ * - Data Analyst Agent (performance metrics)
+ * - Predictive Analytics Agent (forecasting)
  */
-class FinancialAnalyticsOrchestrator(
+class CFOFinancialOrchestrator(
     private val context: Context
 ) : DepartmentalOrchestrator {
     
     companion object {
-        private const val TAG = "FinancialAnalyticsOrchestrator"
+        private const val TAG = "CFOFinancialOrchestrator"
     }
     
-    override val agentType: AgentType = AgentType.FINANCIAL_ANALYTICS_ORCHESTRATOR
-    override val departmentName: String = "Financial & Analytics"
+    override val agentType: AgentType = AgentType.CFO_FINANCIAL_ORCHESTRATOR
+    override val departmentName: String = "CFO - Financial"
     
     private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
     override val status: StateFlow<SystemStatus> = _status.asStateFlow()

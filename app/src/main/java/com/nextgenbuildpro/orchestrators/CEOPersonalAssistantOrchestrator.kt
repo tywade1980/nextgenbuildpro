@@ -12,22 +12,43 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 /**
- * Personal Assistant Orchestrator
+ * CEO Personal Assistant Orchestrator
  * 
- * Handles direct human interaction, voice commands, hands-free operation,
- * and general support across all construction management activities.
- * This orchestrator serves as the primary interface between users and the system.
+ * Highest-level executive interface that directs the Main Orchestrator
+ * and coordinates with all C-suite department heads (COO, CFO, CHRO, CTO, CSO).
+ * 
+ * PRIMARY FUNCTIONS:
+ * - Voice and chat interface for human interaction
+ * - Direct communication with Main Orchestrator
+ * - Cross-department coordination and prioritization
+ * - Executive decision support
+ * - Emergency response coordination
+ * 
+ * OPERATIONAL SCOPE:
+ * - Hands-free operation and voice commands
+ * - Natural language understanding (English/Spanish)
+ * - Context awareness across all departments
+ * - Strategic oversight and reporting
+ * 
+ * Operational Agents (Sub-Agents):
+ * - Voice Command Processor Agent
+ * - Executive Assistant Agent
+ * - Context Manager Agent
+ * - Emergency Response Agent
+ * - Cross-Department Coordinator Agent
+ * - Decision Support Agent
+ * - Communication Hub Agent
  */
-class PersonalAssistantOrchestrator(
+class CEOPersonalAssistantOrchestrator(
     private val context: Context
 ) : DepartmentalOrchestrator {
     
     companion object {
-        private const val TAG = "PersonalAssistantOrchestrator"
+        private const val TAG = "CEOPersonalAssistantOrchestrator"
     }
     
-    override val agentType: AgentType = AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR
-    override val departmentName: String = "Personal Assistant"
+    override val agentType: AgentType = AgentType.CEO_PERSONAL_ASSISTANT
+    override val departmentName: String = "CEO - Personal Assistant"
     
     private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
     override val status: StateFlow<SystemStatus> = _status.asStateFlow()
