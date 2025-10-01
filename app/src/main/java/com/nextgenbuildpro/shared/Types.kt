@@ -30,7 +30,7 @@ enum class Priority {
  * System-wide status indicators
  */
 enum class SystemStatus {
-    INITIALIZING, ACTIVE, IDLE, BUSY, ERROR, MAINTENANCE, SHUTDOWN
+    INITIALIZING, ACTIVE, IDLE, BUSY, ERROR, MAINTENANCE, SHUTDOWN, HEALTHY, STOPPED
 }
 
 /**
@@ -306,7 +306,7 @@ data class AgentCapability(
  * Skill level for capabilities
  */
 enum class SkillLevel {
-    BASIC, INTERMEDIATE, ADVANCED, EXPERT, MASTER
+    BEGINNER, BASIC, INTERMEDIATE, ADVANCED, EXPERT, MASTER
 }
 
 /**
@@ -469,13 +469,23 @@ interface NextGenService {
 }
 
 /**
+ * Health status enum for services
+ */
+enum class HealthStatus {
+    HEALTHY, DEGRADED, UNHEALTHY, STOPPED, STARTING, UNKNOWN
+}
+
+/**
  * Service health status
  */
 data class ServiceHealth(
-    val isHealthy: Boolean,
-    val lastCheckTime: LocalDateTime,
+    val serviceName: String = "",
+    val status: HealthStatus = HealthStatus.HEALTHY,
+    val lastCheck: LocalDateTime = LocalDateTime.now(),
+    val isHealthy: Boolean = (status == HealthStatus.HEALTHY),
+    val lastCheckTime: LocalDateTime = lastCheck,
     val issues: List<String> = emptyList(),
-    val metrics: Map<String, Double> = emptyMap()
+    val metrics: Map<String, Any> = emptyMap()
 )
 
 /**
@@ -758,14 +768,18 @@ data class ResidentialTemplate(
 data class CostRange(
     val min: Double,
     val max: Double,
-    val average: Double
+    val average: Double = (min + max) / 2.0
 )
 
 data class LaborRate(
     val trade: String,
     val hourlyRate: CostRange,
     val skillLevel: SkillLevel,
-    val region: String
+    val region: String,
+    // Legacy properties for backward compatibility
+    val tradeName: String? = null,
+    val description: String? = null
+)
 )
 
 data class MaterialCost(
@@ -1041,20 +1055,33 @@ enum class MaterialCategory {
     WINDOWS, DOORS, FLOORING, HVAC, ELECTRICAL, PLUMBING, FINISHES, OTHER
 }
 
+// MaterialCategoryGroup: Used for grouping material items by category name
+// This is different from the MaterialCategory enum which is used for individual items
+data class MaterialCategoryGroup(
+    val name: String,
+    val items: List<MaterialItem>
+)
+
 enum class TakeoffStatus {
     DRAFT, IN_PROGRESS, COMPLETE, APPROVED, ORDERED
+}
+
+enum class TemplateType {
+    RESIDENTIAL, COMMERCIAL, INDUSTRIAL, MIXED_USE
 }
 
 data class DesignTemplate(
     val templateId: String,
     val name: String,
     val description: String,
-    val category: String,
-    val designType: String,
-    val parameters: Map<String, Any>,
-    val defaultValues: Map<String, Any>,
+    val category: String = "",
+    val designType: String = "",
+    val parameters: Map<String, Any> = emptyMap(),
+    val defaultValues: Map<String, Any> = emptyMap(),
     val thumbnail: String? = null,
-    val tags: List<String> = emptyList()
+    val tags: List<String> = emptyList(),
+    // Legacy properties
+    val templateType: TemplateType? = null
 )
 
 data class DesignKnowledgeBase(
@@ -1065,8 +1092,8 @@ data class DesignKnowledgeBase(
     val bestPractices: List<String> = emptyList()
 )
 
-// Health status for agents
-data class HealthStatus(
+// Agent health status (detailed health info for agents)
+data class AgentHealthStatus(
     val isHealthy: Boolean,
     val lastCheckTime: LocalDateTime,
     val issues: List<String> = emptyList(),

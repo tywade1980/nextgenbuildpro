@@ -806,14 +806,14 @@ class CTODesignOrchestrator(
         )
     }
     
-    private fun calculateMaterialCategories(blueprint: Blueprint): Map<String, MaterialCategory> {
+    private fun calculateMaterialCategories(blueprint: Blueprint): Map<String, MaterialCategoryGroup> {
         return mapOf(
-            "structural" to MaterialCategory("Structural", calculateStructuralMaterials(blueprint)),
-            "roofing" to MaterialCategory("Roofing", calculateRoofingMaterials(blueprint)),
-            "siding" to MaterialCategory("Siding", calculateSidingMaterials(blueprint)),
-            "flooring" to MaterialCategory("Flooring", calculateFlooringMaterials(blueprint)),
-            "electrical" to MaterialCategory("Electrical", calculateElectricalMaterials(blueprint)),
-            "plumbing" to MaterialCategory("Plumbing", calculatePlumbingMaterials(blueprint))
+            "structural" to MaterialCategoryGroup("Structural", calculateStructuralMaterials(blueprint)),
+            "roofing" to MaterialCategoryGroup("Roofing", calculateRoofingMaterials(blueprint)),
+            "siding" to MaterialCategoryGroup("Siding", calculateSidingMaterials(blueprint)),
+            "flooring" to MaterialCategoryGroup("Flooring", calculateFlooringMaterials(blueprint)),
+            "electrical" to MaterialCategoryGroup("Electrical", calculateElectricalMaterials(blueprint)),
+            "plumbing" to MaterialCategoryGroup("Plumbing", calculatePlumbingMaterials(blueprint))
         )
     }
     
