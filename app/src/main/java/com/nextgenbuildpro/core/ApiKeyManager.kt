@@ -65,6 +65,14 @@ object ApiKeyManager {
     }
 
     /**
+     * Get the OpenRouter API key
+     * @return The OpenRouter API key or null if not found
+     */
+    fun getOpenRouterApiKey(): String? {
+        return properties.getProperty("openrouter.api.key")
+    }
+
+    /**
      * Get a property value by key
      * @param key The property key
      * @param defaultValue The default value to return if the property is not found
