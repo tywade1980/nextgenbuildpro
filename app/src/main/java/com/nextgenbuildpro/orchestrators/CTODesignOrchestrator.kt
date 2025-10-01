@@ -14,28 +14,46 @@ import java.util.UUID
 /**
  * CTO (Chief Technology Officer) Orchestrator
  * 
- * C-suite executive managing all design and technical functions:
+ * C-suite executive managing all design and technical functions with
+ * industry-leading tools and construction-specific expertise.
  * 
  * DESIGN & ENGINEERING:
- * - 3D modeling and visualization
- * - Blueprint generation and management
+ * - Advanced CAD and BIM (Building Information Modeling)
+ * - AI-powered 3D modeling and photorealistic rendering
+ * - Blueprint generation and intelligent design optimization
  * - Shop drawings and technical specifications
- * - Design workflows and change management
+ * - Design workflows and change management with real-time updates
  * 
  * TECHNICAL DELIVERABLES:
- * - CAD and technical drawings
- * - Material quantity analysis
- * - Design modification tracking
- * - Construction documentation
+ * - Construction documentation and permit-ready drawings
+ * - Material quantity analysis and cost integration with CFO
+ * - Structural calculations and code compliance checking
+ * - Virtual reality walkthroughs and client presentations
+ * - As-built documentation and project archives
+ * 
+ * CONSTRUCTION DESIGN KNOWLEDGE:
+ * - Building code requirements and permit compliance
+ * - Structural engineering principles and load calculations
+ * - MEP (Mechanical, Electrical, Plumbing) coordination
+ * - Material specifications and availability
+ * - Constructability analysis and value engineering
+ * 
+ * MULTI-LLM SYSTEM:
+ * - Reasoning Model (o1): Complex design optimization, structural analysis, code compliance
+ * - Agent Workflow Model (GPT-4): Design coordination, client communication, change management
+ * - Vision Models (GPT-4V): Blueprint analysis, photo interpretation, progress verification
  * 
  * Operational Agents (Sub-Agents):
- * - CAD Specialist Agent (2D drafting)
- * - 3D Modeler Agent (visualization)
- * - Blueprint Manager Agent (plan management)
- * - Specification Writer Agent (technical specs)
- * - Shop Drawing Agent (detailed drawings)
- * - Rendering Agent (photo-realistic renders)
- * - Design Coordinator Agent (change tracking)
+ * - CAD Specialist Agent (2D drafting, AutoCAD, Revit)
+ * - BIM Coordinator Agent (Building Information Modeling)
+ * - 3D Modeler Agent (visualization, rendering)
+ * - Blueprint Manager Agent (plan management, revisions)
+ * - Specification Writer Agent (technical specs, materials)
+ * - Shop Drawing Agent (detailed construction drawings)
+ * - Rendering Agent (photorealistic visualizations, VR)
+ * - Structural Engineer Agent (calculations, code checking)
+ * - MEP Coordinator Agent (systems integration)
+ * - Design Coordinator Agent (change tracking, version control)
  */
 class CTODesignOrchestrator(
     private val context: Context
@@ -62,86 +80,390 @@ class CTODesignOrchestrator(
     private val knowledgeBase = mutableMapOf<String, Any>()
     override val subAgents: List<SubAgent> = emptyList() // Will be populated with specialized agents
 
+    // Multi-LLM configuration for design intelligence
+    private val multiLLMConfig = initializeMultiLLMSystem()
+    
+    // Construction design knowledge base
+    private val designKnowledge = initializeDesignKnowledge()
+    
     private val blueprintLibrary = mutableMapOf<String, Blueprint>()
     private val threeDModels = mutableMapOf<String, ThreeDModel>()
     private val shopDrawings = mutableMapOf<String, ShopDrawing>()
     private val materialTakeoffs = mutableMapOf<String, MaterialTakeoff>()
     private val designTemplates = mutableMapOf<String, DesignTemplate>()
     
+    private fun initializeMultiLLMSystem(): MultiLLMConfig {
+        return MultiLLMConfig(
+            systemId = "cto-multi-llm",
+            reasoningModel = LLMModel(
+                modelId = "o1-2024-12-17",
+                modelName = "OpenAI o1",
+                provider = LLMProvider.OPENAI,
+                modelType = LLMModelType.REASONING,
+                contextWindow = 128000,
+                temperature = 1.0,
+                maxTokens = 32768,
+                capabilities = listOf(LLMCapability.REASONING)
+            ),
+            agentWorkflowModel = LLMModel(
+                modelId = "gpt-4-turbo",
+                modelName = "GPT-4 Turbo",
+                provider = LLMProvider.OPENAI,
+                modelType = LLMModelType.AGENT_WORKFLOW,
+                contextWindow = 128000,
+                temperature = 0.7,
+                maxTokens = 4096,
+                capabilities = listOf(LLMCapability.FUNCTION_CALLING)
+            ),
+            routingStrategy = LLMRoutingStrategy.TASK_BASED
+        )
+    }
+    
+    private fun initializeDesignKnowledge(): DesignKnowledgeBase {
+        return DesignKnowledgeBase(
+            buildingCodes = mapOf(
+                "IBC" to "International Building Code 2021",
+                "IRC" to "International Residential Code 2021",
+                "NEC" to "National Electrical Code 2023",
+                "IPC" to "International Plumbing Code 2021"
+            ),
+            structuralStandards = mapOf(
+                "load_calculations" to "ASCE 7-16 for wind, snow, seismic loads",
+                "lumber_sizing" to "NDS National Design Specification for Wood",
+                "concrete_design" to "ACI 318 Building Code Requirements"
+            ),
+            designBestPractices = mapOf(
+                "bim_coordination" to "Use BIM for clash detection and MEP coordination",
+                "code_compliance" to "Automated code checking before permit submission",
+                "value_engineering" to "Optimize material selection for cost-performance balance",
+                "constructability" to "Design for ease of construction and phasing"
+            ),
+            materialDatabases = listOf(
+                "Sweets Catalog",
+                "Manufacturer BIM Objects",
+                "CSI MasterFormat Specifications"
+            )
+        )
+    }
+    
     override val toolsets = listOf(
+        // Advanced CAD & BIM Tools
         OrchestratorTool(
-            name = "Blueprint Generation",
-            description = "AI-assisted plan creation from sketches and requirements",
+            name = "AutoCAD Integration",
+            description = "Professional 2D drafting and technical drawing creation",
             toolType = ToolType.DESIGN_TOOL,
-            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE)
+            permissions = listOf(Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
         ),
         OrchestratorTool(
-            name = "3D Model Creation",
-            description = "Convert 2D plans to 3D visualizations for client presentation",
+            name = "Revit BIM Platform",
+            description = "Building Information Modeling for comprehensive 3D design and coordination",
+            toolType = ToolType.MODELING_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "BIM Clash Detection",
+            description = "Automated detection of conflicts between structural, MEP, and architectural elements",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "SketchUp 3D Modeling",
+            description = "Rapid 3D conceptual design and space planning",
+            toolType = ToolType.MODELING_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        // Blueprint Generation & Management
+        OrchestratorTool(
+            name = "AI Blueprint Generator",
+            description = "AI-assisted plan creation from sketches, photos, and requirements",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Blueprint Optimization Engine",
+            description = "Optimize layouts for space efficiency, code compliance, and cost",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Version Control System",
+            description = "Track all design revisions and changes with automatic documentation",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Blueprint Markup & Annotation",
+            description = "Collaborative markup and commenting on construction documents",
+            toolType = ToolType.DESIGN_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        // 3D Visualization & Rendering
+        OrchestratorTool(
+            name = "Photorealistic Rendering Engine",
+            description = "Generate high-quality renders with realistic materials and lighting",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Virtual Reality Walkthrough",
+            description = "Immersive VR experiences for client presentations and design reviews",
             toolType = ToolType.MODELING_TOOL,
             permissions = listOf(Permission.ACCESS_STORAGE)
         ),
         OrchestratorTool(
+            name = "360° Panorama Generator",
+            description = "Create interactive panoramic views of designed spaces",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Real-time Rendering (Enscape/Lumion)",
+            description = "Instant visualization updates as design changes are made",
+            toolType = ToolType.MODELING_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        // Shop Drawings & Technical Documentation
+        OrchestratorTool(
             name = "Shop Drawing Generator",
-            description = "Automated technical drawings for trade contractors",
+            description = "Automated technical drawings for all construction trades",
             toolType = ToolType.DESIGN_TOOL,
             permissions = listOf(Permission.ACCESS_STORAGE)
         ),
+        OrchestratorTool(
+            name = "MEP Coordination",
+            description = "Coordinate mechanical, electrical, plumbing systems with structure",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Detail Library Manager",
+            description = "Library of standard construction details and assemblies",
+            toolType = ToolType.SYSTEM_INTEGRATION,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Specification Writer",
+            description = "Generate CSI MasterFormat specifications for all materials and systems",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
+        ),
+        // Material Takeoff & Cost Integration
         OrchestratorTool(
             name = "Material Takeoff Calculator",
-            description = "Automatic quantity calculations from plans for accurate ordering",
+            description = "Automatic quantity calculations from plans with integration to CFO cost database",
             toolType = ToolType.DATA_ANALYSIS,
+            permissions = listOf(Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Cut List Generator",
+            description = "Optimized cutting plans for lumber and sheet goods to minimize waste",
+            toolType = ToolType.AUTOMATION_TOOL,
             permissions = listOf(Permission.ACCESS_STORAGE)
         ),
         OrchestratorTool(
-            name = "Design Modification Engine",
-            description = "Real-time updates to plans and estimates when changes are made",
-            toolType = ToolType.DESIGN_TOOL,
+            name = "Bill of Materials (BOM)",
+            description = "Complete materials list with specifications, quantities, and ordering info",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        // Code Compliance & Structural
+        OrchestratorTool(
+            name = "Automated Code Checker",
+            description = "AI-powered building code compliance verification (IBC, IRC, NEC, IPC)",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Structural Calculation Engine",
+            description = "Load calculations, beam sizing, foundation design per ASCE 7",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Energy Code Compliance",
+            description = "IECC energy code calculations and compliance documentation",
+            toolType = ToolType.DATA_ANALYSIS,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Accessibility Checker (ADA)",
+            description = "Verify ADA/accessibility compliance in design",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        // Permit & Construction Documentation
+        OrchestratorTool(
+            name = "Permit Drawing Package",
+            description = "Generate complete permit-ready drawing sets with all required details",
+            toolType = ToolType.AUTOMATION_TOOL,
             permissions = listOf(Permission.ACCESS_STORAGE)
         ),
         OrchestratorTool(
-            name = "Construction Documentation",
-            description = "Generate permit-ready drawings and construction documents",
-            toolType = ToolType.DESIGN_TOOL,
+            name = "Construction Document Set",
+            description = "Complete CD set with plans, elevations, sections, details, specifications",
+            toolType = ToolType.AUTOMATION_TOOL,
             permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "As-Built Documentation",
+            description = "Track and document field changes to create accurate as-built drawings",
+            toolType = ToolType.SYSTEM_INTEGRATION,
+            permissions = listOf(Permission.ACCESS_STORAGE, Permission.CAMERA)
+        ),
+        OrchestratorTool(
+            name = "Submittal Manager",
+            description = "Track and organize product submittals and shop drawings from subcontractors",
+            toolType = ToolType.SYSTEM_INTEGRATION,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        // Design Modification & Change Management
+        OrchestratorTool(
+            name = "Design Change Tracker",
+            description = "Real-time tracking of design changes with automatic updates to all documents",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Change Order Impact Analyzer",
+            description = "Analyze cost and schedule impacts of design changes (integrates with CFO/COO)",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "RFI Manager",
+            description = "Manage requests for information from field teams and subcontractors",
+            toolType = ToolType.SYSTEM_INTEGRATION,
+            permissions = listOf(Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
+        ),
+        // AI-Powered Design Tools
+        OrchestratorTool(
+            name = "AI Design Assistant",
+            description = "Suggest design improvements, space optimization, and cost-saving alternatives",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Style Transfer Engine",
+            description = "Apply architectural styles and aesthetics to designs",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Site Analysis AI",
+            description = "Analyze site photos/surveys to optimize building placement and design",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.CAMERA, Permission.ACCESS_LOCATION, Permission.INTERNET_ACCESS)
+        ),
+        // Collaboration & Client Presentation
+        OrchestratorTool(
+            name = "Client Presentation Builder",
+            description = "Create compelling presentations with renderings, plans, and material boards",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Design Option Comparison",
+            description = "Side-by-side comparison of design alternatives with cost analysis",
+            toolType = ToolType.AUTOMATION_TOOL,
+            permissions = listOf(Permission.ACCESS_STORAGE)
+        ),
+        OrchestratorTool(
+            name = "Collaborative Design Platform",
+            description = "Real-time collaboration with architects, engineers, and contractors",
+            toolType = ToolType.THIRD_PARTY_API,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        // Multi-LLM Tools
+        OrchestratorTool(
+            name = "Reasoning Engine (o1)",
+            description = "Complex design optimization, structural analysis, code compliance verification",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Agent Workflow Coordinator (GPT-4)",
+            description = "Design coordination, client communication, change management workflows",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.INTERNET_ACCESS)
+        ),
+        OrchestratorTool(
+            name = "Vision AI (GPT-4V)",
+            description = "Blueprint analysis, photo interpretation, progress verification from site photos",
+            toolType = ToolType.AI_SERVICE,
+            permissions = listOf(Permission.CAMERA, Permission.ACCESS_STORAGE, Permission.INTERNET_ACCESS)
         )
     )
     
     override val capabilities = listOf(
         AgentCapability(
+            name = "Advanced CAD & BIM",
+            description = "Professional 2D/3D design with Building Information Modeling",
+            inputTypes = listOf("Requirements", "Sketches", "SiteData"),
+            outputTypes = listOf("CADDrawings", "BIMModel", "CoordinatedDesign"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
             name = "Blueprint Generation",
-            description = "Create professional blueprints from sketches or requirements",
+            description = "AI-powered professional blueprints from sketches or requirements",
             inputTypes = listOf("Sketch", "Requirements", "SitePhoto"),
             outputTypes = listOf("Blueprint", "FloorPlan", "ElevationDrawing"),
             skillLevel = SkillLevel.EXPERT
         ),
         AgentCapability(
-            name = "3D Visualization",
-            description = "Generate 3D models and renderings for client presentation",
-            inputTypes = listOf("Blueprint", "DesignSpecifications"),
-            outputTypes = listOf("3DModel", "Rendering", "VirtualTour"),
-            skillLevel = SkillLevel.ADVANCED
+            name = "3D Visualization & Rendering",
+            description = "Photorealistic renders, VR walkthroughs, and interactive presentations",
+            inputTypes = listOf("Blueprint", "DesignSpecifications", "MaterialSelections"),
+            outputTypes = listOf("3DModel", "PhotorealisticRender", "VRWalkthrough"),
+            skillLevel = SkillLevel.EXPERT
         ),
         AgentCapability(
             name = "Technical Drawing Creation",
-            description = "Generate shop drawings and technical specifications",
-            inputTypes = listOf("Blueprint", "ConstructionDetails"),
-            outputTypes = listOf("ShopDrawing", "TechnicalSpec", "DetailDrawing"),
+            description = "Shop drawings, MEP coordination, and technical specifications",
+            inputTypes = listOf("Blueprint", "ConstructionDetails", "SystemRequirements"),
+            outputTypes = listOf("ShopDrawing", "MEPDrawings", "TechnicalSpec"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Code Compliance & Structural",
+            description = "Automated code checking and structural calculations",
+            inputTypes = listOf("Design", "BuildingCode", "LoadRequirements"),
+            outputTypes = listOf("ComplianceReport", "StructuralCalcs", "CodeVerification"),
             skillLevel = SkillLevel.EXPERT
         ),
         AgentCapability(
             name = "Material Quantity Analysis",
-            description = "Calculate precise material quantities from plans",
-            inputTypes = listOf("Blueprint", "ConstructionPlan"),
-            outputTypes = listOf("MaterialTakeoff", "QuantityList", "CostEstimate"),
-            skillLevel = SkillLevel.ADVANCED
+            description = "Precise material takeoffs integrated with CFO cost database",
+            inputTypes = listOf("Blueprint", "ConstructionPlan", "Specifications"),
+            outputTypes = listOf("MaterialTakeoff", "BillOfMaterials", "CostEstimate"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Design Optimization",
+            description = "AI-powered design improvements for cost, efficiency, and aesthetics",
+            inputTypes = listOf("InitialDesign", "Budget", "Requirements"),
+            outputTypes = listOf("OptimizedDesign", "CostSavings", "Alternatives"),
+            skillLevel = SkillLevel.EXPERT
         ),
         AgentCapability(
             name = "Design Change Management",
-            description = "Manage design changes and update all related documents",
+            description = "Track changes, update documents, analyze impacts across all systems",
             inputTypes = listOf("ChangeRequest", "ModifiedPlan"),
-            outputTypes = listOf("UpdatedBlueprint", "RevisedTakeoff", "ChangeOrder"),
+            outputTypes = listOf("UpdatedDrawings", "ImpactAnalysis", "ChangeOrder"),
             skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Permit Documentation",
+            description = "Complete permit-ready drawing packages with compliance verification",
+            inputTypes = listOf("DesignDocuments", "LocalCodes", "PermitRequirements"),
+            outputTypes = listOf("PermitPackage", "ConstructionDocs", "ComplianceCertification"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Constructability Analysis",
+            description = "Evaluate designs for ease of construction and identify potential issues",
+            inputTypes = listOf("DesignDocuments", "ConstructionMethods", "SiteConditions"),
+            outputTypes = listOf("ConstructabilityReport", "Recommendations", "PhaseAnalysis"),
+            skillLevel = SkillLevel.ADVANCED
         )
     )
     
