@@ -36,9 +36,7 @@ class HierarchicalCatalogueRepository(private val context: Context) {
             // Create project types
             val projectTypes = listOf(
                 createNewConstructionProjectType(webResources),
-                // TODO: Implement these project types
-                // createRemodelingProjectType(webResources),
-                // createAdditionProjectType(webResources),
+                // TODO: Implement remodeling and addition project types in future
                 createRepairMaintenanceProjectType(webResources)
             )
 
