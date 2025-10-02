@@ -178,7 +178,7 @@ class LLMServiceTest {
         val content = "I'll help coordinate the agents"
         val role = "assistant"
         val finishReason = "stop"
-        val usage = com.nextgenbuildpro.ai.llm.TokenUsage(10, 20, 30)
+        val usage = TokenUsage(10, 20, 30)
         
         // When
         val response = OpenRouterResponse(id, model, content, role, finishReason, usage)

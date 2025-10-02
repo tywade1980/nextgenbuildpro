@@ -151,6 +151,7 @@ fun FileUploadScreen(navController: NavController) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun UploadOptionCard(
     option: UploadOption,

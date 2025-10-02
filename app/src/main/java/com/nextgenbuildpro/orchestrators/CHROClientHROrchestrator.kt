@@ -501,11 +501,7 @@ class CHROClientHROrchestrator(
         return Result.success(null)
     }
     
-    override suspend fun executeTask(task: NextGenTask): Result<NextGenTask> {
-        return processTask(task)
-    }
-    
-    override suspend fun processTask(task: NextGenTask): Result<NextGenTask> = try {
+    override suspend fun executeTask(task: NextGenTask): Result<NextGenTask> = try {
         Log.d(TAG, "Processing task: ${task.description}")
         
         val updatedTask = when (task.type) {
@@ -614,3 +610,9 @@ class CHROClientHROrchestrator(
         )
     }
 }
+
+data class MarketingKnowledgeBase(
+    val constructionMarketingBestPractices: Map<String, String>,
+    val brandingGuidelines: Map<String, String>,
+    val targetAudiences: List<String>
+)

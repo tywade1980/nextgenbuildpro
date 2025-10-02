@@ -5,7 +5,6 @@ import com.nextgenbuildpro.shared.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlinx.serialization.*
 
 /**
  * MCP (Model Context Protocol) Server for NextGen BuildPro v2.0
@@ -142,6 +141,27 @@ class MCPServer private constructor() {
             registeredResources = resourceRegistry.size
         )
     }
+
+    suspend fun shutdown(): Result<Unit> = try {
+        Log.i("MCPServer", "Shutting down MCP Server...")
+        _serverStatus.value = MCPServerStatus.STOPPING
+
+        // Close all active connections
+        activeConnections.values.forEach { it.close() }
+        activeConnections.clear()
+        messageQueue.clear()
+
+        // Cancel coroutine scope
+        scope.cancel()
+
+        _serverStatus.value = MCPServerStatus.STOPPED
+        Log.i("MCPServer", "MCP Server shutdown complete")
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Log.e("MCPServer", "Failed to shutdown MCP Server", e)
+        _serverStatus.value = MCPServerStatus.ERROR
+        Result.failure(e)
+    }
 }
 
 class MCPConnection(
@@ -161,7 +181,6 @@ enum class MCPServerStatus {
     STOPPED, STARTING, RUNNING, STOPPING, ERROR
 }
 
-@Serializable
 data class MCPMessage(
     val id: String,
     val sourceAgentId: String,
@@ -171,7 +190,6 @@ data class MCPMessage(
     val timestamp: Long
 )
 
-@Serializable  
 data class MCPResource(
     val id: String,
     val name: String,

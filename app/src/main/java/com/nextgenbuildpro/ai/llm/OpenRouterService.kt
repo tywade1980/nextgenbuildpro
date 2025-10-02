@@ -108,7 +108,7 @@ class OpenRouterService(
         val llmResponse = LLMResponse(
             content = openRouterResponse.content,
             conversationId = conversationId,
-            tokenUsage = com.nextgenbuildpro.ai.llm.TokenUsage(
+            tokenUsage = TokenUsage(
                 promptTokens = openRouterResponse.usage.promptTokens,
                 completionTokens = openRouterResponse.usage.completionTokens,
                 totalTokens = openRouterResponse.usage.totalTokens

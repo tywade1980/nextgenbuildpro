@@ -800,7 +800,7 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     )
     
     // Resource management classes with proper implementations
-    private inner class TaskQueue {
+    private class TaskQueue {
         private val queue = mutableListOf<NextGenTask>()
         private val mutex = Mutex()
         
@@ -828,7 +828,7 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         }
     }
     
-    private inner class OrchestrationResourceManager {
+    private class OrchestrationResourceManager {
         private var initialized = false
         
         fun initialize() {
@@ -896,7 +896,7 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         }
     }
     
-    private inner class DecisionEngine {
+    private class DecisionEngine {
         private var initialized = false
         
         fun initialize() {

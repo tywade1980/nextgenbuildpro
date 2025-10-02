@@ -118,15 +118,15 @@ class FoundationCatalogueValidation(private val context: Context) {
         check(result.isSuccess) { "Catalogue seeding should succeed: ${result.exceptionOrNull()?.message}" }
         
         // Verify Foundation category was created with proper data
-        val catalogueResult = catalogueService.getCompleteCatalogue()
+        val catalogueResult = catalogueService.getCategoriesWithChildren()
         check(catalogueResult.isSuccess) { "Should be able to get complete catalogue" }
-        
+
         val categories = catalogueResult.getOrThrow()
-        val foundationCategory = categories.find { it.category.name == "Foundation" }
+        val foundationCategory = categories.find { categoryWithChildren -> categoryWithChildren.category.name == "Foundation" }
         checkNotNull(foundationCategory) { "Foundation category should exist in seeded data" }
-        
+
         // Verify Foundation category has Concrete trade
-        val concreteTradeExists = foundationCategory.trades.any { it.trade.name == "Concrete" }
+        val concreteTradeExists = foundationCategory.trades.any { tradeWithChildren -> tradeWithChildren.trade.name == "Concrete" }
         check(concreteTradeExists) { "Foundation category should have Concrete trade" }
         
         Log.d(TAG, "✅ CatalogueSeeder foundation data validated")

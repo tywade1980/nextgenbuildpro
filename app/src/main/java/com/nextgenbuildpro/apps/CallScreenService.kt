@@ -168,7 +168,7 @@ class CallScreenService : InCallService(), NextGenService {
             recordCallEnd(call)
             
             // Process call analytics
-            val analytics = aiAssistant.analyzeCallPerformance(call)
+            aiAssistant.analyzeCallPerformance(call)
             
             // Update call state
             _callState.value = null
@@ -351,7 +351,7 @@ class CallScreenService : InCallService(), NextGenService {
     
     // Helper classes for call intelligence
     
-    private inner class CallAIAssistant {
+    private class CallAIAssistant {
         fun initialize() {
             Log.d("CallAIAssistant", "Initializing AI assistant")
         }
@@ -401,7 +401,7 @@ class CallScreenService : InCallService(), NextGenService {
         }
     }
     
-    private inner class CallContextAnalyzer {
+    private class CallContextAnalyzer {
         fun initialize() {
             Log.d("CallContextAnalyzer", "Initializing context analyzer")
         }

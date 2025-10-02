@@ -6,6 +6,11 @@ import com.nextgenbuildpro.pm.data.repository.EnhancedCatalogueDataService
 import com.nextgenbuildpro.pm.data.model.TemplateEstimate
 import com.nextgenbuildpro.pm.data.model.AssemblyTemplate
 import com.nextgenbuildpro.pm.data.model.TemplateAssembly
+import com.nextgenbuildpro.pm.data.model.CategoryWithChildren
+import com.nextgenbuildpro.pm.data.model.TradeWithChildren
+import com.nextgenbuildpro.pm.data.model.ScopeWithChildren
+import com.nextgenbuildpro.pm.data.model.AssemblyWithChildren
+import com.nextgenbuildpro.pm.data.model.EnhancedAssembly
 import com.nextgenbuildpro.shared.ClientInfo
 import org.json.JSONObject
 import org.json.JSONArray
@@ -125,11 +130,12 @@ class EstimateAPIService(private val context: Context) {
                                     put("id", assembly.id)
                                     put("name", assembly.name)
                                     put("description", assembly.description)
-                                    put("estimatedCost", assembly.estimatedCost)
-                                    put("unit", assembly.unitOfMeasure)
+                                    put("estimatedCost", assembly.totalCost)
+                                    put("unit", assembly.unit)
                                     put("laborHours", assembly.laborHours)
                                     put("materialCost", assembly.materialCost)
                                     put("laborCost", assembly.laborCost)
+                                    put("equipmentCost", assembly.equipmentCost)
                                 }
                                 
                                 matchingAssemblies.add(assemblyJson)
@@ -161,7 +167,7 @@ class EstimateAPIService(private val context: Context) {
             }
             
             val categories = catalogueResult.getOrThrow()
-            var foundAssembly: com.nextgenbuildpro.pm.data.model.Assembly? = null
+            var foundAssembly: EnhancedAssembly? = null
             
             // Find the assembly by ID
             categories.forEach { categoryWithChildren: CategoryWithChildren ->
@@ -188,9 +194,9 @@ class EstimateAPIService(private val context: Context) {
                 put("name", assembly.name)
                 put("description", assembly.description)
                 put("quantity", quantity)
-                put("unit", assembly.unitOfMeasure)
-                put("unitCost", assembly.estimatedCost)
-                put("totalCost", assembly.estimatedCost * quantity)
+                put("unit", assembly.unit)
+                put("unitCost", assembly.totalCost)
+                put("totalCost", assembly.totalCost * quantity)
                 put("laborHours", assembly.laborHours * quantity)
                 put("materialCost", assembly.materialCost * quantity)
                 put("laborCost", assembly.laborCost * quantity)
@@ -270,14 +276,19 @@ class EstimateAPIService(private val context: Context) {
         markupSettings: MarkupSettings
     ): Result<TemplateEstimate> {
         return try {
-            val result = estimateRepository.applyTaxAndMarkup(
+            val success = estimateRepository.applyTaxAndMarkup(
                 estimateId,
                 taxSettings,
                 markupSettings
             )
-            
-            if (result != null) {
-                Result.success(result)
+
+            if (success) {
+                val updatedEstimate = estimateRepository.getById(estimateId)
+                if (updatedEstimate != null) {
+                    Result.success(updatedEstimate)
+                } else {
+                    Result.failure(Exception("Estimate not found after applying tax and markup"))
+                }
             } else {
                 Result.failure(Exception("Failed to apply tax and markup"))
             }

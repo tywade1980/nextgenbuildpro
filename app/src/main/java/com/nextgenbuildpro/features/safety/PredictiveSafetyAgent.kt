@@ -24,15 +24,35 @@ import java.util.UUID
  * Success Metric: Reduce safety incidents by 85% (current: 75%)
  */
 class PredictiveSafetyAgent : NextGenService, LearningAgent {
-    
+
     companion object {
         private const val TAG = "PredictiveSafetyAgent"
     }
-    
+
     override val serviceName: String = "Predictive Safety Intelligence"
+    override val agentType: AgentType = AgentType.OPERATIONAL_AGENT
+    override val capabilities: List<AgentCapability> = listOf(
+        AgentCapability(
+            name = "Machine Learning",
+            description = "Learns from safety incidents and patterns",
+            inputTypes = listOf("incident_data", "sensor_data"),
+            outputTypes = listOf("predictions", "recommendations"),
+            skillLevel = SkillLevel.ADVANCED
+        ),
+        AgentCapability(
+            name = "Predictive Analysis",
+            description = "Predicts potential safety hazards",
+            inputTypes = listOf("site_data", "historical_data"),
+            outputTypes = listOf("hazard_predictions", "risk_scores"),
+            skillLevel = SkillLevel.EXPERT
+        )
+    )
     
     private val _isRunning = MutableStateFlow(false)
     override val isRunning: StateFlow<Boolean> = _isRunning.asStateFlow()
+    
+    private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
+    override val status: StateFlow<SystemStatus> = _status.asStateFlow()
     
     private val _safetyState = MutableStateFlow<SafetyState>(SafetyState.Initializing)
     val safetyState: StateFlow<SafetyState> = _safetyState.asStateFlow()
@@ -105,6 +125,27 @@ class PredictiveSafetyAgent : NextGenService, LearningAgent {
             )
         )
     }
+    
+    // NextGenAgent interface implementations
+    override suspend fun initialize(): Result<Unit> = start()
+    
+    override suspend fun processMessage(message: AgentMessage): Result<AgentMessage?> = runCatching {
+        Log.d(TAG, "Processing message: ${message.messageType}")
+        // Process agent messages (simplified implementation)
+        null
+    }
+    
+    override suspend fun executeTask(task: NextGenTask): Result<NextGenTask> = runCatching {
+        Log.d(TAG, "Executing task: ${task.title}")
+        // Execute safety-related tasks (simplified implementation)
+        task.copy(status = TaskStatus.COMPLETED, progress = 1.0f)
+    }
+    
+    override suspend fun getStatus(): SystemStatus {
+        return _status.value
+    }
+    
+    override suspend fun shutdown(): Result<Unit> = stop()
     
     /**
      * Detect hazards in real-time using computer vision and sensor data
@@ -250,14 +291,18 @@ class PredictiveSafetyAgent : NextGenService, LearningAgent {
             
             // Learn from the incident
             learn(LearningData(
-                dataType = "incident",
-                data = mapOf(
+                type = LearningType.SUPERVISED,
+                input = mapOf(
                     "incidentType" to incident.incidentType,
                     "severity" to incident.severity.name,
                     "rootCause" to incident.rootCause
                 ),
-                outcome = incident.resolved,
-                timestamp = LocalDateTime.now()
+                expectedOutput = incident.resolved,
+                feedback = if (incident.resolved) 1.0 else -0.5,
+                metadata = mapOf(
+                    "dataType" to "incident",
+                    "timestamp" to LocalDateTime.now().toString()
+                )
             ))
         }
     }
@@ -287,14 +332,15 @@ class PredictiveSafetyAgent : NextGenService, LearningAgent {
     
     override suspend fun learn(data: LearningData): Result<Unit> = runCatching {
         mutex.withLock {
-            when (data.dataType) {
+            when (data.metadata["dataType"]) {
                 "incident" -> {
                     // Update prediction models based on actual incidents
-                    val incidentData = data.data
+                    val incidentData = data.input
                     knowledgeBase["incident_patterns"] = incidentData
-                    
+
                     // Improve prediction accuracy
-                    if (data.outcome) {
+                    val outcome = data.expectedOutput as? Boolean ?: false
+                    if (outcome) {
                         predictionAccuracy = (predictionAccuracy * 0.95 + 0.98 * 0.05).coerceAtMost(0.98)
                     }
                 }

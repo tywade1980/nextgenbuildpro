@@ -504,8 +504,7 @@ class CSOSafetyOrchestrator(
     }
     
     override suspend fun processMessage(message: AgentMessage): Result<AgentMessage?> = Result.success(null)
-    override suspend fun executeTask(task: NextGenTask): Result<NextGenTask> = processTask(task)
-    override suspend fun processTask(task: NextGenTask): Result<NextGenTask> = Result.success(task.copy(status = TaskStatus.COMPLETED, progress = 1.0f))
+    override suspend fun executeTask(task: NextGenTask): Result<NextGenTask> = Result.success(task.copy(status = TaskStatus.COMPLETED, progress = 1.0f))
     override suspend fun processVoiceCommand(command: String): Result<String> = Result.success("Processing safety command: $command")
     override suspend fun getSpecializedCapabilities(): List<AgentCapability> = capabilities
     override suspend fun coordinateWithOtherDepartments(request: InterDepartmentalRequest): Result<InterDepartmentalResponse> = 
@@ -525,3 +524,10 @@ class CSOSafetyOrchestrator(
         Result.failure(e)
     }
 }
+
+data class SafetyKnowledgeBase(
+    val oshaStandards: Map<String, String>,
+    val commonHazards: Map<String, String>,
+    val trainingRequirements: List<String>,
+    val emergencyProcedures: Map<String, String>
+)

@@ -355,7 +355,7 @@ class DialerApp(private val context: Context) : NextGenService {
     
     // Helper classes
     
-    private inner class ContactManager {
+    private class ContactManager {
         fun initialize(context: Context) {
             Log.d("ContactManager", "Initializing contact manager")
         }
@@ -632,11 +632,11 @@ fun DialerAppUI(
         // Tab Content
         when (selectedTab) {
             0 -> KeypadTab(dialerApp, dialedNumber)
-            1 -> RecentCallsTab(recentCalls) { recordId: String -> 
-                coroutineScope.launch { dialerApp.dialFromHistory(recordId) }
+            1 -> RecentCallsTab(recentCalls) { record: DialerApp.CallRecord -> 
+                coroutineScope.launch { dialerApp.dialFromHistory(record) }
             }
-            2 -> ContactsTab(contacts) { contactId: String -> 
-                coroutineScope.launch { dialerApp.dialContact(contactId) }
+            2 -> ContactsTab(contacts) { contact: DialerApp.Contact -> 
+                coroutineScope.launch { dialerApp.dialContact(contact) }
             }
             3 -> SmartSuggestionsTab(smartSuggestions) { suggestion: DialerApp.SmartContact -> 
                 coroutineScope.launch { dialerApp.dialContact(suggestion.contact) }
@@ -650,7 +650,7 @@ private fun KeypadTab(
     dialerApp: DialerApp,
     dialedNumber: String
 ) {
-    val context = LocalContext.current
+    LocalContext.current
     
     Column(
         modifier = Modifier
@@ -802,7 +802,7 @@ private fun DialerKeypadButton(
 @Composable
 private fun RecentCallsTab(
     recentCalls: List<DialerApp.CallRecord>,
-    onCallSelected: (String) -> Unit
+    onCallSelected: (DialerApp.CallRecord) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -819,11 +819,11 @@ private fun RecentCallsTab(
 @Composable
 private fun CallRecordItem(
     call: DialerApp.CallRecord,
-    onCallSelected: (String) -> Unit
+    onCallSelected: (DialerApp.CallRecord) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        onClick = { onCallSelected(call.id) }
+        onClick = { onCallSelected(call) }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -873,7 +873,7 @@ private fun CallRecordItem(
 @Composable
 private fun ContactsTab(
     contacts: List<DialerApp.Contact>,
-    onContactSelected: (String) -> Unit
+    onContactSelected: (DialerApp.Contact) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -890,11 +890,11 @@ private fun ContactsTab(
 @Composable
 private fun ContactItem(
     contact: DialerApp.Contact,
-    onContactSelected: (String) -> Unit
+    onContactSelected: (DialerApp.Contact) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        onClick = { onContactSelected(contact.id) }
+        onClick = { onContactSelected(contact) }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),

@@ -77,7 +77,7 @@ class OrchestratorManager(private val context: Context) {
      */
     suspend fun processTask(task: NextGenTask): Result<NextGenTask> = try {
         val orchestrator = getOrchestratorForTask(task)
-        orchestrator.processTask(task)
+        orchestrator.executeTask(task)
     } catch (e: Exception) {
         Log.e("OrchestratorManager", "Failed to process task: ${task.description}", e)
         Result.failure(e)
@@ -112,8 +112,10 @@ class OrchestratorManager(private val context: Context) {
                 id = "voice_${System.currentTimeMillis()}",
                 type = "voice_command",
                 description = "Process voice command: $voiceInput",
-                parameters = mapOf("voice_input" to voiceInput),
-                priority = Priority.HIGH
+                assignedAgent = AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR,
+                priority = Priority.HIGH,
+                status = TaskStatus.PENDING,
+                parameters = mapOf("voice_input" to voiceInput)
             )
             
             val result = voiceAgent.processTask(task).getOrThrow()
@@ -238,7 +240,7 @@ class OrchestratorManager(private val context: Context) {
         }
         
         // Stop MCP server
-        mcpServer.stop()
+        mcpServer.shutdown()
         
         _systemStatus.value = SystemStatus.SHUTDOWN
         _isInitialized.value = false

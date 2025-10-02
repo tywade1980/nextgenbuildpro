@@ -90,9 +90,10 @@ if (result.isSuccess) {
 ## 📊 Sample Seeded Data
 
 ### Standard Staircase Assembly
+
 ```kotlin
 Assembly: "Standard Staircase"
-Unit: "flight"
+: "flight"
 Labor Hours: 24.0
 Total Cost: $2,650
 Markup: 15%
@@ -108,20 +109,21 @@ Materials:
 ```
 
 ### Toilet Installation Assembly
+
 ```kotlin
 Assembly: "Toilet Installation"
-Unit: "each"  
-Labor Hours: 1.5
-Total Cost: $400
+: "each"
+Labor Hours : 1.5
+Total Cost : $400
 Markup: 15%
 
 Tasks:
-1. Install wax ring (0.25 hours, $12.50 + $8 materials)
-2. Set toilet on flange (0.25 hours, $12.50)
+1.Install wax ring(0.25 hours, $12.50+$8 materials)
+2.Set toilet on flange (0.25 hours, $12.50)
 
 Materials:
-- Toilet: 1 × $250 = $250
-- Wax Ring: 1 × $8 = $8
+-Toilet: 1 × $250 = $250
+-Wax Ring : 1 × $8 = $8
 ```
 
 ## 🧪 Testing & Verification

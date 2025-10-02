@@ -45,11 +45,10 @@ fun AssemblyIntegrationDemoScreen(navController: NavController) {
         TemplateSystemService(context, templateEstimateRepository, hierarchicalCatalogueRepository)
     }
     val performanceOptimizer = remember { CataloguePerformanceOptimizer(context) }
-    val validationService = remember { CalculationValidationService() }
+    remember { CalculationValidationService() }
     val integrationTest = remember { AssemblyCatalogueIntegrationTest(context) }
     
     // Demo state
-    var currentDemo by remember { mutableStateOf<DemoSection?>(null) }
     var demoResults by remember { mutableStateOf<String>("") }
     var isLoading by remember { mutableStateOf(false) }
     var searchResults by remember { mutableStateOf<List<AssemblySearchResult>>(emptyList()) }
@@ -245,9 +244,9 @@ fun AssemblyIntegrationDemoScreen(navController: NavController) {
                 val startTime = System.currentTimeMillis()
                 
                 // Test optimized search
-                val results1 = performanceOptimizer.optimizedSearch(keyword = "wall")
-                val results2 = performanceOptimizer.optimizedSearch(keyword = "wall") // Should hit cache
-                val results3 = performanceOptimizer.optimizedSearch(tradeType = "Framing")
+                performanceOptimizer.optimizedSearch(keyword = "wall")
+                performanceOptimizer.optimizedSearch(keyword = "wall") // Should hit cache
+                performanceOptimizer.optimizedSearch(tradeType = "Framing")
                 
                 val searchTime = System.currentTimeMillis() - startTime
                 performanceStats += "Optimized search completed in ${searchTime}ms\n"

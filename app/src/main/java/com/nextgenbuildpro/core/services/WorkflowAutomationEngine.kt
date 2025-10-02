@@ -340,7 +340,7 @@ class WorkflowAutomationEngine(private val context: Context) : NextGenService {
             assignedAgent = AgentType.valueOf(step.parameters["assignedAgent"] as? String ?: "ORCHESTRATOR"),
             priority = Priority.valueOf(step.parameters["priority"] as? String ?: "MEDIUM"),
             status = TaskStatus.PENDING,
-            scheduledTime = scheduledTime
+            dueDate = scheduledTime
         )
         
         // In a real implementation, this would schedule the task in the system
@@ -369,14 +369,14 @@ class WorkflowAutomationEngine(private val context: Context) : NextGenService {
         // In a real implementation, this would generate actual documents
         Log.d(TAG, "Generating $documentType document with template $templateId")
         
-        return mapOf(
-            "documentType" to documentType,
-            "documentId" to UUID.randomUUID().toString(),
-            "templateId" to templateId,
-            "documentData" to documentData,
-            "timestamp" to LocalDateTime.now(),
-            "filePath" to "/documents/automated_${UUID.randomUUID()}.pdf"
-        )
+        return buildMap<String, Any> {
+            put("documentType", documentType)
+            put("documentId", UUID.randomUUID().toString())
+            templateId?.let { put("templateId", it) }
+            put("documentData", documentData)
+            put("timestamp", LocalDateTime.now())
+            put("filePath", "/documents/automated_${UUID.randomUUID()}.pdf")
+        }
     }
     
     private suspend fun executeUpdateStatusStep(

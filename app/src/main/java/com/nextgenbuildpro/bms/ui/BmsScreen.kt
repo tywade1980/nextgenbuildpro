@@ -251,6 +251,7 @@ private fun PerformanceTab(performance: List<BuildingPerformance>) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BuildingCard(
     building: Building,

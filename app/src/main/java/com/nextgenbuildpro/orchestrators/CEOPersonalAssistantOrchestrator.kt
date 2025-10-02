@@ -832,6 +832,12 @@ class CEOPersonalAssistantOrchestrator(
 }
 
 // Supporting data classes
+
+data class ExecutiveKnowledgeBase(
+    val strategicPriorities: List<String>,
+    val keyMetrics: Map<String, List<String>>,
+    val decisionFrameworks: Map<String, String>
+)
 data class VoiceCommand(
     val id: String,
     val originalText: String,

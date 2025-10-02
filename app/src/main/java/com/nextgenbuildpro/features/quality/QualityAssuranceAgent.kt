@@ -24,15 +24,35 @@ import java.util.UUID
  * Success Metric: 90% reduction in rework costs
  */
 class QualityAssuranceAgent : NextGenService, LearningAgent {
-    
+
     companion object {
         private const val TAG = "QualityAssuranceAgent"
     }
-    
+
     override val serviceName: String = "Quality Assurance Agent"
+    override val agentType: AgentType = AgentType.OPERATIONAL_AGENT
+    override val capabilities: List<AgentCapability> = listOf(
+        AgentCapability(
+            name = "Quality Inspection",
+            description = "Automated quality inspection with 99% accuracy",
+            inputTypes = listOf("inspection_data", "images"),
+            outputTypes = listOf("inspection_results", "quality_reports"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Defect Detection",
+            description = "AI-powered defect detection and classification",
+            inputTypes = listOf("visual_data", "sensor_data"),
+            outputTypes = listOf("defect_reports", "recommendations"),
+            skillLevel = SkillLevel.ADVANCED
+        )
+    )
     
     private val _isRunning = MutableStateFlow(false)
     override val isRunning: StateFlow<Boolean> = _isRunning.asStateFlow()
+    
+    private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
+    override val status: StateFlow<SystemStatus> = _status.asStateFlow()
     
     private val _qualityState = MutableStateFlow<QualityState>(QualityState.Initializing)
     val qualityState: StateFlow<QualityState> = _qualityState.asStateFlow()
@@ -105,6 +125,25 @@ class QualityAssuranceAgent : NextGenService, LearningAgent {
             )
         )
     }
+    
+    // NextGenAgent interface implementations
+    override suspend fun initialize(): Result<Unit> = start()
+    
+    override suspend fun processMessage(message: AgentMessage): Result<AgentMessage?> = runCatching {
+        Log.d(TAG, "Processing message: ${message.messageType}")
+        null
+    }
+    
+    override suspend fun executeTask(task: NextGenTask): Result<NextGenTask> = runCatching {
+        Log.d(TAG, "Executing task: ${task.title}")
+        task.copy(status = TaskStatus.COMPLETED, progress = 1.0f)
+    }
+    
+    override suspend fun getStatus(): SystemStatus {
+        return _status.value
+    }
+    
+    override suspend fun shutdown(): Result<Unit> = stop()
     
     /**
      * Perform automated quality inspection
@@ -298,10 +337,10 @@ class QualityAssuranceAgent : NextGenService, LearningAgent {
     
     override suspend fun learn(data: LearningData): Result<Unit> = runCatching {
         mutex.withLock {
-            when (data.dataType) {
+            when (data.metadata["dataType"]) {
                 "inspection" -> {
                     // Learn from inspection feedback
-                    val wasAccurate = data.outcome
+                    val wasAccurate = data.metadata["outcome"] as? Boolean ?: false
                     if (wasAccurate) {
                         inspectionAccuracy = (inspectionAccuracy * 0.98 + 0.99 * 0.02).coerceAtMost(0.995)
                         defectDetectionRate = (defectDetectionRate * 0.98 + 0.97 * 0.02).coerceAtMost(0.98)
@@ -311,7 +350,7 @@ class QualityAssuranceAgent : NextGenService, LearningAgent {
                     }
                 }
                 "defect_detection" -> {
-                    val wasCorrect = data.outcome
+                    val wasCorrect = data.metadata["outcome"] as? Boolean ?: false
                     defectDetectionRate = if (wasCorrect) {
                         (defectDetectionRate * 0.98 + 0.98 * 0.02).coerceAtMost(0.99)
                     } else {

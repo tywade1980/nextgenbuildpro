@@ -161,6 +161,7 @@ fun TimelineHeader(viewMode: TimelineViewMode) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectTimelineRow(
     project: TimelineProject,
@@ -396,7 +397,7 @@ private fun drawTimelineHeader(drawScope: DrawScope, viewMode: TimelineViewMode)
             
             // Add time labels (simplified)
             if (i < divisions) {
-                val label = when (viewMode) {
+                when (viewMode) {
                     TimelineViewMode.WEEK -> "Day ${i + 1}"
                     TimelineViewMode.MONTH -> "Week ${i + 1}"
                     TimelineViewMode.QUARTER -> "Month ${i + 1}"
@@ -451,7 +452,7 @@ private fun drawProjectTimeline(
         project.milestones.forEach { milestone ->
             val milestoneX = startX + (barWidth * 0.5f) // Simplified positioning
             drawCircle(
-                color = if (milestone.isCompleted) Color.Green else Color.Orange,
+                color = if (milestone.isCompleted) Color.Green else Color(0xFFFFA500),
                 radius = 4.dp.toPx(),
                 center = Offset(milestoneX, height * 0.5f)
             )

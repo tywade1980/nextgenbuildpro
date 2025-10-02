@@ -30,9 +30,29 @@ class ComputerVisionService : NextGenService, LearningAgent {
     }
     
     override val serviceName: String = "Computer Vision Service"
+    override val agentType: AgentType = AgentType.OPERATIONAL_AGENT
+    override val capabilities: List<AgentCapability> = listOf(
+        AgentCapability(
+            name = "Hazard Detection",
+            description = "AI-powered safety hazard detection from images",
+            inputTypes = listOf("images", "video_frames"),
+            outputTypes = listOf("hazard_detections", "safety_reports"),
+            skillLevel = SkillLevel.EXPERT
+        ),
+        AgentCapability(
+            name = "Quality Inspection",
+            description = "Automated visual quality inspection",
+            inputTypes = listOf("images", "specifications"),
+            outputTypes = listOf("inspection_results", "defect_reports"),
+            skillLevel = SkillLevel.EXPERT
+        )
+    )
     
     private val _isRunning = MutableStateFlow(false)
     override val isRunning: StateFlow<Boolean> = _isRunning.asStateFlow()
+    
+    private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
+    override val status: StateFlow<SystemStatus> = _status.asStateFlow()
     
     private val _visionState = MutableStateFlow<VisionState>(VisionState.Initializing)
     val visionState: StateFlow<VisionState> = _visionState.asStateFlow()
@@ -107,6 +127,25 @@ class ComputerVisionService : NextGenService, LearningAgent {
             )
         )
     }
+    
+    // NextGenAgent interface implementations
+    override suspend fun initialize(): Result<Unit> = start()
+    
+    override suspend fun processMessage(message: AgentMessage): Result<AgentMessage?> = runCatching {
+        Log.d(TAG, "Processing message: ${message.messageType}")
+        null
+    }
+    
+    override suspend fun executeTask(task: NextGenTask): Result<NextGenTask> = runCatching {
+        Log.d(TAG, "Executing task: ${task.title}")
+        task.copy(status = TaskStatus.COMPLETED, progress = 1.0f)
+    }
+    
+    override suspend fun getStatus(): SystemStatus {
+        return _status.value
+    }
+    
+    override suspend fun shutdown(): Result<Unit> = stop()
     
     /**
      * Detect safety hazards in construction site images
@@ -366,9 +405,11 @@ class ComputerVisionService : NextGenService, LearningAgent {
     
     override suspend fun learn(data: LearningData): Result<Unit> = runCatching {
         mutex.withLock {
-            when (data.dataType) {
+            val dataType = data.metadata["dataType"] as? String
+            val wasCorrect = data.feedback > 0.0 // Positive feedback means correct
+            
+            when (dataType) {
                 "hazard_detection" -> {
-                    val wasCorrect = data.outcome
                     if (wasCorrect) {
                         hazardDetectionAccuracy = (hazardDetectionAccuracy * 0.98 + 0.99 * 0.02).coerceAtMost(0.99)
                     } else {
@@ -377,7 +418,6 @@ class ComputerVisionService : NextGenService, LearningAgent {
                     }
                 }
                 "progress_tracking" -> {
-                    val wasCorrect = data.outcome
                     progressTrackingAccuracy = if (wasCorrect) {
                         (progressTrackingAccuracy * 0.98 + 0.95 * 0.02).coerceAtMost(0.95)
                     } else {
@@ -393,7 +433,7 @@ class ComputerVisionService : NextGenService, LearningAgent {
             }
             
             knowledgeBase["learning_data"] = data
-            Log.d(TAG, "Model updated from learning data: ${data.dataType}")
+            Log.d(TAG, "Model updated from learning data: $dataType")
         }
     }
     

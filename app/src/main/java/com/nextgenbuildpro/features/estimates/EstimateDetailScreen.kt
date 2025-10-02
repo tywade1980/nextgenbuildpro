@@ -175,8 +175,8 @@ fun EstimateDetailScreen(navController: NavController, estimateId: String) {
                         id = UUID.randomUUID().toString(),
                         title = "${estimate.title} (Copy)",
                         status = EstimateStatus.DRAFT.name,
-                        createdAt = DateUtils.getCurrentDateString(),
-                        updatedAt = DateUtils.getCurrentDateString()
+                        createdAt = DateUtils.getCurrentTimestamp(),
+                        updatedAt = DateUtils.getCurrentTimestamp()
                     )
                     viewModel.createEstimate(duplicatedEstimate)
                     navController.navigate("estimate_detail/${duplicatedEstimate.id}")

@@ -155,6 +155,13 @@ class IntuitiveNavigationManager {
                 QuickAction("change_orders", "📝 Changes", "Change orders")
             )
             
+            NavigationContext.EMERGENCY -> listOf(
+                QuickAction("emergency_call", "☎️ Emergency Call", "Call emergency services"),
+                QuickAction("safety_alert", "🚨 Safety Alert", "Send safety alert"),
+                QuickAction("incident_report", "📋 Report", "Create incident report"),
+                QuickAction("evacuate", "🚪 Evacuate", "Evacuation procedures")
+            )
+
             NavigationContext.DEFAULT -> listOf(
                 QuickAction("dashboard", "🏠 Dashboard", "Main dashboard"),
                 QuickAction("projects", "🏗️ Projects", "Active projects"),

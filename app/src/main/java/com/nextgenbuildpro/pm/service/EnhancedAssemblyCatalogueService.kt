@@ -277,28 +277,7 @@ data class AssemblyCreationData(
     val imageUrl: String? = null
 )
 
-data class TaskCreationData(
-    val name: String,
-    val description: String,
-    val sequence: Int,
-    val laborHours: Double,
-    val materialCost: Double,
-    val laborCost: Double,
-    val equipmentCost: Double = 0.0,
-    val notes: String = ""
-)
-
-data class MaterialCreationData(
-    val taskId: String? = null,
-    val assemblyId: String? = null,
-    val name: String,
-    val description: String,
-    val quantity: Double,
-    val unit: String,
-    val unitCost: Double,
-    val waste: Double = 0.0,
-    val notes: String = ""
-)
+// Note: TaskCreationData and MaterialCreationData are defined in EnhancedCatalogueModels.kt
 
 data class EnhancedAssemblyDetails(
     val assembly: EnhancedAssembly,

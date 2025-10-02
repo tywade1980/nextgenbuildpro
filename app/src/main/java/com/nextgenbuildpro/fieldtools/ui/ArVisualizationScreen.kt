@@ -192,6 +192,7 @@ fun ArViewScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArActionCard(
     action: ArAction,

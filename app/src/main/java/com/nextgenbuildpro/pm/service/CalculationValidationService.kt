@@ -332,7 +332,7 @@ class CalculationValidationService {
         // Validate task calculation
         val expectedLaborCost = task.quantity * task.task.laborPerUnit
         val expectedMaterialCost = task.quantity * task.task.materialPerUnit
-        val expectedMarkupCost = (expectedLaborCost + expectedMaterialCost) * task.task.markup
+        (expectedLaborCost + expectedMaterialCost) * task.task.markup
         
         if (abs(task.laborCost - expectedLaborCost) > maxTolerancePercentage * expectedLaborCost) {
             issues.add(ValidationIssue(

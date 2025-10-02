@@ -521,7 +521,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
     
     // Helper classes
     
-    private inner class ProjectManager {
+    private class ProjectManager {
         fun initialize() {
             Log.d("ProjectManager", "Initializing project manager")
         }
@@ -531,7 +531,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         }
     }
     
-    private inner class ResourceManager {
+    private class ResourceManager {
         fun initialize() {
             Log.d("ResourceManager", "Initializing resource manager")
         }
@@ -554,7 +554,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         }
     }
     
-    private inner class SafetyManager {
+    private class SafetyManager {
         fun initialize() {
             Log.d("SafetyManager", "Initializing safety manager")
         }
@@ -572,7 +572,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         }
     }
     
-    private inner class QualityControl {
+    private class QualityControl {
         fun initialize() {
             Log.d("QualityControl", "Initializing quality control")
         }
@@ -582,7 +582,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         }
     }
     
-    private inner class ConstructionAIOptimizer {
+    private class ConstructionAIOptimizer {
         fun initialize() {
             Log.d("ConstructionAIOptimizer", "Initializing AI optimizer")
         }
@@ -602,7 +602,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         suspend fun optimizeProject(
             project: ConstructionProject,
             tasks: List<ConstructionTask>,
-            resources: List<ConstructionPlatform.Resource>
+            resources: List<Resource>
         ): OptimizationResult {
             return OptimizationResult(
                 projectId = project.id,

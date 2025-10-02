@@ -60,9 +60,7 @@ class ReceptionistImpl(
         }
 
         // Use CallHandlingService to determine how to handle the call
-        val callStatus = callHandlingService.handleIncomingCall(call.callerNumber, call.callerName)
-
-        when (callStatus) {
+        when (val callStatus = callHandlingService.handleIncomingCall(call.callerNumber, call.callerName)) {
             CallStatus.REJECTED_SPAM -> {
                 Log.d(TAG, "Call rejected as spam")
                 // In a real implementation, this would reject the call

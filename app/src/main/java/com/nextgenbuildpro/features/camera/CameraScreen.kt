@@ -190,6 +190,7 @@ private fun ProjectsTab(photos: List<Photo>) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CameraOptionCard(option: CameraOption) {
     Card(
@@ -233,6 +234,7 @@ private fun CameraOptionCard(option: CameraOption) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun QuickActionCard(action: QuickAction) {
     Card(

@@ -132,16 +132,11 @@ class CTODesignOrchestrator(
                 "lumber_sizing" to "NDS National Design Specification for Wood",
                 "concrete_design" to "ACI 318 Building Code Requirements"
             ),
-            designBestPractices = mapOf(
+            designGuidelines = mapOf(
                 "bim_coordination" to "Use BIM for clash detection and MEP coordination",
                 "code_compliance" to "Automated code checking before permit submission",
                 "value_engineering" to "Optimize material selection for cost-performance balance",
                 "constructability" to "Design for ease of construction and phasing"
-            ),
-            materialDatabases = listOf(
-                "Sweets Catalog",
-                "Manufacturer BIM Objects",
-                "CSI MasterFormat Specifications"
             )
         )
     }
@@ -558,7 +553,7 @@ class CTODesignOrchestrator(
         Log.d(TAG, "Generating blueprint for ${projectRequirements.projectType}")
         
         val blueprint = Blueprint(
-            id = UUID.randomUUID().toString(),
+            blueprintId = UUID.randomUUID().toString(),
             projectId = projectRequirements.projectId,
             projectType = projectRequirements.projectType,
             squareFootage = projectRequirements.squareFootage,
@@ -573,11 +568,11 @@ class CTODesignOrchestrator(
             version = "1.0"
         )
         
-        blueprintLibrary[blueprint.id] = blueprint
-        
+        blueprintLibrary[blueprint.blueprintId] = blueprint
+
         Log.i(TAG, "Blueprint generated successfully: ${blueprint.id}")
         Result.success(blueprint)
-        
+
     } catch (e: Exception) {
         Log.e(TAG, "Failed to generate blueprint", e)
         Result.failure(e)
@@ -593,20 +588,19 @@ class CTODesignOrchestrator(
         Log.d(TAG, "Creating 3D model from blueprint: $blueprintId")
         
         val model = ThreeDModel(
-            id = UUID.randomUUID().toString(),
-            blueprintId = blueprintId,
+            modelId = UUID.randomUUID().toString(),
             projectId = blueprint.projectId,
+            name = "3D Model - ${blueprint.projectType}",
             modelType = ModelType.EXTERIOR_INTERIOR,
-            renderQuality = RenderQuality.HIGH,
-            views = generateModelViews(blueprint),
+            renderingQuality = RenderingQuality.HIGH_QUALITY,
             materials = generateModelMaterials(blueprint),
-            lighting = "Natural + Artificial",
-            createdDate = LocalDateTime.now()
+            createdDate = LocalDateTime.now(),
+            blueprintId = blueprintId
         )
         
-        threeDModels[model.id] = model
-        
-        Log.i(TAG, "3D model created successfully: ${model.id}")
+        threeDModels[model.modelId] = model
+
+        Log.i(TAG, "3D model created successfully: ${model.modelId}")
         Result.success(model)
         
     } catch (e: Exception) {
@@ -634,7 +628,7 @@ class CTODesignOrchestrator(
         }
         
         shopDrawings.forEach { drawing ->
-            this.shopDrawings[drawing.id] = drawing
+            this.shopDrawings[drawing.drawingId] = drawing
         }
         
         Log.i(TAG, "Generated ${shopDrawings.size} shop drawings for $tradeType")
@@ -655,19 +649,24 @@ class CTODesignOrchestrator(
         
         Log.d(TAG, "Calculating material takeoff for blueprint: $blueprintId")
         
+        val categories = calculateMaterialCategories(blueprint)
+        val allItems = categories.values.flatMap { it.items }
+        val totalCost = allItems.sumOf { it.totalCost }
+
         val takeoff = MaterialTakeoff(
-            id = UUID.randomUUID().toString(),
-            blueprintId = blueprintId,
+            takeoffId = UUID.randomUUID().toString(),
             projectId = blueprint.projectId,
-            categories = calculateMaterialCategories(blueprint),
-            totalQuantities = calculateTotalQuantities(blueprint),
-            estimatedCost = calculateEstimatedCost(blueprint),
-            createdDate = LocalDateTime.now()
+            trade = "All Trades",
+            description = "Complete Material Takeoff",
+            items = allItems,
+            totalCost = totalCost,
+            createdDate = LocalDateTime.now(),
+            id = blueprintId
         )
         
-        materialTakeoffs[takeoff.id] = takeoff
-        
-        Log.i(TAG, "Material takeoff calculated successfully: ${takeoff.id}")
+        materialTakeoffs[takeoff.takeoffId] = takeoff
+
+        Log.i(TAG, "Material takeoff calculated successfully: ${takeoff.takeoffId}")
         Result.success(takeoff)
         
     } catch (e: Exception) {
@@ -748,18 +747,18 @@ class CTODesignOrchestrator(
     private fun generateFramingDrawings(blueprint: Blueprint): List<ShopDrawing> {
         return listOf(
             ShopDrawing(
-                id = UUID.randomUUID().toString(),
-                blueprintId = blueprint.id,
-                tradeType = "Framing",
-                drawingType = "Floor Framing Plan",
-                details = "Structural framing layout and member sizes"
+                drawingId = UUID.randomUUID().toString(),
+                projectId = blueprint.projectId,
+                trade = "Framing",
+                description = "Floor Framing Plan - Structural framing layout and member sizes",
+                id = blueprint.blueprintId
             ),
             ShopDrawing(
-                id = UUID.randomUUID().toString(),
-                blueprintId = blueprint.id,
-                tradeType = "Framing",
-                drawingType = "Roof Framing Plan",
-                details = "Roof structure and truss layout"
+                drawingId = UUID.randomUUID().toString(),
+                projectId = blueprint.projectId,
+                trade = "Framing",
+                description = "Roof Framing Plan - Roof structure and truss layout",
+                id = blueprint.blueprintId
             )
         )
     }
@@ -767,11 +766,11 @@ class CTODesignOrchestrator(
     private fun generateElectricalDrawings(blueprint: Blueprint): List<ShopDrawing> {
         return listOf(
             ShopDrawing(
-                id = UUID.randomUUID().toString(),
-                blueprintId = blueprint.id,
-                tradeType = "Electrical",
-                drawingType = "Electrical Layout",
-                details = "Outlet, switch, and fixture locations"
+                drawingId = UUID.randomUUID().toString(),
+                projectId = blueprint.projectId,
+                trade = "Electrical",
+                description = "Electrical Layout - Outlet, switch, and fixture locations",
+                id = blueprint.blueprintId
             )
         )
     }
@@ -779,11 +778,11 @@ class CTODesignOrchestrator(
     private fun generatePlumbingDrawings(blueprint: Blueprint): List<ShopDrawing> {
         return listOf(
             ShopDrawing(
-                id = UUID.randomUUID().toString(),
-                blueprintId = blueprint.id,
-                tradeType = "Plumbing",
-                drawingType = "Plumbing Layout",
-                details = "Water supply and waste line routing"
+                drawingId = UUID.randomUUID().toString(),
+                projectId = blueprint.projectId,
+                trade = "Plumbing",
+                description = "Plumbing Layout - Water supply and waste line routing",
+                id = blueprint.blueprintId
             )
         )
     }
@@ -791,11 +790,11 @@ class CTODesignOrchestrator(
     private fun generateHVACDrawings(blueprint: Blueprint): List<ShopDrawing> {
         return listOf(
             ShopDrawing(
-                id = UUID.randomUUID().toString(),
-                blueprintId = blueprint.id,
-                tradeType = "HVAC",
-                drawingType = "HVAC Layout",
-                details = "Ductwork and equipment placement"
+                drawingId = UUID.randomUUID().toString(),
+                projectId = blueprint.projectId,
+                trade = "HVAC",
+                description = "HVAC Layout - Ductwork and equipment placement",
+                id = blueprint.blueprintId
             )
         )
     }
@@ -803,11 +802,11 @@ class CTODesignOrchestrator(
     private fun generateGenericShopDrawings(blueprint: Blueprint, tradeType: String): List<ShopDrawing> {
         return listOf(
             ShopDrawing(
-                id = UUID.randomUUID().toString(),
-                blueprintId = blueprint.id,
-                tradeType = tradeType,
-                drawingType = "$tradeType Layout",
-                details = "Technical details for $tradeType trade"
+                drawingId = UUID.randomUUID().toString(),
+                projectId = blueprint.projectId,
+                trade = tradeType,
+                description = "$tradeType Layout - Technical details for $tradeType trade",
+                id = blueprint.blueprintId
             )
         )
     }
@@ -824,61 +823,154 @@ class CTODesignOrchestrator(
     }
     
     private fun calculateStructuralMaterials(blueprint: Blueprint): List<MaterialItem> {
+        val sqft = blueprint.squareFootage ?: 0.0
         return listOf(
-            MaterialItem("2x4x8 SPF Lumber", (blueprint.squareFootage * 0.5).toInt(), "pieces"),
-            MaterialItem("2x6x8 SPF Lumber", (blueprint.squareFootage * 0.2).toInt(), "pieces"),
-            MaterialItem("Plywood Sheathing 4x8", (blueprint.squareFootage / 30).toInt(), "sheets")
+            MaterialItem(
+                itemId = "struct_1",
+                description = "2x4x8 SPF Lumber",
+                quantity = (sqft * 0.5),
+                unit = "pieces",
+                category = MaterialCategory.LUMBER
+            ),
+            MaterialItem(
+                itemId = "struct_2",
+                description = "2x6x8 SPF Lumber",
+                quantity = (sqft * 0.2),
+                unit = "pieces",
+                category = MaterialCategory.LUMBER
+            ),
+            MaterialItem(
+                itemId = "struct_3",
+                description = "Plywood Sheathing 4x8",
+                quantity = (sqft / 30),
+                unit = "sheets",
+                category = MaterialCategory.LUMBER
+            )
         )
     }
     
     private fun calculateRoofingMaterials(blueprint: Blueprint): List<MaterialItem> {
+        val sqft = blueprint.squareFootage ?: 0.0
         return listOf(
-            MaterialItem("Asphalt Shingles", (blueprint.squareFootage / 100).toInt(), "squares"),
-            MaterialItem("Roofing Felt", (blueprint.squareFootage * 1.1).toInt(), "sq ft")
+            MaterialItem(
+                itemId = "roof_1",
+                description = "Asphalt Shingles",
+                quantity = (sqft / 100),
+                unit = "squares",
+                category = MaterialCategory.ROOFING
+            ),
+            MaterialItem(
+                itemId = "roof_2",
+                description = "Roofing Felt",
+                quantity = (sqft * 1.1),
+                unit = "sq ft",
+                category = MaterialCategory.ROOFING
+            )
         )
     }
-    
+
     private fun calculateSidingMaterials(blueprint: Blueprint): List<MaterialItem> {
-        val perimeterArea = blueprint.squareFootage * 0.8 // Estimated exterior wall area
+        val sqft = blueprint.squareFootage ?: 0.0
+        val perimeterArea = sqft * 0.8 // Estimated exterior wall area
         return listOf(
-            MaterialItem("Vinyl Siding", perimeterArea.toInt(), "sq ft"),
-            MaterialItem("House Wrap", perimeterArea.toInt(), "sq ft")
+            MaterialItem(
+                itemId = "siding_1",
+                description = "Vinyl Siding",
+                quantity = perimeterArea,
+                unit = "sq ft",
+                category = MaterialCategory.SIDING
+            ),
+            MaterialItem(
+                itemId = "siding_2",
+                description = "House Wrap",
+                quantity = perimeterArea,
+                unit = "sq ft",
+                category = MaterialCategory.SIDING
+            )
         )
     }
     
     private fun calculateFlooringMaterials(blueprint: Blueprint): List<MaterialItem> {
+        val sqft = blueprint.squareFootage ?: 0.0
         return listOf(
-            MaterialItem("Hardwood Flooring", (blueprint.squareFootage * 0.7).toInt(), "sq ft"),
-            MaterialItem("Tile Flooring", (blueprint.squareFootage * 0.3).toInt(), "sq ft")
+            MaterialItem(
+                itemId = "floor_1",
+                description = "Hardwood Flooring",
+                quantity = (sqft * 0.7),
+                unit = "sq ft",
+                category = MaterialCategory.FLOORING
+            ),
+            MaterialItem(
+                itemId = "floor_2",
+                description = "Tile Flooring",
+                quantity = (sqft * 0.3),
+                unit = "sq ft",
+                category = MaterialCategory.FLOORING
+            )
         )
     }
-    
+
     private fun calculateElectricalMaterials(blueprint: Blueprint): List<MaterialItem> {
+        val sqft = blueprint.squareFootage ?: 0.0
         return listOf(
-            MaterialItem("12-2 Romex Wire", (blueprint.squareFootage * 2).toInt(), "linear feet"),
-            MaterialItem("Standard Outlets", (blueprint.squareFootage / 80).toInt(), "pieces"),
-            MaterialItem("Light Switches", (blueprint.squareFootage / 150).toInt(), "pieces")
+            MaterialItem(
+                itemId = "elec_1",
+                description = "12-2 Romex Wire",
+                quantity = (sqft * 2),
+                unit = "linear feet",
+                category = MaterialCategory.ELECTRICAL
+            ),
+            MaterialItem(
+                itemId = "elec_2",
+                description = "Standard Outlets",
+                quantity = (sqft / 80),
+                unit = "pieces",
+                category = MaterialCategory.ELECTRICAL
+            ),
+            MaterialItem(
+                itemId = "elec_3",
+                description = "Light Switches",
+                quantity = (sqft / 150),
+                unit = "pieces",
+                category = MaterialCategory.ELECTRICAL
+            )
         )
     }
-    
+
     private fun calculatePlumbingMaterials(blueprint: Blueprint): List<MaterialItem> {
+        val sqft = blueprint.squareFootage ?: 0.0
         return listOf(
-            MaterialItem("PEX Pipe 3/4\"", (blueprint.squareFootage * 1.5).toInt(), "linear feet"),
-            MaterialItem("PVC Pipe 4\"", (blueprint.squareFootage * 0.5).toInt(), "linear feet")
+            MaterialItem(
+                itemId = "plumb_1",
+                description = "PEX Pipe 3/4\"",
+                quantity = (sqft * 1.5),
+                unit = "linear feet",
+                category = MaterialCategory.PLUMBING
+            ),
+            MaterialItem(
+                itemId = "plumb_2",
+                description = "PVC Pipe 4\"",
+                quantity = (sqft * 0.5),
+                unit = "linear feet",
+                category = MaterialCategory.PLUMBING
+            )
         )
     }
-    
+
     private fun calculateTotalQuantities(blueprint: Blueprint): Map<String, Int> {
+        val sqft = blueprint.squareFootage ?: 0.0
+        val bathrooms = blueprint.bathrooms ?: 0.0
         return mapOf(
-            "total_lumber_pieces" to (blueprint.squareFootage * 0.7).toInt(),
-            "total_sheets" to (blueprint.squareFootage / 30).toInt(),
-            "total_fixtures" to (blueprint.bathrooms * 3 + 1) // Bathroom fixtures + kitchen sink
+            "total_lumber_pieces" to (sqft * 0.7).toInt(),
+            "total_sheets" to (sqft / 30).toInt(),
+            "total_fixtures" to (bathrooms.toInt() * 3 + 1) // Bathroom fixtures + kitchen sink
         )
     }
-    
+
     private fun calculateEstimatedCost(blueprint: Blueprint): Double {
+        val sqft = blueprint.squareFootage ?: 0.0
         // Simple cost calculation based on square footage
-        return blueprint.squareFootage * 15.0 // $15 per sq ft for materials
+        return sqft * 15.0 // $15 per sq ft for materials
     }
     
     // Voice command handlers
@@ -966,3 +1058,9 @@ class CTODesignOrchestrator(
         return Result.success(Unit)
     }
 }
+
+data class DesignKnowledgeBase(
+    val buildingCodes: Map<String, String>,
+    val structuralStandards: Map<String, String>,
+    val designGuidelines: Map<String, String>
+)

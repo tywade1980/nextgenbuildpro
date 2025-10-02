@@ -279,8 +279,10 @@ class HierarchicalCatalogueExample(private val context: Context) {
                     Log.d(TAG, "  Equipment Cost: $${String.format("%.2f", totalEquipmentCost)}")
                     Log.d(TAG, "  Markup (20%): $${String.format("%.2f", markup)}")
                     Log.d(TAG, "  Grand Total: $${String.format("%.2f", grandTotal)}")
+                } else {
+                    Log.d(TAG, "Wall assembly not found for cost calculation")
                 }
-                
+
             } catch (e: Exception) {
                 Log.e(TAG, "Error demonstrating cost calculation", e)
             }

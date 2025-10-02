@@ -196,7 +196,7 @@ class ReceptionistInCallService : InCallService() {
      * Start a counter to auto-answer after specified number of rings
      */
     private fun startRingCounter(callId: String) {
-        val callState = activeCalls[callId] ?: return
+        activeCalls[callId] ?: return
 
         // Start a handler to count rings and auto-answer
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
@@ -241,7 +241,7 @@ class ReceptionistInCallService : InCallService() {
      * Simulate transcription updates (for demonstration)
      */
     private fun simulateTranscriptionUpdates(callId: String) {
-        val callState = activeCalls[callId] ?: return
+        activeCalls[callId] ?: return
 
         // Sample conversation snippets
         val conversationSnippets = listOf(
@@ -321,7 +321,7 @@ class ReceptionistInCallService : InCallService() {
      * Take over the call (transfer from AI to user)
      */
     fun takeOverCall(callId: String) {
-        val callState = activeCalls[callId] ?: return
+        activeCalls[callId] ?: return
 
         // Inform the caller that they're being transferred
         if (isTtsReady) {
@@ -341,7 +341,7 @@ class ReceptionistInCallService : InCallService() {
      * Send call to voicemail
      */
     fun sendToVoicemail(callId: String) {
-        val callState = activeCalls[callId] ?: return
+        activeCalls[callId] ?: return
 
         // Inform the caller that they're being sent to voicemail
         if (isTtsReady) {

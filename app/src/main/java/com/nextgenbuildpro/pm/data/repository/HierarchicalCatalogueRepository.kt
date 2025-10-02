@@ -36,8 +36,6 @@ class HierarchicalCatalogueRepository(private val context: Context) {
             // Create project types
             val projectTypes = listOf(
                 createNewConstructionProjectType(webResources),
-                createRemodelingProjectType(webResources),
-                createAdditionProjectType(webResources),
                 createRepairMaintenanceProjectType(webResources)
             )
 
@@ -259,7 +257,7 @@ class HierarchicalCatalogueRepository(private val context: Context) {
     /**
      * Get navigation information for a specific item in the hierarchy
      */
-    fun getNavigationInfo(itemId: String, level: CatalogueLevel): CatalogueNavigation? {
+    fun getNavigationInfo(itemId: String, level: CatalogueLevel): CatalogueNavigation {
         // Implementation would traverse the hierarchy to find the item and build navigation
         return CatalogueNavigation(
             currentLevel = level,

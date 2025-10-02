@@ -55,7 +55,7 @@ fun DigitalSignatureScreen(
 
     // Create repositories
     val signatureRepository = remember { DigitalSignatureRepository(context) }
-    val leadRepository = remember { LeadRepository() }
+    remember { LeadRepository() }
 
     // State for the screen
     var currentTab by remember { mutableStateOf(0) }
@@ -496,7 +496,7 @@ fun UploadDocumentDialog(
     documentType: DocumentType,
     onDocumentTypeChanged: (DocumentType) -> Unit
 ) {
-    val context = LocalContext.current
+    LocalContext.current
     var documentTitle by remember { mutableStateOf("") }
     var documentDescription by remember { mutableStateOf("") }
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }

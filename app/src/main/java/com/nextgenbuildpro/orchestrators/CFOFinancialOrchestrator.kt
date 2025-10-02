@@ -114,9 +114,27 @@ class CFOFinancialOrchestrator(
                 )
             ),
             laborRates = mapOf(
-                "carpenter" to LaborRate("carpenter", "Carpenter", CostRange(35.0, 55.0), SkillLevel.ADVANCED, "US-Average"),
-                "electrician" to LaborRate("electrician", "Electrician", CostRange(45.0, 75.0), SkillLevel.EXPERT, "US-Average"),
-                "laborer" to LaborRate("laborer", "General Laborer", CostRange(20.0, 30.0), SkillLevel.BEGINNER, "US-Average")
+                "carpenter" to LaborRate(
+                    trade = "carpenter",
+                    hourlyRate = CostRange(35.0, 55.0),
+                    skillLevel = SkillLevel.ADVANCED,
+                    region = "US-Average",
+                    tradeName = "Carpenter"
+                ),
+                "electrician" to LaborRate(
+                    trade = "electrician",
+                    hourlyRate = CostRange(45.0, 75.0),
+                    skillLevel = SkillLevel.EXPERT,
+                    region = "US-Average",
+                    tradeName = "Electrician"
+                ),
+                "laborer" to LaborRate(
+                    trade = "laborer",
+                    hourlyRate = CostRange(20.0, 30.0),
+                    skillLevel = SkillLevel.BEGINNER,
+                    region = "US-Average",
+                    tradeName = "General Laborer"
+                )
             ),
             materialPrices = mapOf(
                 "concrete" to MaterialPrice("concrete", "Concrete 3000PSI", "CY", 120.0, "Regional Ready Mix", 2, 1.0, MaterialAvailability.IN_STOCK),
@@ -345,11 +363,7 @@ class CFOFinancialOrchestrator(
         return Result.success(null)
     }
     
-    override suspend fun executeTask(task: NextGenTask): Result<NextGenTask> {
-        return processTask(task)
-    }
-    
-    override suspend fun processTask(task: NextGenTask): Result<NextGenTask> = try {
+    override suspend fun executeTask(task: NextGenTask): Result<NextGenTask> = try {
         Log.d(TAG, "Processing task: ${task.description}")
         
         val updatedTask = when (task.type) {
