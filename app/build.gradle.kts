@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.gms.google-services")
 }
 
@@ -10,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.nextgenbuildpro"
-        minSdk = 26
+        minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -36,9 +37,6 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
     }
     packaging {
         resources {
@@ -67,6 +65,9 @@ dependencies {
     // Image loading
     implementation("io.coil-kt:coil-compose:2.7.0")
 
+    // HTTP client for API calls
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     // Firebase
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
@@ -79,10 +80,23 @@ dependencies {
     implementation("com.google.firebase:firebase-common-ktx")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
+    // ML Kit for Computer Vision
+    implementation("com.google.mlkit:object-detection:17.0.1")
+    implementation("com.google.mlkit:object-detection-custom:17.0.1")
+    implementation("com.google.mlkit:image-labeling:17.0.1")
+    implementation("com.google.mlkit:image-labeling-custom:17.0.1")
+
+    // ARCore for Augmented Reality
+    implementation("com.google.ar:core:1.42.0")
+    implementation("io.github.sceneview:sceneview:1.0.1")
+
+    // OpenAI API for LLM integration
+    implementation("com.aallam.openai:openai-client:3.7.0")
+
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.mockito:mockito-core:5.1.1")
     testImplementation("org.mockito:mockito-inline:5.1.1")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.20")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:2.0.21")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

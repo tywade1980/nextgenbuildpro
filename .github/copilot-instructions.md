@@ -4,29 +4,30 @@ This document provides essential information for GitHub Copilot coding agents wo
 
 ## 🚀 Quick Start for Copilot Agents
 
-**Key Context**: This is a hybrid Android/TypeScript construction management app with a unique multi-agent AI architecture. Before making changes:
+**Key Context**: This is a hybrid Android/TypeScript construction management app with a unique **C-Suite Executive** multi-agent AI architecture. Before making changes:
 1. Understand which build system you're working with (Gradle for Android, npm for frontend)
-2. Check if your changes affect AI agent coordination (`MainOrchestrator.kt`) 
+2. Check if your changes affect orchestrator coordination (`MainOrchestrator.kt` + `OrchestratorManager.kt`)
 3. Verify Firebase integration requirements if working with data services
 4. Test both platforms if making cross-cutting changes
 
 ## Repository Overview
 
-**NextGen BuildPro** is an Android application built in Kotlin that implements a Multi-Agent AI Operating System for the construction industry. The project combines specialized AI agents with human intelligence to create an adaptive construction management platform.
+**NextGen BuildPro** is an Android application built in Kotlin that implements a Multi-Agent AI Operating System for the construction industry. The project uses a **corporate C-Suite architecture** where AI agents are structured like company executives managing operational sub-agents.
 
 ### Key Specifications
-- **Platform**: Android (Jetpack Compose UI), Kotlin 2.0.21, Gradle 8.11.1
+- **Platform**: Android (Jetpack Compose UI), Kotlin 2.0.21, Gradle 8.12.0
 - **Target SDK**: API 34 (Android 14), **Min SDK**: API 26
-- **Repository Size**: 197 Kotlin files across multiple modules
-- **Architecture**: Multi-Agent AI System with 5 core agents
+- **Architecture**: Corporate C-Suite Multi-Agent System (CEO → 6 C-Suite Executives → 5-8 Sub-Agents each)
 - **Frontend**: TypeScript/React Native hybrid with npm scripts
+- **Key Files**: ~197 Kotlin files, 13+ departmental orchestrators
 
-### Core AI Agents
-1. **MRM (Master Resource Manager)** - Resource allocation and optimization
-2. **HermesBrain** - Communication hub and coordination
-3. **BigDaddyAgent** - Executive decision-making and strategic oversight
-4. **HRM Model** - Human resource management
-5. **EliteHuman** - Human excellence and creativity amplification
+### Corporate C-Suite AI Architecture
+1. **CEO Personal Assistant** - Primary human interface, directs MainOrchestrator  
+2. **COO Operations** - Project management, field operations, equipment
+3. **CFO Financial** - Estimating, accounting, analytics, budgeting
+4. **CHRO/CMO Client/HR** - CRM, marketing, HR, client quality
+5. **CTO Design** - CAD, blueprints, 3D modeling, technical design
+6. **CSO Safety** - Safety compliance, permits, OSHA regulations
 
 ## Build and Development
 
@@ -38,14 +39,16 @@ This document provides essential information for GitHub Copilot coding agents wo
 ### Build Process
 
 **In Full Development Environment**:
-```bash
-./gradlew clean && ./gradlew build
+```powershell
+./gradlew clean
+./gradlew build
 ```
 
 **CRITICAL ISSUE**: Plugin not found errors for `org.jetbrains.kotlin.plugin.compose:2.0.21`
 - **Cause**: Kotlin Compose Plugin requires proper Android SDK setup and compatible versions
 - **Solution**: Use Android Studio or ensure Android SDK is properly installed
 - **Sandbox Workaround**: Focus on Kotlin code analysis/modification without compilation
+- **Current Gradle**: 8.12.0 with Android Gradle Plugin 8.12.0
 
 ### Frontend Development
 
@@ -67,6 +70,7 @@ npm run test     # Jest testing
 npm run seed:catalogue    # Seed construction catalogue
 npm run seed:verify      # Verify seeded data
 npm run seed:demo        # Run seeding demo
+npm run seed:run         # Alternative seeder runner
 ```
 
 **Note**: Frontend dependencies need to be installed with `npm install` before running scripts.
@@ -90,68 +94,79 @@ npm run seed:demo        # Run seeding demo
 ### Directory Structure
 ```
 app/src/main/java/com/nextgenbuildpro/
-├── agents/                     # Core AI agents (MRM, HermesBrain, BigDaddy, etc.)
-├── apps/                      # Main applications (CallScreen, Dialer, Construction)
-├── core/                      # MainOrchestrator, services, API integrations
-├── crm/                       # CRM module with AI assistant
-├── pm/                        # Project management and test utilities
-├── ui/                        # UI components and screens
-├── shared/                    # Shared types and utilities
-├── env/LivingEnv.kt          # Living Environment Mesh
-├── bms/                       # Building Management System
-├── clientengagement/          # Client engagement features
-├── debug/                     # Debug utilities and monitoring
-├── features/                  # Feature-specific modules
-├── navigation/                # Navigation components
-├── receptionist/              # AI receptionist service
-├── service/                   # Service layer components
-├── timeclock/                 # Time tracking functionality
-└── util/                      # Utility functions
+├── orchestrators/             # C-Suite executive orchestrators (OrchestratorManager.kt)
+│   ├── CEOPersonalAssistantOrchestrator.kt
+│   ├── COOOperationsOrchestrator.kt  
+│   ├── CFOFinancialOrchestrator.kt
+│   └── [CHRO, CTO, CSO]Orchestrator.kt
+├── agents/                    # Sub-agent implementations by department
+│   ├── personal_assistant/    # CEO sub-agents
+│   ├── estimating/           # CFO sub-agents  
+│   └── crm/                  # CHRO sub-agents
+├── core/                     # MainOrchestrator.kt, services, API integrations
+├── shared/                   # Types.kt - ALL shared interfaces and types
+├── ai/llm/                   # OpenRouterService.kt, LLMService implementations
+├── mcp/                      # Model Context Protocol server integration
+├── apps/                     # Main applications (CallScreen, Dialer, Construction)
+├── ui/                       # UI components and screens
+├── navigation/               # Navigation components
+├── data/                     # Data layer repositories and models
+└── [bms, crm, pm, debug, etc.] # Feature modules
 ```
 
 ### Frontend Structure
 ```
 ├── EstimateEditor.js          # Construction estimate editor
+├── models/CatalogueSchema.ts  # TypeScript data models
+├── services/CatalogueDataService.ts # Firebase integration services
+├── seeds/                     # Database seeding (seedCatalogue.ts, demo.ts)
+├── tests/                     # Jest test files
+├── examples/                  # Code examples and demos
 ├── package.json               # npm dependencies and scripts
-├── tsconfig.json              # TypeScript configuration
-├── jest.config.js             # Jest testing configuration
-├── seeds/                     # Database seeding scripts
-└── examples/                  # Code examples and demos
+└── tsconfig.json              # TypeScript configuration
 ```
 
 ### Key Files
-- **MainActivity.kt** - Entry point, initializes ModuleManager and automation
-- **MainOrchestrator.kt** - Central orchestration engine
-- **BigDaddyAgent.kt** - Example AI agent implementation
+- **MainActivity.kt** - Entry point, initializes NextGenBuildProApplication
+- **core/MainOrchestrator.kt** - Central orchestration engine, coordinates OrchestratorManager
+- **orchestrators/OrchestratorManager.kt** - Manages 6 C-Suite executives + sub-agents
+- **shared/Types.kt** - ALL interfaces: DepartmentalOrchestrator, SpecializedAgent, etc.
+- **ai/llm/OpenRouterService.kt** - Multi-LLM service (o1, Claude, GPT models)
 - **google-services.json** - Firebase configuration (required)
-- **buildgradle.txt** - Legacy build configuration reference
 
 ## Key Development Patterns
 
-### AI Agent Implementation
-All agents implement `LearningAgent` interface from `shared/Types.kt`:
+### C-Suite Orchestrator Implementation
+All orchestrators implement `DepartmentalOrchestrator` interface from `shared/Types.kt`:
 ```kotlin
-interface LearningAgent : NextGenAgent {
-    suspend fun learn(data: LearningData): Result<Unit>
-    suspend fun getKnowledgeBase(): Map<String, Any>
-    suspend fun updateModel(parameters: Map<String, Any>): Result<Unit>
+interface DepartmentalOrchestrator : LearningAgent {
+    val departmentName: String
+    val toolsets: List<OrchestratorTool>
+    val subAgents: List<SubAgent>
+    
+    suspend fun processVoiceCommand(command: String): Result<String>
+    suspend fun delegateToSubAgent(task: NextGenTask): Result<NextGenTask>
+    suspend fun executeTask(task: NextGenTask): Result<NextGenTask>
 }
 ```
 
-**Pattern**: Use `MutableStateFlow` for state, `Mutex` for thread safety, maintain knowledge bases
+**Pattern**: Each C-Suite executive manages 5-8 `SubAgent` implementations with specialized ML models and MCP tools
 
-### Service Architecture
-Services implement `NextGenService` interface:
+### Sub-Agent Architecture
+Sub-agents implement `SubAgent` interface extending `SpecializedAgent`:
 ```kotlin
-interface NextGenService {
-    val serviceName: String
-    val isRunning: StateFlow<Boolean>
-    suspend fun start(): Result<Unit>
-    suspend fun stop(): Result<Unit>
-    suspend fun restart(): Result<Unit>
-    suspend fun getHealthStatus(): ServiceHealth
+interface SubAgent : SpecializedAgent {
+    val departmentHead: AgentType
+    val subAgentRole: String
+    val mlModel: MLModelConfig?
+    val mcpTools: List<MCPTool>
+    
+    suspend fun executeSpecializedTask(task: NextGenTask): Result<NextGenTask>
+    suspend fun requestHumanApproval(task: NextGenTask, reason: String): Result<HumanApprovalRecord>
 }
 ```
+
+**Pattern**: Use `MutableStateFlow` for state, `Mutex` for thread safety, specialized tooling per domain
 
 ### Critical Dependencies
 - **Jetpack Compose** - UI toolkit
@@ -160,6 +175,8 @@ interface NextGenService {
 - **Material Design 3** - UI components
 - **React Native** - Hybrid mobile framework for cross-platform features
 - **TypeScript** - Type-safe JavaScript for frontend development
+- **OpenRouter API** - Multi-LLM access (o1, Claude, GPT models)
+- **MCP (Model Context Protocol)** - Tool integration for sub-agents
 
 ## Code Style and Conventions
 
@@ -184,10 +201,11 @@ interface NextGenService {
 ## Common Workflows
 
 ### Making Changes to AI Agents
-1. Modify agent in `agents/` directory
-2. Update tests in `pm/test/` if applicable
-3. Test through `AutomationDebugger.kt`
-4. Verify integration with `MainOrchestrator.kt`
+1. **C-Suite Orchestrators**: Modify in `orchestrators/` directory, update `OrchestratorManager.kt` registration
+2. **Sub-Agents**: Modify in `agents/{department}/` directory, ensure integration with parent orchestrator
+3. Update tests in `pm/test/` if applicable, use `AutomationDebugger.kt` for testing
+4. Verify coordination through `MainOrchestrator.kt` → `OrchestratorManager.kt` flow
+5. Update `shared/Types.kt` if adding new interfaces or enums
 
 ### Adding New Features
 1. Implement data layer (repositories, models)
@@ -248,6 +266,28 @@ This instruction set minimizes exploration time and maximizes productivity withi
 - The codebase uses a unique multi-agent AI architecture - changes to one agent may affect others
 - Firebase integration is critical - many features require proper `google-services.json` configuration  
 - The project combines Android native and React Native/TypeScript - consider both platforms when making changes
+- Testing infrastructure is distributed across multiple locations (`app/src/test/` and `app/src/main/.../test/`)
+- Build issues often relate to Android SDK setup - focus on code analysis in sandboxed environments
+
+## Expected Outputs and Quality Standards
+
+### Code Quality
+- All Kotlin code should compile against Kotlin 2.0.21+ and follow coroutine patterns
+- TypeScript code should type-check with strict settings (`tsconfig.json`)
+- UI components should follow Material Design 3 guidelines
+- All agents should implement proper error handling with `Result<T>` patterns
+
+### Testing Expectations  
+- New agent features should have tests in `app/src/main/.../test/` or `app/src/test/`
+- Frontend functionality should have Jest tests in `tests/` directory
+- Complex integrations should be testable through `AutomationDebugger.kt`
+- Firebase-dependent features may require mock implementations for testing
+
+### Documentation Standards
+- New AI agents should document their capabilities and integration points
+- API changes should update relevant README files in module directories
+- Cross-platform features should note compatibility requirements
+- Complex algorithms should include inline documentation explaining the construction domain context
 - Testing infrastructure is distributed across multiple locations (`app/src/test/` and `app/src/main/.../test/`)
 - Build issues often relate to Android SDK setup - focus on code analysis in sandboxed environments
 

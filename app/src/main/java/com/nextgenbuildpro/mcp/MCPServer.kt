@@ -119,15 +119,15 @@ class MCPServer private constructor() {
     
     private fun startMessageProcessor() {
         scope.launch {
-            while (isActive) {
+            while (scope.isActive) {
                 delay(100)
             }
         }
     }
-    
+
     private fun startMetricsCollector() {
         scope.launch {
-            while (isActive) {
+            while (scope.isActive) {
                 updateMetrics()
                 delay(5000)
             }

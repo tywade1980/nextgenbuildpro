@@ -41,6 +41,33 @@ fun AssembliesScreen(navController: NavController) {
     var assemblies by remember { mutableStateOf<List<Assembly>>(emptyList()) }
     var jobTemplates by remember { mutableStateOf<List<JobTemplate>>(emptyList()) }
 
+    // Search state
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearchActive by remember { mutableStateOf(false) }
+
+    // Filtered data based on search
+    val filteredAssemblies by remember(assemblies, searchQuery) {
+        derivedStateOf {
+            if (searchQuery.isBlank()) assemblies
+            else assemblies.filter {
+                it.name.contains(searchQuery, ignoreCase = true) ||
+                it.description.contains(searchQuery, ignoreCase = true) ||
+                it.tradeName.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
+    val filteredJobTemplates by remember(jobTemplates, searchQuery) {
+        derivedStateOf {
+            if (searchQuery.isBlank()) jobTemplates
+            else jobTemplates.filter {
+                it.name.contains(searchQuery, ignoreCase = true) ||
+                it.description.contains(searchQuery, ignoreCase = true) ||
+                it.tradeName.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
     // Load data
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -78,10 +105,10 @@ fun AssembliesScreen(navController: NavController) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Implement search */ }) {
+                    IconButton(onClick = { isSearchActive = !isSearchActive }) {
                         Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search"
+                            imageVector = if (isSearchActive) Icons.Default.Close else Icons.Default.Search,
+                            contentDescription = if (isSearchActive) "Close Search" else "Search"
                         )
                     }
                 }
@@ -93,6 +120,35 @@ fun AssembliesScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            // Search bar when active
+            if (isSearchActive) {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    placeholder = { Text("Search assemblies and templates...") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search"
+                        )
+                    },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { searchQuery = "" }) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = "Clear search"
+                                )
+                            }
+                        }
+                    },
+                    singleLine = true
+                )
+            }
+
             // Trade categories horizontal list
             LazyRow(
                 modifier = Modifier
@@ -128,7 +184,7 @@ fun AssembliesScreen(navController: NavController) {
                     )
                 }
 
-                items(jobTemplates) { template ->
+                items(filteredJobTemplates) { template ->
                     JobTemplateCard(
                         template = template,
                         onClick = {
@@ -148,7 +204,7 @@ fun AssembliesScreen(navController: NavController) {
                     )
                 }
 
-                items(assemblies) { assembly ->
+                items(filteredAssemblies) { assembly ->
                     AssemblyCard(
                         assembly = assembly,
                         onClick = {

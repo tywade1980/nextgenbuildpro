@@ -2,17 +2,26 @@ package com.nextgenbuildpro.pm.data.repository
 
 import android.content.Context
 import android.util.Log
+import com.nextgenbuildpro.core.api.FirestoreService
 import com.nextgenbuildpro.pm.data.model.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
 import java.time.LocalDateTime
 
 /**
  * Repository for managing the hierarchical indexed catalogue
  * Provides comprehensive construction project data with detailed assemblies, tasks, and web-sourced cost information
  */
-class HierarchicalCatalogueRepository(private val context: Context) {
+class HierarchicalCatalogueRepository(
+    private val context: Context,
+    private val firestoreService: FirestoreService? = null
+) {
     private val TAG = "HierarchicalCatalogueRepo"
     
     private val _projectCatalogue = MutableStateFlow<ProjectCatalogue?>(null)
@@ -22,17 +31,139 @@ class HierarchicalCatalogueRepository(private val context: Context) {
     val searchResults: StateFlow<List<Any>> = _searchResults.asStateFlow()
 
     init {
-        loadComprehensiveConstructionCatalogue()
+        // Load fallback data synchronously for immediate availability
+        loadFallbackCatalogueSync()
+        // Attempt to load from Firestore asynchronously (fire and forget)
+        attemptAsyncFirestoreLoad()
+    }
+
+    /**
+     * Attempt to load catalogue from Firestore asynchronously
+     */
+    private fun attemptAsyncFirestoreLoad() {
+        try {
+            GlobalScope.launch(Dispatchers.IO) {
+                try {
+                    val firestoreCatalogue = loadCatalogueFromFirestore()
+                    if (firestoreCatalogue != null) {
+                        // Update on main thread
+                        withContext(Dispatchers.Main) {
+                            _projectCatalogue.value = firestoreCatalogue
+                            Log.d(TAG, "Loaded catalogue from Firestore")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error loading catalogue from Firestore", e)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error starting async Firestore load", e)
+        }
     }
 
     /**
      * Load comprehensive construction catalogue with detailed hierarchical data
+     * Attempts to load from Firestore first, falls back to hardcoded data
      */
-    private fun loadComprehensiveConstructionCatalogue() {
+    private suspend fun loadCatalogueFromFirestore(): ProjectCatalogue? {
+        return try {
+            if (firestoreService == null || !firestoreService.isServiceAvailable()) {
+                Log.d(TAG, "Firestore not available, using fallback data")
+                return null
+            }
+
+            val catalogueCollection = firestoreService.getCollection("catalogues")
+            val snapshot = catalogueCollection
+                .whereEqualTo("name", "Home Construction Master Catalogue")
+                .limit(1)
+                .get()
+                .await()
+
+            if (!snapshot.isEmpty) {
+                val doc = snapshot.documents.first()
+                // Parse Firestore data into ProjectCatalogue
+                // This would be a complex mapping - for now return null to use fallback
+                Log.d(TAG, "Found catalogue in Firestore: ${doc.id}")
+                null // TODO: Implement full Firestore parsing
+            } else {
+                Log.d(TAG, "No catalogue found in Firestore, using fallback data")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading catalogue from Firestore", e)
+            null
+        }
+    }
+
+
+
+    /**
+     * Synchronous fallback catalogue loading for error cases
+     */
+    private fun loadFallbackCatalogueSync() {
         try {
             // Create web resource URLs for cost data sourcing
             val webResources = createWebResources()
-            
+
+            // Create project types (simplified synchronous version)
+            val projectTypes = listOf(
+                createNewConstructionProjectTypeSync(webResources),
+                createRepairMaintenanceProjectType(webResources)
+            )
+
+            // Create the root project catalogue
+            val catalogue = ProjectCatalogue(
+                name = "Home Construction Master Catalogue",
+                description = "Comprehensive hierarchical catalogue for residential construction projects with detailed assemblies, tasks, material specifications, and labor cost data sourced from industry web resources",
+                version = "1.0.0",
+                projectTypes = projectTypes
+            )
+
+            _projectCatalogue.value = catalogue
+            Log.d(TAG, "Loaded sync fallback construction catalogue with ${projectTypes.size} project types")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading sync fallback construction catalogue", e)
+        }
+    }
+
+    /**
+     * Synchronous version of createNewConstructionProjectType for error fallback
+     */
+    private fun createNewConstructionProjectTypeSync(webResources: List<WebResourceUrl>): ProjectType {
+        val trades = listOf(
+            createEmptyTradeIndex("Framing", "FRM", "Structural framing and carpentry work", HomeLifecyclePhase.STRUCTURE, webResources),
+            createEmptyTradeIndex("Electrical", "ELC", "Electrical system installation", HomeLifecyclePhase.SYSTEMS, webResources),
+            createEmptyTradeIndex("Plumbing", "PLM", "Plumbing system installation", HomeLifecyclePhase.SYSTEMS, webResources),
+            createEmptyTradeIndex("HVAC", "HVC", "HVAC system installation", HomeLifecyclePhase.SYSTEMS, webResources),
+            createEmptyTradeIndex("Drywall", "DRY", "Drywall installation and finishing", HomeLifecyclePhase.INTERIORS, webResources),
+            createEmptyTradeIndex("Roofing", "ROF", "Roofing system installation", HomeLifecyclePhase.ENCLOSURE, webResources),
+            createEmptyTradeIndex("Foundation", "FND", "Foundation and concrete work", HomeLifecyclePhase.STRUCTURE, webResources)
+        )
+
+        return ProjectType(
+            name = "New Construction",
+            description = "Complete new residential construction from foundation to finish",
+            code = "NC",
+            contextMode = ContextMode.NEW_CONSTRUCTION,
+            applicablePhases = HomeLifecyclePhase.values().toList(),
+            trades = trades,
+            metadata = mapOf(
+                "typical_duration" to "6-12 months",
+                "complexity" to "high",
+                "permit_required" to "true"
+            )
+        )
+    }
+
+    /**
+     * Load fallback hardcoded catalogue data
+     */
+    private suspend fun loadFallbackCatalogue() {
+        try {
+            // Create web resource URLs for cost data sourcing
+            val webResources = createWebResources()
+
             // Create project types
             val projectTypes = listOf(
                 createNewConstructionProjectType(webResources),
@@ -48,10 +179,10 @@ class HierarchicalCatalogueRepository(private val context: Context) {
             )
 
             _projectCatalogue.value = catalogue
-            Log.d(TAG, "Loaded comprehensive construction catalogue with ${projectTypes.size} project types")
-            
+            Log.d(TAG, "Loaded fallback construction catalogue with ${projectTypes.size} project types")
+
         } catch (e: Exception) {
-            Log.e(TAG, "Error loading construction catalogue", e)
+            Log.e(TAG, "Error loading fallback construction catalogue", e)
         }
     }
 
@@ -102,7 +233,7 @@ class HierarchicalCatalogueRepository(private val context: Context) {
     /**
      * Create New Construction project type with comprehensive trade data
      */
-    private fun createNewConstructionProjectType(webResources: List<WebResourceUrl>): ProjectType {
+    private suspend fun createNewConstructionProjectType(webResources: List<WebResourceUrl>): ProjectType {
         val trades = listOf(
             createFramingTradeIndex(webResources),
             createElectricalTradeIndex(webResources),
@@ -130,16 +261,56 @@ class HierarchicalCatalogueRepository(private val context: Context) {
 
     /**
      * Create Framing trade index with detailed assemblies and tasks
-     * TODO: Load from Firestore instead of hardcoded data
+     * Attempts to load from Firestore, falls back to empty structure
      */
-    private fun createFramingTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
-        return createEmptyTradeIndex(
-            tradeName = "Framing",
-            tradeCode = "FRM",
-            description = "Structural framing and carpentry work",
-            lifecyclePhase = HomeLifecyclePhase.STRUCTURE,
-            webResources = webResources
-        )
+    private suspend fun createFramingTradeIndex(webResources: List<WebResourceUrl>): TradeIndex {
+        return try {
+            // Try to load from Firestore first (only if service is available)
+            if (firestoreService == null) {
+                return createEmptyTradeIndex(
+                    tradeName = "Framing",
+                    tradeCode = "FRM",
+                    description = "Structural framing and carpentry work",
+                    lifecyclePhase = HomeLifecyclePhase.STRUCTURE,
+                    webResources = webResources
+                )
+            }
+
+            val tradeCollection = firestoreService.getCollection("trades")
+            val snapshot = tradeCollection
+                .whereEqualTo("tradeCode", "FRM")
+                .limit(1)
+                .get()
+                .await()
+
+            if (!snapshot.isEmpty) {
+                val doc = snapshot.documents.first()
+                val data = doc.data
+                if (data != null) {
+                    // Parse Firestore data into TradeIndex
+                    Log.d(TAG, "Loaded Framing trade from Firestore")
+                    // TODO: Implement full Firestore parsing for TradeIndex
+                }
+            }
+
+            // Fallback to empty structure
+            createEmptyTradeIndex(
+                tradeName = "Framing",
+                tradeCode = "FRM",
+                description = "Structural framing and carpentry work",
+                lifecyclePhase = HomeLifecyclePhase.STRUCTURE,
+                webResources = webResources
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading Framing trade from Firestore", e)
+            createEmptyTradeIndex(
+                tradeName = "Framing",
+                tradeCode = "FRM",
+                description = "Structural framing and carpentry work",
+                lifecyclePhase = HomeLifecyclePhase.STRUCTURE,
+                webResources = webResources
+            )
+        }
     }
 
     /**
@@ -314,8 +485,8 @@ class HierarchicalCatalogueRepository(private val context: Context) {
     }
 
     companion object {
-        fun create(context: Context): HierarchicalCatalogueRepository {
-            return HierarchicalCatalogueRepository(context)
+        fun create(context: Context, firestoreService: FirestoreService? = null): HierarchicalCatalogueRepository {
+            return HierarchicalCatalogueRepository(context, firestoreService)
         }
     }
 }

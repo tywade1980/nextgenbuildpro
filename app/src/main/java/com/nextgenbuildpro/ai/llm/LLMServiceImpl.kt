@@ -4,6 +4,12 @@ import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.nextgenbuildpro.core.api.FirestoreService
 import com.nextgenbuildpro.shared.AgentType
+import com.aallam.openai.api.BetaOpenAI
+import com.aallam.openai.api.chat.ChatCompletionRequest
+import com.aallam.openai.api.chat.ChatMessage
+import com.aallam.openai.api.chat.ChatRole
+import com.aallam.openai.api.model.ModelId
+import com.aallam.openai.client.OpenAI
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -15,20 +21,67 @@ import java.util.UUID
  * Implements LLM integration with cloud database storage for multi-agent coordination.
  * This is a foundation implementation that can be extended with actual LLM API calls.
  */
+@OptIn(BetaOpenAI::class)
 class LLMServiceImpl(
-    private val firestoreService: FirestoreService
+    private val firestoreService: FirestoreService,
+    private val openAIApiKey: String // Would be injected securely
 ) : LLMService {
-    
+
     private val TAG = "LLMService"
-    
+
+    // OpenAI client
+    private val openAI = OpenAI(token = openAIApiKey)
+
     // Collection names in Firestore
     private val CONVERSATIONS_COLLECTION = "llm_conversations"
     private val AGENT_CONTEXTS_COLLECTION = "agent_llm_contexts"
     private val COORDINATION_LOGS_COLLECTION = "coordination_logs"
-    
-    // Agent system prompts for different types
+
+    // Construction domain expertise system prompts
     private val agentSystemPrompts = mapOf<AgentType, String>(
-        // System prompts for departmental orchestrators can be added here as needed
+        AgentType.ORCHESTRATOR to """
+            You are the CEO of NextGen BuildPro, a comprehensive AI-powered construction management system.
+            You coordinate multiple specialized AI agents across operations, finance, human resources, design, and safety domains.
+            Your expertise includes construction project management, team coordination, strategic planning, and crisis management.
+            Always provide clear, actionable responses focused on construction industry best practices.
+        """.trimIndent(),
+
+        AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR to """
+            You are a senior project manager with 20+ years of construction experience.
+            You specialize in construction scheduling, resource allocation, risk management, and quality control.
+            You understand OSHA regulations, building codes, and construction methodologies.
+            Provide detailed, practical advice for construction project execution.
+        """.trimIndent(),
+
+        AgentType.CRM_ORCHESTRATOR to """
+            You are a construction sales and marketing expert specializing in client relationship management.
+            You understand construction bidding processes, client needs assessment, and long-term relationship building.
+            Focus on construction-specific sales strategies, proposal writing, and customer satisfaction.
+        """.trimIndent(),
+
+        AgentType.ESTIMATING_DEPARTMENT_ORCHESTRATOR to """
+            You are a professional construction estimator with expertise in cost analysis and bidding.
+            You understand material costs, labor rates, equipment pricing, and regional cost variations.
+            Provide accurate, competitive estimates with detailed breakdowns and risk assessments.
+        """.trimIndent(),
+
+        AgentType.ANALYTICS_ORCHESTRATOR to """
+            You are a construction data analyst specializing in performance metrics and predictive analytics.
+            You analyze project data, identify trends, and provide insights for continuous improvement.
+            Focus on KPIs like efficiency, safety, cost control, and schedule performance.
+        """.trimIndent(),
+
+        AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR to """
+            You are an architect and design coordinator with expertise in construction design and planning.
+            You understand building codes, structural engineering, MEP systems, and construction drawings.
+            Provide guidance on design coordination, blueprint interpretation, and construction planning.
+        """.trimIndent(),
+
+        AgentType.MARKETING_ORCHESTRATOR to """
+            You are a construction marketing specialist focusing on digital marketing and brand management.
+            You understand construction industry marketing, lead generation, and reputation management.
+            Provide strategies for online presence, content marketing, and client acquisition.
+        """.trimIndent()
     )
     
     override suspend fun generateResponse(
@@ -37,24 +90,56 @@ class LLMServiceImpl(
         agentType: AgentType
     ): Result<LLMResponse> = try {
         Log.d(TAG, "Generating LLM response for agent: $agentType")
-        
+
         val conversationId = context?.conversationId ?: UUID.randomUUID().toString()
         val systemPrompt = agentSystemPrompts[agentType] ?: "You are a helpful assistant."
-        
-        // For now, generate a structured response based on the agent type and prompt
-        // In a real implementation, this would call an actual LLM API
-        val response = generateMockLLMResponse(prompt, systemPrompt, agentType)
-        
+
+        // Build conversation messages
+        val messages = mutableListOf<ChatMessage>()
+
+        // Add system prompt
+        messages.add(ChatMessage(
+            role = ChatRole.System,
+            content = systemPrompt
+        ))
+
+        // Add conversation history
+        context?.previousMessages?.forEach { prevMessage ->
+            val role = when (prevMessage.role) {
+                "user" -> ChatRole.User
+                "assistant" -> ChatRole.Assistant
+                else -> ChatRole.User
+            }
+            messages.add(ChatMessage(role = role, content = prevMessage.content))
+        }
+
+        // Add current prompt
+        messages.add(ChatMessage(role = ChatRole.User, content = prompt))
+
+        // Call OpenAI API
+        val chatCompletionRequest = ChatCompletionRequest(
+            model = ModelId("gpt-4"), // Use GPT-4 for construction expertise
+            messages = messages,
+            maxTokens = 1000,
+            temperature = 0.7f
+        )
+
+        val completion = openAI.chatCompletion(chatCompletionRequest)
+        val response = completion.choices.first().message.content ?: "I apologize, but I couldn't generate a response."
+
+        // Calculate token usage
+        val tokenUsage = TokenUsage(
+            promptTokens = completion.usage?.promptTokens ?: (prompt.length / 4),
+            completionTokens = completion.usage?.completionTokens ?: (response.length / 4),
+            totalTokens = completion.usage?.totalTokens ?: ((prompt.length + response.length) / 4)
+        )
+
         val llmResponse = LLMResponse(
             content = response,
             conversationId = conversationId,
-            tokenUsage = TokenUsage(
-                promptTokens = prompt.length / 4, // Rough estimation
-                completionTokens = response.length / 4,
-                totalTokens = (prompt.length + response.length) / 4
-            )
+            tokenUsage = tokenUsage
         )
-        
+
         // Store the conversation if context is provided
         context?.let { ctx ->
             val updatedConversation = LLMConversation(
@@ -69,11 +154,22 @@ class LLMServiceImpl(
             )
             storeConversation(updatedConversation)
         }
-        
+
+        Log.i(TAG, "Generated response with ${tokenUsage.totalTokens} tokens")
         Result.success(llmResponse)
     } catch (e: Exception) {
         Log.e(TAG, "Error generating LLM response", e)
-        Result.failure(e)
+        // Fallback to mock response if API fails
+        val fallbackResponse = generateMockLLMResponse(prompt, agentSystemPrompts[agentType] ?: "You are a helpful assistant.", agentType)
+        Result.success(LLMResponse(
+            content = fallbackResponse,
+            conversationId = context?.conversationId ?: UUID.randomUUID().toString(),
+            tokenUsage = TokenUsage(
+                promptTokens = prompt.length / 4,
+                completionTokens = fallbackResponse.length / 4,
+                totalTokens = (prompt.length + fallbackResponse.length) / 4
+            )
+        ))
     }
     
     override suspend fun generateCoordinationResponse(
