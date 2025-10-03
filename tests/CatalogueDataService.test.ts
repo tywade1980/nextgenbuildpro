@@ -42,6 +42,7 @@ const mockQuerySnapshot = {
   docs: [mockDocSnap]
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mockData: any;
 let catalogueService: CatalogueDataService;
 
