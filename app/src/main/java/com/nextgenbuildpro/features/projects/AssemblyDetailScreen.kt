@@ -64,7 +64,12 @@ fun AssemblyDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Implement edit functionality */ }) {
+                    IconButton(
+                        onClick = { 
+                            // Navigate to assembly editor
+                            navController.navigate("assembly_editor/$assemblyId")
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Edit"
@@ -312,7 +317,10 @@ fun AssemblyDetailContent(assembly: Assembly) {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(
-                    onClick = { /* TODO: Implement add to project functionality */ }
+                    onClick = { 
+                        // Navigate to project selector to add assembly
+                        navController.navigate("select_project?assemblyId=$assemblyId")
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -324,7 +332,10 @@ fun AssemblyDetailContent(assembly: Assembly) {
                 }
                 
                 OutlinedButton(
-                    onClick = { /* TODO: Implement duplicate functionality */ }
+                    onClick = { 
+                        // Navigate to duplicate assembly screen
+                        navController.navigate("duplicate_assembly/$assemblyId")
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.ContentCopy,

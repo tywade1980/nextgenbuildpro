@@ -42,6 +42,8 @@ const mockQuerySnapshot = {
   docs: [mockDocSnap]
 };
 
+// Type annotation needed for mock data structure
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mockData: any;
 let catalogueService: CatalogueDataService;
 
