@@ -35,6 +35,7 @@ const EstimateEditor = ({
   // State management - equivalent to Kotlin mutableStateOf
   const [estimate, setEstimate] = useState(null);
   const [sections, setSections] = useState([]);
+  const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showAssemblySelector, setShowAssemblySelector] = useState(false);
@@ -55,6 +56,7 @@ const EstimateEditor = ({
       try {
         // Load clients
         const clientsData = await fetchClients();
+        setClients(clientsData);
         
         if (estimateId) {
           // Load existing estimate - equivalent to templateEstimateRepository.getById()
