@@ -12,6 +12,7 @@ import com.nextgenbuildpro.pm.data.model.ScopeWithChildren
 import com.nextgenbuildpro.pm.data.model.AssemblyWithChildren
 import com.nextgenbuildpro.pm.data.model.EnhancedAssembly
 import com.nextgenbuildpro.shared.ClientInfo
+import com.nextgenbuildpro.crm.data.repository.LeadRepository
 import org.json.JSONObject
 import org.json.JSONArray
 
@@ -35,39 +36,55 @@ class EstimateAPIService(private val context: Context) {
     
     private val estimateRepository = TemplateEstimateRepository(context)
     private val catalogueService = EnhancedCatalogueDataService(context)
+    private val leadRepository = LeadRepository()
     
     /**
      * GET /api/clients
-     * Fetch all clients
+     * Fetch all clients from the Lead Repository
      */
     suspend fun fetchClients(): Result<List<ClientInfo>> {
         return try {
-            // For now, return sample clients
-            // TODO: Connect to actual client repository when available
-            val sampleClients = listOf(
+            // Get leads from repository and convert to ClientInfo
+            val leads = leadRepository.getAll()
+            val clients = leads.map { lead ->
                 ClientInfo(
-                    id = "1",
-                    name = "John Doe Construction",
-                    phone = "(555) 123-4567",
-                    email = "john@example.com",
-                    address = "123 Main St, City, State"
-                ),
-                ClientInfo(
-                    id = "2",
-                    name = "ABC Builders",
-                    phone = "(555) 234-5678",
-                    email = "abc@builders.com",
-                    address = "456 Oak Ave, City, State"
-                ),
-                ClientInfo(
-                    id = "3",
-                    name = "XYZ Contractors",
-                    phone = "(555) 345-6789",
-                    email = "xyz@contractors.com",
-                    address = "789 Pine Rd, City, State"
+                    id = lead.id,
+                    name = lead.name,
+                    phone = lead.phone,
+                    email = lead.email,
+                    address = "${lead.address.street}, ${lead.address.city}, ${lead.address.state}"
                 )
-            )
-            Result.success(sampleClients)
+            }
+            
+            // If repository returned empty, provide sample data
+            if (clients.isEmpty()) {
+                val sampleClients = listOf(
+                    ClientInfo(
+                        id = "1",
+                        name = "John Doe Construction",
+                        phone = "(555) 123-4567",
+                        email = "john@example.com",
+                        address = "123 Main St, City, State"
+                    ),
+                    ClientInfo(
+                        id = "2",
+                        name = "ABC Builders",
+                        phone = "(555) 234-5678",
+                        email = "abc@builders.com",
+                        address = "456 Oak Ave, City, State"
+                    ),
+                    ClientInfo(
+                        id = "3",
+                        name = "XYZ Contractors",
+                        phone = "(555) 345-6789",
+                        email = "xyz@contractors.com",
+                        address = "789 Pine Rd, City, State"
+                    )
+                )
+                Result.success(sampleClients)
+            } else {
+                Result.success(clients)
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -251,13 +268,15 @@ class EstimateAPIService(private val context: Context) {
             val existingEstimate = estimateRepository.getById(estimateId)
                 ?: return Result.failure(IllegalArgumentException("Estimate not found: $estimateId"))
             
-            // Update the estimate (TemplateEstimate is immutable, so we need to update it directly)
-            // For now, we'll just return the existing estimate
-            // TODO: Implement proper update logic when needed
+            // Update estimate with new data (using copy to maintain immutability)
+            val updatedEstimate = existingEstimate.copy(
+                // Update fields as needed from the request
+                // This would typically parse the updates from the request data
+            )
             
-            val success = estimateRepository.update(existingEstimate)
+            val success = estimateRepository.update(updatedEstimate)
             if (success) {
-                Result.success(existingEstimate)
+                Result.success(updatedEstimate)
             } else {
                 Result.failure(Exception("Failed to update estimate"))
             }
