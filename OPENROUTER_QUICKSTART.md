@@ -220,25 +220,12 @@ openrouter.api.key=sk-or-v1-your-key-here
 
 - **Comprehensive Guide**: [app/src/main/java/com/nextgenbuildpro/ai/llm/README.md](app/src/main/java/com/nextgenbuildpro/ai/llm/README.md)
 - **API Key Management**: [app/src/main/java/com/nextgenbuildpro/core/README.md](app/src/main/java/com/nextgenbuildpro/core/README.md)
-- **Code Examples**: [app/src/main/java/com/nextgenbuildpro/examples/OpenRouterExample.kt](app/src/main/java/com/nextgenbuildpro/examples/OpenRouterExample.kt)
 - **OpenRouter Docs**: [https://openrouter.ai/docs](https://openrouter.ai/docs)
 - **Model List**: [https://openrouter.ai/models](https://openrouter.ai/models)
 
 ## 🎓 Example Usage
 
-See complete working examples in `OpenRouterExample.kt`:
-
-```kotlin
-import com.nextgenbuildpro.examples.OpenRouterExample
-
-// Run all examples (requires API key and credits)
-OpenRouterExample.runAllExamples(firestoreService)
-
-// Or run individual examples
-OpenRouterExample.example1_BasicResponse(firestoreService)
-OpenRouterExample.example2_MultiAgentCoordination(firestoreService)
-OpenRouterExample.example3_ConversationWithContext(firestoreService)
-```
+See the OpenRouterService documentation for complete working examples.
 
 ## ✅ Checklist
 
@@ -263,4 +250,4 @@ Before deploying to production:
 
 ---
 
-**Ready to build?** Start with `OpenRouterExample.kt` to see it in action! 🚀
+**Ready to build?** Review the OpenRouterService implementation to see it in action! 🚀

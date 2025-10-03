@@ -65,13 +65,13 @@ object SeedCatalogueRunner {
 }
 ```
 
-### 4. CatalogueSeederDemo.kt
-Demo class for easy testing:
+### 4. SeedCatalogueRunner.kt
+Executable runner for the seeding process:
 
 ```kotlin
-class CatalogueSeederDemo(private val context: Context) {
-    fun runSeederDemo()
-    fun verifyExistingData()
+object SeedCatalogueRunner {
+    fun runSeeding(context: Context): Boolean
+    fun verifySeedData(context: Context)
 }
 ```
 
@@ -87,17 +87,6 @@ val success = SeedCatalogueRunner.runSeeding(context)
 if (success) {
     println("Catalogue seeded successfully!")
 }
-```
-
-### Demo Usage
-
-```kotlin
-// Run the complete demo
-val demo = CatalogueSeederDemo(context)
-demo.runSeederDemo()
-
-// Or just verify existing data
-demo.verifyExistingData()
 ```
 
 ### In Tests
@@ -166,8 +155,7 @@ This will log summary statistics including:
 1. **Modified**: `EnhancedCatalogueDataService.kt` - Added overloaded createCompleteAssembly method
 2. **Created**: `CatalogueSeeder.kt` - Main seeding logic with construction data
 3. **Created**: `SeedCatalogueRunner.kt` - Executable runner and verification
-4. **Created**: `CatalogueSeederDemo.kt` - Demo and testing utilities
-5. **Created**: `CatalogueSeederTest.kt` - Unit tests for seeding functionality
+4. **Created**: `CatalogueSeederTest.kt` - Unit tests for seeding functionality
 
 ## Based on JavaScript Example
 

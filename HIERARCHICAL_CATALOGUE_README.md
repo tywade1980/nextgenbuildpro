@@ -56,9 +56,6 @@ ProjectCatalogue (Home Construction)
 - `HierarchicalCatalogueRepository.kt` - Main repository managing the catalogue data
 - `WebResourceLaborService.kt` - Service for sourcing labor costs and times from web resources
 
-### Examples and Usage
-- `HierarchicalCatalogueExample.kt` - Comprehensive examples showing how to use the system
-
 ## Data Sources and Web Resource Integration
 
 The system integrates with multiple web resources for current cost and time data:

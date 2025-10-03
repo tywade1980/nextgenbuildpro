@@ -1,18 +1,15 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+/.idea/
+.idea/
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+.kotlin/
 
 # Node.js dependencies
 node_modules/
@@ -34,3 +31,19 @@ coverage/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Backup and temporary files
+*.backup
+*.old
+*.log
+*.tmp
+*.temp
+
+# Example and demo directories
+examples/
+research/
+caroline/
+
+# Duplicate implementation files
+*_OLD.md
+*_old.md
