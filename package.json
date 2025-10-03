@@ -14,9 +14,9 @@
     "seed:demo": "npx ts-node seeds/demo.ts"
   },
   "dependencies": {
-    "firebase": "^10.13.2",
+    "firebase": "^11.10.0",
     "react": "^18.3.1",
-    "react-native": "^0.76.3",
+    "react-native": "^0.76.9",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
