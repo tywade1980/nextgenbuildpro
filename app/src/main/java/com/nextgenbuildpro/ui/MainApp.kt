@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Upload
-import androidx.compose.material.icons.filled.ViewInAr
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -195,13 +194,6 @@ fun CreateMenuDialog(
                     headlineContent = { Text("Room Scan") },
                     leadingContent = { Icon(Icons.Default.CameraAlt, contentDescription = "Room Scan") },
                     modifier = Modifier.clickable { onOptionSelected(NavDestinations.ROOM_SCAN) }
-                )
-
-                // AR Visualization
-                ListItem(
-                    headlineContent = { Text("AR Visualization") },
-                    leadingContent = { Icon(Icons.Default.ViewInAr, contentDescription = "AR Visualization") },
-                    modifier = Modifier.clickable { onOptionSelected(NavDestinations.AR_VISUALIZATION) }
                 )
 
                 // Voice to Text

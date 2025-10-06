@@ -222,12 +222,6 @@ fun getToolsItems(): List<SettingsItemData> {
             title = "Voice to Text",
             description = "Convert speech to text",
             destination = NavDestinations.VOICE_TO_TEXT
-        ),
-        SettingsItemData(
-            icon = Icons.Default.ViewInAr,
-            title = "AR Visualization",
-            description = "Visualize projects in augmented reality",
-            destination = NavDestinations.AR_VISUALIZATION
         )
     )
 }
