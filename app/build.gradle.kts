@@ -85,10 +85,6 @@ dependencies {
     implementation("com.google.mlkit:image-labeling:17.0.9")
     implementation("com.google.mlkit:image-labeling-custom:17.0.3")
 
-    // ARCore - Latest stable
-    implementation("com.google.ar:core:1.47.0")
-    implementation("io.github.sceneview:sceneview:1.0.1")
-
     // OpenAI API - Latest stable
     implementation("com.aallam.openai:openai-client:3.8.2")
 

@@ -197,13 +197,6 @@ fun CreateMenuDialog(
                     modifier = Modifier.clickable { onOptionSelected(NavDestinations.ROOM_SCAN) }
                 )
 
-                // AR Visualization
-                ListItem(
-                    headlineContent = { Text("AR Visualization") },
-                    leadingContent = { Icon(Icons.Default.ViewInAr, contentDescription = "AR Visualization") },
-                    modifier = Modifier.clickable { onOptionSelected(NavDestinations.AR_VISUALIZATION) }
-                )
-
                 // Voice to Text
                 ListItem(
                     headlineContent = { Text("Voice to Text") },

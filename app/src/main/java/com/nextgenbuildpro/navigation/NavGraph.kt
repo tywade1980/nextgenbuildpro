@@ -19,7 +19,6 @@ import com.nextgenbuildpro.features.estimates.AssemblySearchAndSelectionScreen
 import com.nextgenbuildpro.features.estimates.EnhancedEstimateEditorScreen
 import com.nextgenbuildpro.features.estimates.AssemblyIntegrationDemoScreen
 import com.nextgenbuildpro.features.estimates.EnhancedCatalogueDemoScreen
-import com.nextgenbuildpro.fieldtools.ui.ArVisualizationScreen
 import com.nextgenbuildpro.fieldtools.ui.VoiceToTextScreen
 import com.nextgenbuildpro.fieldtools.ui.OfflineModeScreen
 import com.nextgenbuildpro.clientengagement.ui.ClientPortalScreen
@@ -288,11 +287,6 @@ fun NavGraph(navController: NavHostController) {
             TimeClockScreen(navController)
         }
 
-        // Field Tools - AR Visualization
-        composable(NavDestinations.AR_VISUALIZATION) {
-            ArVisualizationScreen(navController)
-        }
-
         // Field Tools - Voice to Text
         composable(NavDestinations.VOICE_TO_TEXT) {
             VoiceToTextScreen(navController)
@@ -431,7 +425,6 @@ object NavDestinations {
     const val TIME_CLOCK = "time_clock"
 
     // Field Tools
-    const val AR_VISUALIZATION = "ar_visualization"
     const val VOICE_TO_TEXT = "voice_to_text"
     const val OFFLINE_MODE = "offline_mode"
 

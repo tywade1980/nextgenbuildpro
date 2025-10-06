@@ -45,7 +45,6 @@ class NavigationHelper(private val context: Context) {
         NavDestinations.CALENDAR_EVENT_EDITOR,
         NavDestinations.CALENDAR_TIMELINE,
         NavDestinations.TIME_CLOCK,
-        NavDestinations.AR_VISUALIZATION,
         NavDestinations.VOICE_TO_TEXT,
         NavDestinations.OFFLINE_MODE,
         NavDestinations.CLIENT_PORTAL,
