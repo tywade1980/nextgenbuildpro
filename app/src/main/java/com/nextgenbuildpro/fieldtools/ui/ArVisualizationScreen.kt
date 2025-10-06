@@ -10,10 +10,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.nextgenbuildpro.features.fieldtools.ArBlueprintService
+import com.nextgenbuildpro.features.fieldtools.BlueprintData
+import io.github.sceneview.ar.ArSceneView
+import io.github.sceneview.ar.node.ArModelNode
+import io.github.sceneview.math.Position
+import io.github.sceneview.math.Rotation
+import io.github.sceneview.math.Scale
+import com.google.ar.core.Anchor
+import com.google.ar.core.HitResult
+import com.google.ar.core.Plane
+import androidx.compose.ui.viewinterop.AndroidView
 
 /**
  * AR Visualization Screen - Functional implementation for AR tools
@@ -21,9 +34,18 @@ import androidx.navigation.NavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArVisualizationScreen(navController: NavController) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     var isArActive by remember { mutableStateOf(false) }
     var selectedModel by remember { mutableStateOf<String?>(null) }
-    
+    var arBlueprintService by remember { mutableStateOf<ArBlueprintService?>(null) }
+
+    // Initialize AR service
+    LaunchedEffect(Unit) {
+        arBlueprintService = ArBlueprintService(context)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -55,10 +77,14 @@ fun ArVisualizationScreen(navController: NavController) {
         if (isArActive) {
             ArViewScreen(
                 selectedModel = selectedModel,
+                arBlueprintService = arBlueprintService,
                 onModelPlaced = { model ->
                     // Handle model placement
                 },
-                onExitAr = { isArActive = false }
+                onExitAr = {
+                    isArActive = false
+                    arBlueprintService?.clearAll()
+                }
             )
         } else {
             LazyColumn(
@@ -127,46 +153,74 @@ fun ArVisualizationScreen(navController: NavController) {
 @Composable
 fun ArViewScreen(
     selectedModel: String?,
+    arBlueprintService: ArBlueprintService?,
     onModelPlaced: (String) -> Unit,
     onExitAr: () -> Unit
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // AR Camera view placeholder - in real implementation, this would be ARCore/ARKit
-        Card(
-            modifier = Modifier.fillMaxSize(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    var arSceneView by remember { mutableStateOf<ArSceneView?>(null) }
+    var isPlacingModel by remember { mutableStateOf(false) }
+
+    // Initialize AR scene
+    LaunchedEffect(Unit) {
+        arBlueprintService?.let { service ->
+            // Load sample blueprint
+            val sampleBlueprint = BlueprintData(
+                id = "sample_blueprint",
+                name = "Sample Kitchen Layout",
+                dimensions = floatArrayOf(5f, 4f)
             )
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ViewInAr,
-                        contentDescription = "AR View",
-                        modifier = Modifier.size(100.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "AR Camera View",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Point camera at surface to place ${selectedModel ?: "3D model"}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center
-                    )
+            service.loadBlueprint(sampleBlueprint)
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        // AR Scene View
+        AndroidView(
+            factory = { ctx ->
+                ArSceneView(ctx).apply {
+                    arSceneView = this
+                    arBlueprintService?.initializeArScene(this)
+
+                    // Set up plane detection
+                    planeRenderer.isVisible = true
+
+                    // Handle tap to place models
+                    setOnTouchAr {
+                        if (isPlacingModel) {
+                            val hitResult = it.node?.hitTest(it.motionEvent) ?: it.hitResult
+                            hitResult?.let { result ->
+                                placeModelAtHit(result, selectedModel, arBlueprintService, onModelPlaced)
+                                isPlacingModel = false
+                            }
+                        }
+                    }
                 }
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // AR UI Overlay
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(16.dp)
+        ) {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+                )
+            ) {
+                Text(
+                    text = "Tap to place: ${selectedModel ?: "Select a model"}",
+                    modifier = Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
-        
+
         // AR Controls overlay
         Column(
             modifier = Modifier
@@ -177,21 +231,66 @@ fun ArViewScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(
-                    onClick = { selectedModel?.let { onModelPlaced(it) } }
+                    onClick = { isPlacingModel = true },
+                    enabled = selectedModel != null
                 ) {
                     Text("Place Model")
                 }
-                
+
                 OutlinedButton(
                     onClick = onExitAr
                 ) {
                     Text("Exit AR")
                 }
             }
+
+            // Model manipulation controls
+            arBlueprintService?.placedModels?.collectAsState()?.value?.let { models ->
+                if (models.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "${models.size} models placed",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
     }
 }
 
+private fun placeModelAtHit(
+    hitResult: HitResult,
+    selectedModel: String?,
+    arBlueprintService: ArBlueprintService?,
+    onModelPlaced: (String) -> Unit
+) {
+    arBlueprintService?.let { service ->
+        when (selectedModel) {
+            "kitchen_layout", "bathroom_fixtures", "furniture_set" -> {
+                // Place blueprint overlay
+                val blueprintId = service.placeBlueprintOverlay(hitResult.hitPose, hitResult.trackable as? Plane ?: return)
+                onModelPlaced(blueprintId)
+            }
+            "lighting_fixtures" -> {
+                // Place 3D model (simplified - would need actual 3D model files)
+                val modelId = service.place3DModel(
+                    modelPath = "models/light_fixture.glb", // Would need actual model file
+                    hitPose = hitResult.hitPose,
+                    modelName = "Lighting Fixture"
+                )
+                onModelPlaced(modelId)
+            }
+            else -> {
+                // Default blueprint placement
+                val blueprintId = service.placeBlueprintOverlay(hitResult.hitPose, hitResult.trackable as? Plane ?: return)
+                onModelPlaced(blueprintId)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArActionCard(
     action: ArAction,

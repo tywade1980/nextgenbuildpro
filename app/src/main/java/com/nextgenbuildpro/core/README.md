@@ -27,6 +27,9 @@ sdk.dir=C:\\Users\\Username\\android\\android-sdk
 # API Keys
 google.api.key=your_google_api_key_here
 firebase.storage.url=gs://your-firebase-storage-bucket.appspot.com
+
+# OpenRouter API Key (for LLM access)
+openrouter.api.key=sk-or-v1-your-openrouter-api-key-here
 ```
 
 ### 2. Loading API Keys
@@ -69,6 +72,9 @@ val googleApiKey = ApiKeyManager.getGoogleApiKey()
 
 // Get the Firebase Storage URL
 val firebaseStorageUrl = ApiKeyManager.getFirebaseStorageUrl()
+
+// Get the OpenRouter API key
+val openRouterApiKey = ApiKeyManager.getOpenRouterApiKey()
 
 // Get any property by key
 val customValue = ApiKeyManager.getProperty("custom.key", "default_value")
@@ -135,6 +141,78 @@ sdk.dir=/path/to/your/android/sdk
 # API Keys
 google.api.key=YOUR_GOOGLE_API_KEY
 firebase.storage.url=gs://YOUR_FIREBASE_STORAGE_BUCKET.appspot.com
+
+# OpenRouter API Key
+# Get your API key from https://openrouter.ai/keys
+openrouter.api.key=sk-or-v1-YOUR_OPENROUTER_API_KEY
 ```
 
 Instruct developers to copy this file to `local.properties` and replace the placeholder values with their own API keys.
+
+## OpenRouter LLM Integration
+
+NextGen BuildPro uses OpenRouter for LLM (Large Language Model) access. OpenRouter provides a unified API to access multiple LLM providers including:
+
+- OpenAI (GPT-4, GPT-3.5-turbo, o1-preview, etc.)
+- Anthropic (Claude 3 Opus, Sonnet, Haiku)
+- Meta (Llama 3, Llama 2)
+- Google (Gemini Pro, PaLM)
+- Mistral AI
+- And many more
+
+### Setting up OpenRouter
+
+1. **Get an API Key**:
+   - Visit [https://openrouter.ai](https://openrouter.ai)
+   - Sign up for an account
+   - Navigate to [https://openrouter.ai/keys](https://openrouter.ai/keys)
+   - Create a new API key
+   - Add credits to your account at [https://openrouter.ai/credits](https://openrouter.ai/credits)
+
+2. **Add the API Key to local.properties**:
+   ```properties
+   openrouter.api.key=sk-or-v1-your-actual-key-here
+   ```
+
+3. **Usage in Code**:
+   ```kotlin
+   // Using OpenRouterService
+   val openRouterService = OpenRouterService(firestoreService)
+   
+   val result = openRouterService.generateResponse(
+       prompt = "Help me coordinate construction agents",
+       context = null,
+       agentType = AgentType.ORCHESTRATOR
+   )
+   
+   result.onSuccess { response ->
+       Log.d(TAG, "Response: ${response.content}")
+   }
+   ```
+
+### Available Models
+
+OpenRouter provides access to many models. Here are some recommended models:
+
+- **Reasoning**: `openai/o1-preview` - Best for complex reasoning tasks
+- **Agent Workflow**: `anthropic/claude-3-opus` - Best for agent coordination
+- **Fast Inference**: `openai/gpt-3.5-turbo` - Quick and cost-effective
+- **Code Generation**: `anthropic/claude-3-sonnet` - Excellent for code
+- **Budget-Friendly**: `meta-llama/llama-3-8b-instruct` - Low cost, good quality
+
+### Cost Management
+
+OpenRouter charges based on token usage. To manage costs:
+
+1. **Set Rate Limits**: Configure limits in your OpenRouter dashboard
+2. **Use Appropriate Models**: Use cheaper models for simple tasks
+3. **Monitor Usage**: Check usage at [https://openrouter.ai/activity](https://openrouter.ai/activity)
+4. **Cache Responses**: Store frequently used responses in Firestore
+
+### Best Practices
+
+1. **Never commit your API key** - Always use `local.properties`
+2. **Rotate keys regularly** - Generate new keys periodically
+3. **Use environment-specific keys** - Different keys for dev/staging/production
+4. **Monitor for anomalies** - Set up alerts for unusual usage patterns
+5. **Handle errors gracefully** - Implement retry logic with exponential backoff

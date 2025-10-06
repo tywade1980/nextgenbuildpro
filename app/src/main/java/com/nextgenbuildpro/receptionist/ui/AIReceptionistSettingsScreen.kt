@@ -125,8 +125,8 @@ fun AIReceptionistSettingsScreen(navController: NavController) {
                             showSuccessMessage = true
 
                             // Hide success message after a delay
-                            kotlinx.coroutines.MainScope().launch {
-                                kotlinx.coroutines.delay(2000)
+                            MainScope().launch {
+                                delay(2000)
                                 showSuccessMessage = false
                             }
                         },

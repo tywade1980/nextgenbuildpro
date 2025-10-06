@@ -20,6 +20,7 @@ import com.nextgenbuildpro.pm.data.repository.EnhancedCatalogueDataService
 import com.nextgenbuildpro.pm.data.repository.HierarchicalCatalogueRepository
 import com.nextgenbuildpro.pm.data.repository.AssemblyRepository
 import com.nextgenbuildpro.pm.service.EnhancedAssemblyCatalogueService
+import com.nextgenbuildpro.pm.service.AssemblyCreationData
 import kotlinx.coroutines.launch
 
 /**

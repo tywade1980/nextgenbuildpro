@@ -72,7 +72,7 @@ class VoiceCommandAgent : SpecializedAgent {
         return try {
             Log.d("VoiceCommandAgent", "Processing voice command: ${task.description}")
             
-            val voiceInput = task.parameters["voice_input"] as? String
+            val voiceInput = task.metadata["voice_input"] as? String
                 ?: return Result.failure(IllegalArgumentException("No voice input provided"))
             
             val processedCommand = processVoiceCommand(voiceInput)
@@ -80,7 +80,7 @@ class VoiceCommandAgent : SpecializedAgent {
             
             val completedTask = task.copy(
                 status = TaskStatus.COMPLETED,
-                result = mapOf(
+                metadata = task.metadata + mapOf(
                     "processed_command" to processedCommand,
                     "execution_result" to result,
                     "confidence_score" to calculateConfidenceScore(voiceInput),

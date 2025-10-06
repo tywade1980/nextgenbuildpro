@@ -67,7 +67,12 @@ fun TemplateDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Implement edit functionality */ }) {
+                    IconButton(
+                        onClick = { 
+                            // Navigate to template editor
+                            navController.navigate("template_editor/$templateId")
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Edit"
@@ -78,7 +83,10 @@ fun TemplateDetailScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* TODO: Implement create project from template */ }
+                onClick = { 
+                    // Navigate to project creation from template
+                    navController.navigate("create_project?templateId=$templateId")
+                }
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Create Project")
             }

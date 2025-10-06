@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.launch
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.ExperimentalMaterial3Api
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -351,24 +354,25 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
     
     // === AI OPTIMIZATION ===
     
-    suspend fun optimizeProject(projectId: String): Result<OptimizationResult> = try {
-        Log.d("ConstructionPlatform", "Optimizing project: $projectId")
-        
-        val project = _projects.value.find { it.id == projectId }
-        if (project == null) {
-            return Result.failure(IllegalArgumentException("Project not found: $projectId"))
+    suspend fun optimizeProject(projectId: String): Result<OptimizationResult> {
+        return try {
+            Log.d("ConstructionPlatform", "Optimizing project: $projectId")
+            
+            val project = _projects.value.find { it.id == projectId }
+            if (project == null) {
+                return Result.failure(IllegalArgumentException("Project not found: $projectId"))
+            }
+            
+            val optimization = aiOptimizer.optimizeProject(project, _tasks.value, _resources.value)
+            
+            // Apply optimizations
+            applyOptimizations(optimization)
+            
+            Result.success(optimization)
+        } catch (e: Exception) {
+            Log.e("ConstructionPlatform", "Error optimizing project", e)
+            Result.failure(e)
         }
-        
-        val optimization = aiOptimizer.optimizeProject(project, _tasks.value, _resources.value)
-        
-        // Apply optimizations
-        applyOptimizations(optimization)
-        
-        Log.i("ConstructionPlatform", "Project optimization completed: $projectId")
-        Result.success(optimization)
-    } catch (e: Exception) {
-        Log.e("ConstructionPlatform", "Error optimizing project", e)
-        Result.failure(e)
     }
     
     // === PRIVATE METHODS ===
@@ -389,8 +393,15 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
                 budget = 5000000.0,
                 currentCost = 1200000.0,
                 phases = listOf(
-                    ProjectPhase("phase_1", "Foundation", "Foundation and basement work", 
-                        LocalDateTime.now().minusDays(30), LocalDateTime.now().plusDays(30), TaskStatus.IN_PROGRESS, listOf("Excavation", "Concrete pour"))
+                    ProjectPhaseDetails(
+                        id = "phase_1",
+                        name = "Foundation",
+                        description = "Foundation and basement work",
+                        startDate = LocalDateTime.now().minusDays(30),
+                        endDate = LocalDateTime.now().plusDays(30),
+                        status = TaskStatus.IN_PROGRESS,
+                        milestones = listOf("Excavation", "Concrete pour")
+                    )
                 ),
                 tasks = emptyList(),
                 documents = emptyList()
@@ -416,8 +427,8 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         _safetyAlerts.value = emptyList()
     }
     
-    private fun createProjectPhase(phaseData: PhaseCreationData): ProjectPhase {
-        return ProjectPhase(
+    private fun createProjectPhase(phaseData: PhaseCreationData): ProjectPhaseDetails {
+        return ProjectPhaseDetails(
             id = UUID.randomUUID().toString(),
             name = phaseData.name,
             description = phaseData.description,
@@ -510,7 +521,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
     
     // Helper classes
     
-    private inner class ProjectManager {
+    private class ProjectManager {
         fun initialize() {
             Log.d("ProjectManager", "Initializing project manager")
         }
@@ -520,7 +531,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         }
     }
     
-    private inner class ResourceManager {
+    private class ResourceManager {
         fun initialize() {
             Log.d("ResourceManager", "Initializing resource manager")
         }
@@ -543,7 +554,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         }
     }
     
-    private inner class SafetyManager {
+    private class SafetyManager {
         fun initialize() {
             Log.d("SafetyManager", "Initializing safety manager")
         }
@@ -561,7 +572,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         }
     }
     
-    private inner class QualityControl {
+    private class QualityControl {
         fun initialize() {
             Log.d("QualityControl", "Initializing quality control")
         }
@@ -571,7 +582,7 @@ class ConstructionPlatform(private val context: Context) : NextGenService {
         }
     }
     
-    private inner class ConstructionAIOptimizer {
+    private class ConstructionAIOptimizer {
         fun initialize() {
             Log.d("ConstructionAIOptimizer", "Initializing AI optimizer")
         }
@@ -731,6 +742,7 @@ fun ConstructionPlatformUI(
     val resources by platform.resources.collectAsState()
     val safetyAlerts by platform.safetyAlerts.collectAsState()
     
+    val coroutineScope = rememberCoroutineScope()
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Dashboard", "Projects", "Tasks", "Resources", "Safety")
     
@@ -749,8 +761,12 @@ fun ConstructionPlatformUI(
         // Tab Content
         when (selectedTab) {
             0 -> DashboardTab(projects, tasks, resources, safetyAlerts)
-            1 -> ProjectsTab(projects, activeProject) { platform.selectProject(it) }
-            2 -> TasksTab(tasks, activeProject) { platform.updateTaskStatus(it, TaskStatus.COMPLETED) }
+            1 -> ProjectsTab(projects, activeProject) { projectId -> 
+                coroutineScope.launch { platform.selectProject(projectId) }
+            }
+            2 -> TasksTab(tasks, activeProject) { taskId -> 
+                coroutineScope.launch { platform.updateTaskStatus(taskId, TaskStatus.COMPLETED) }
+            }
             3 -> ResourcesTab(resources)
             4 -> SafetyTab(safetyAlerts)
         }
@@ -760,9 +776,9 @@ fun ConstructionPlatformUI(
 @Composable
 private fun DashboardTab(
     projects: List<ConstructionProject>,
-    tasks: List<ConstructionTask>,
-    resources: List<Resource>,
-    safetyAlerts: List<SafetyAlert>
+    tasks: List<ConstructionPlatform.ConstructionTask>,
+    resources: List<ConstructionPlatform.Resource>,
+    safetyAlerts: List<ConstructionPlatform.SafetyAlert>
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -867,7 +883,7 @@ private fun DashboardCard(
 }
 
 @Composable
-private fun SafetyAlertsSection(alerts: List<SafetyAlert>) {
+private fun SafetyAlertsSection(alerts: List<ConstructionPlatform.SafetyAlert>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.1f))
@@ -896,8 +912,9 @@ private fun SafetyAlertsSection(alerts: List<SafetyAlert>) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SafetyAlertItem(alert: SafetyAlert) {
+private fun SafetyAlertItem(alert: ConstructionPlatform.SafetyAlert) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -935,7 +952,7 @@ private fun SafetyAlertItem(alert: SafetyAlert) {
 }
 
 @Composable
-private fun RecentActivitySection(recentTasks: List<ConstructionTask>) {
+private fun RecentActivitySection(recentTasks: List<ConstructionPlatform.ConstructionTask>) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -1016,6 +1033,7 @@ private fun ProjectsTab(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProjectItem(
     project: ConstructionProject,
@@ -1084,7 +1102,7 @@ private fun ProjectItem(
 
 @Composable
 private fun TasksTab(
-    tasks: List<ConstructionTask>,
+    tasks: List<ConstructionPlatform.ConstructionTask>,
     activeProject: ConstructionProject?,
     onTaskCompleted: (String) -> Unit
 ) {
@@ -1113,9 +1131,10 @@ private fun TasksTab(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskItem(
-    task: ConstructionTask,
+    task: ConstructionPlatform.ConstructionTask,
     onTaskCompleted: (String) -> Unit
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
@@ -1166,7 +1185,7 @@ private fun TaskItem(
 }
 
 @Composable
-private fun ResourcesTab(resources: List<Resource>) {
+private fun ResourcesTab(resources: List<ConstructionPlatform.Resource>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -1186,8 +1205,9 @@ private fun ResourcesTab(resources: List<Resource>) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ResourceItem(resource: Resource) {
+private fun ResourceItem(resource: ConstructionPlatform.Resource) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -1239,7 +1259,7 @@ private fun ResourceItem(resource: Resource) {
 }
 
 @Composable
-private fun SafetyTab(safetyAlerts: List<SafetyAlert>) {
+private fun SafetyTab(safetyAlerts: List<ConstructionPlatform.SafetyAlert>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -1284,8 +1304,9 @@ private fun SafetyTab(safetyAlerts: List<SafetyAlert>) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SafetyAlertDetailItem(alert: SafetyAlert) {
+private fun SafetyAlertDetailItem(alert: ConstructionPlatform.SafetyAlert) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(

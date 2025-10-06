@@ -66,6 +66,13 @@ object ReceptionistModule {
     }
 
     /**
+     * Check if the module is initialized
+     */
+    fun isInitialized(): Boolean {
+        return initialized
+    }
+
+    /**
      * Check if current time is within business hours
      */
     fun isWithinBusinessHours(): Boolean {

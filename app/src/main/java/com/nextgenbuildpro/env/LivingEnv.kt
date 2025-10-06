@@ -467,7 +467,7 @@ class LivingEnv : EnvironmentMesh {
             while (true) {
                 try {
                     kotlinx.coroutines.delay(30000) // 30 seconds
-                    val metrics = gatherEnvironmentMetrics()
+                    gatherEnvironmentMetrics()
                     environmentMetrics.add(EnvironmentMetrics(
                         timestamp = LocalDateTime.now(),
                         activeAgents = registeredAgents.size,
@@ -518,7 +518,7 @@ class LivingEnv : EnvironmentMesh {
         val networkQuality: NetworkQuality
     )
     
-    private data class EnvironmentOptimization(
+    data class EnvironmentOptimization(
         val metricsAnalyzed: Map<String, Any>,
         val bottlenecksIdentified: List<String>,
         val optimizationsApplied: List<String>,
@@ -526,8 +526,8 @@ class LivingEnv : EnvironmentMesh {
         val performanceImprovement: Double,
         val timestamp: LocalDateTime
     )
-    
-    private data class NetworkHealthReport(
+
+    data class NetworkHealthReport(
         val overallHealth: Double,
         val averageLatency: Double,
         val throughput: Double,
@@ -537,16 +537,16 @@ class LivingEnv : EnvironmentMesh {
         val recommendations: List<String>,
         val timestamp: LocalDateTime
     )
-    
-    private data class LoadMetrics(
+
+    data class LoadMetrics(
         val cpuUsage: Double,
         val memoryUsage: Double,
         val networkUtilization: Double,
         val messageQueueSize: Int,
         val responseTime: Double
     )
-    
-    private data class AdaptationResult(
+
+    data class AdaptationResult(
         val strategy: String,
         val adaptationsApplied: List<String>,
         val results: Map<String, Any>,
@@ -566,15 +566,15 @@ class LivingEnv : EnvironmentMesh {
         val timestamp: LocalDateTime
     )
     
-    private data class AgentCollaborationRequest(
+    data class AgentCollaborationRequest(
         val id: String,
         val participantTypes: List<AgentType>,
         val objective: String,
         val timeframe: String,
         val constraints: List<String>
     )
-    
-    private data class CollaborationFacilitation(
+
+    data class CollaborationFacilitation(
         val requestId: String,
         val participantsCount: Int,
         val collaborationContext: Map<String, Any>,
@@ -586,7 +586,7 @@ class LivingEnv : EnvironmentMesh {
     
     // Helper classes for environment intelligence
     
-    private inner class MessageRouter {
+    private class MessageRouter {
         fun optimizeMessage(message: AgentMessage): AgentMessage {
             // Apply message optimization logic
             return message.copy(
@@ -598,14 +598,14 @@ class LivingEnv : EnvironmentMesh {
         }
     }
     
-    private inner class ContextManager {
+    private class ContextManager {
         fun processContextUpdate(context: EnvironmentContext) {
             // Process context updates and trigger necessary adaptations
             Log.d("LivingEnv", "Processing context update for environment: ${context.environmentType}")
         }
     }
     
-    private inner class AdaptationEngine {
+    private class AdaptationEngine {
         fun analyzeLoadChanges(loadMetrics: LoadMetrics): String {
             return when {
                 loadMetrics.cpuUsage > 0.8 -> "scale_up"
@@ -649,7 +649,7 @@ class LivingEnv : EnvironmentMesh {
         }
     }
     
-    private inner class NetworkMonitor {
+    private class NetworkMonitor {
         fun measureAverageLatency(): Double = 50.0 // Placeholder
         fun measureThroughput(): Double = 1000.0 // Placeholder
         fun calculateErrorRate(): Double = 0.01 // Placeholder

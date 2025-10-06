@@ -34,7 +34,7 @@ class EnhancedAssemblyCatalogueService(
         tags: List<String> = emptyList()
     ): List<AssemblySearchResultWithContext> {
         try {
-            val criteria = CatalogueSearchCriteria(
+            val criteria = EnhancedCatalogueSearchCriteria(
                 query = keyword,
                 categoryId = categoryId,
                 tradeId = tradeId,
@@ -168,8 +168,7 @@ class EnhancedAssemblyCatalogueService(
             )
             
             val enhancedTasks = tasks.map { taskData ->
-                Task(
-                    assemblyId = "", // Will be set when assembly is created
+                TaskCreationData(
                     name = taskData.name,
                     description = taskData.description,
                     sequence = taskData.sequence,
@@ -182,7 +181,7 @@ class EnhancedAssemblyCatalogueService(
             }
             
             val enhancedMaterials = materials.map { materialData ->
-                Material(
+                MaterialCreationData(
                     taskId = materialData.taskId,
                     assemblyId = materialData.assemblyId,
                     name = materialData.name,
@@ -190,7 +189,6 @@ class EnhancedAssemblyCatalogueService(
                     quantity = materialData.quantity,
                     unit = materialData.unit,
                     unitCost = materialData.unitCost,
-                    totalCost = materialData.unitCost * materialData.quantity * (1 + materialData.waste),
                     waste = materialData.waste,
                     notes = materialData.notes
                 )
@@ -279,35 +277,14 @@ data class AssemblyCreationData(
     val imageUrl: String? = null
 )
 
-data class TaskCreationData(
-    val name: String,
-    val description: String,
-    val sequence: Int,
-    val laborHours: Double,
-    val materialCost: Double,
-    val laborCost: Double,
-    val equipmentCost: Double = 0.0,
-    val notes: String = ""
-)
-
-data class MaterialCreationData(
-    val taskId: String? = null,
-    val assemblyId: String? = null,
-    val name: String,
-    val description: String,
-    val quantity: Double,
-    val unit: String,
-    val unitCost: Double,
-    val waste: Double = 0.0,
-    val notes: String = ""
-)
+// Note: TaskCreationData and MaterialCreationData are defined in EnhancedCatalogueModels.kt
 
 data class EnhancedAssemblyDetails(
     val assembly: EnhancedAssembly,
     val scope: Scope,
     val trade: Trade,
     val category: Category,
-    val tasks: List<Task>,
-    val materials: List<Material>,
+    val tasks: List<CatalogueTask>,
+    val materials: List<CatalogueMaterial>,
     val costBreakdown: AssemblyCostBreakdown
 )

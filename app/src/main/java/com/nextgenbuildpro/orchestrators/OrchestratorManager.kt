@@ -13,26 +13,26 @@ import kotlinx.coroutines.flow.*
 /**
  * Orchestrator Manager for NextGen BuildPro v2.0
  * 
- * Manages all 6 departmental orchestrators and their 48 specialized agents.
- * Provides centralized coordination, MCP integration, and navigation management.
+ * Manages C-suite executive orchestrators and their operational agents.
+ * Structured as a corporate hierarchy: CEO coordinates with COO, CFO, CHRO, CTO, CSO.
+ * Each C-suite executive manages 5-8 operational agents (sub-agents) in their domain.
  */
-class OrchestratorManager(
-    private val context: Context
-) {
+class OrchestratorManager(private val context: Context) {
     
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val mcpServer = MCPServer.getInstance()
     private val navigationManager = IntuitiveNavigationManager()
+    private val livingEnvironmentMesh = LivingEnvironmentMesh()
     
-    // Orchestrators
-    private lateinit var personalAssistantOrchestrator: PersonalAssistantOrchestrator
-    private lateinit var crmOrchestrator: CRMOrchestrator
-    private lateinit var projectManagementOrchestrator: ProjectManagementOrchestrator
-    private lateinit var analyticsOrchestrator: AnalyticsOrchestrator
-    private lateinit var designDepartmentOrchestrator: DesignDepartmentOrchestrator
-    private lateinit var marketingOrchestrator: MarketingOrchestrator
+    // C-Suite Executive Orchestrators
+    private lateinit var ceoPersonalAssistantOrchestrator: CEOPersonalAssistantOrchestrator
+    private lateinit var cooOperationsOrchestrator: COOOperationsOrchestrator
+    private lateinit var cfoFinancialOrchestrator: CFOFinancialOrchestrator
+    private lateinit var chroClientHROrchestrator: CHROClientHROrchestrator
+    private lateinit var ctoDesignOrchestrator: CTODesignOrchestrator
+    private lateinit var csoSafetyOrchestrator: CSOSafetyOrchestrator
     
-    // Specialized agents registry (8 per orchestrator = 48 total)
+    // Operational agents registry (5-8 per C-suite executive)
     private val specializedAgents = mutableMapOf<String, SpecializedAgent>()
     
     private val _isInitialized = MutableStateFlow(false)
@@ -51,14 +51,26 @@ class OrchestratorManager(
         
         // Start MCP server
         mcpServer.start().getOrThrow()
-        
+
+        // Initialize Living Environment Mesh
+        val availableAgents = listOf(
+            AgentType.ORCHESTRATOR,
+            AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR,
+            AgentType.CRM_ORCHESTRATOR,
+            AgentType.ESTIMATING_DEPARTMENT_ORCHESTRATOR,
+            AgentType.ANALYTICS_ORCHESTRATOR,
+            AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR,
+            AgentType.MARKETING_ORCHESTRATOR
+        )
+        livingEnvironmentMesh.initialize(availableAgents).getOrThrow()
+
         // Initialize orchestrators
         initializeOrchestrators()
-        
+
         // Initialize all 48 specialized agents
         initializeSpecializedAgents()
-        
-        // Setup inter-departmental communication
+
+        // Setup inter-departmental communication through Living Environment Mesh
         setupInterDepartmentalCommunication()
         
         _isInitialized.value = true
@@ -74,11 +86,46 @@ class OrchestratorManager(
     }
     
     /**
-     * Process task through appropriate orchestrator
+     * Process task through appropriate orchestrator using Living Environment Mesh
      */
     suspend fun processTask(task: NextGenTask): Result<NextGenTask> = try {
+        val startTime = System.currentTimeMillis()
+
+        // Create agent message for routing
+        val message = AgentMessage(
+            id = task.id,
+            sender = AgentType.ORCHESTRATOR,
+            targetAgent = task.assignedAgent,
+            messageType = MessageType.TASK_REQUEST,
+            content = task.description,
+            priority = task.priority,
+            metadata = task.metadata
+        )
+
+        // Route through Living Environment Mesh
+        val routeResult = livingEnvironmentMesh.routeMessage(message)
+        val route = routeResult.getOrThrow()
+
+        Log.d("OrchestratorManager", "Task routed through ${route.path.size} agents with ${route.confidence * 100}% confidence")
+
+        // Execute task through appropriate orchestrator
         val orchestrator = getOrchestratorForTask(task)
-        orchestrator.processTask(task)
+        val result = orchestrator.executeTask(task)
+
+        // Record interaction for emergent intelligence
+        val interactionTime = System.currentTimeMillis() - startTime
+        livingEnvironmentMesh.recordInteraction(
+            AgentInteraction(
+                fromAgent = AgentType.ORCHESTRATOR,
+                toAgent = task.assignedAgent ?: AgentType.ORCHESTRATOR,
+                type = "task_execution",
+                success = result.isSuccess,
+                responseTimeMs = interactionTime,
+                metadata = mapOf("task_type" to task.type, "route_confidence" to route.confidence)
+            )
+        )
+
+        result
     } catch (e: Exception) {
         Log.e("OrchestratorManager", "Failed to process task: ${task.description}", e)
         Result.failure(e)
@@ -104,86 +151,96 @@ class OrchestratorManager(
     /**
      * Execute voice command across all orchestrators
      */
-    suspend fun executeVoiceCommand(voiceInput: String): Result<String> = try {
-        val voiceAgent = specializedAgents["voice_command_agent"] as? VoiceCommandAgent
-            ?: return Result.failure(IllegalStateException("Voice agent not available"))
-        
-        val task = NextGenTask(
-            id = "voice_${System.currentTimeMillis()}",
-            type = "voice_command",
-            description = "Process voice command: $voiceInput",
-            parameters = mapOf("voice_input" to voiceInput),
-            priority = Priority.HIGH
-        )
-        
-        val result = voiceAgent.processTask(task).getOrThrow()
-        val response = result.result?.get("execution_result") as? String ?: "Command processed"
-        
-        Result.success(response)
-    } catch (e: Exception) {
-        Result.failure(e)
+    suspend fun executeVoiceCommand(voiceInput: String): Result<String> {
+        return try {
+            val voiceAgent = specializedAgents["voice_command_agent"] as? VoiceCommandAgent
+                ?: return Result.failure(IllegalStateException("Voice agent not available"))
+
+            val task = NextGenTask(
+                id = "voice_${System.currentTimeMillis()}",
+                type = "voice_command",
+                description = "Process voice command: $voiceInput",
+                assignedAgent = AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR,
+                priority = Priority.HIGH,
+                status = TaskStatus.PENDING,
+                metadata = mapOf("voice_input" to voiceInput)
+            )
+
+            val result = voiceAgent.processTask(task).getOrThrow()
+            val response = result.metadata["execution_result"] as? String ?: "Command processed"
+
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
     
     /**
-     * Get system metrics and health status
+     * Get system metrics and health status including Living Environment Mesh
      */
-    fun getSystemMetrics(): SystemMetrics {
-        val activeAgents = specializedAgents.values.count { 
-            runBlocking { it.isActive.first() }
+    suspend fun getSystemMetrics(): SystemMetrics {
+        val activeAgents = specializedAgents.values.count {
+            it.isActive.first()
         }
-        
+
+        val meshHealth = livingEnvironmentMesh.getNetworkHealth()
+
         return SystemMetrics(
-            totalOrchestrators = 6,
+            totalOrchestrators = 6, // 6 C-suite executives
             totalSpecializedAgents = specializedAgents.size,
             activeAgents = activeAgents,
             systemStatus = _systemStatus.value,
-            mcpServerStatus = runBlocking { mcpServer.serverStatus.first() },
-            uptime = System.currentTimeMillis() // Simplified
+            mcpServerStatus = mcpServer.serverStatus.first(),
+            uptime = System.currentTimeMillis(), // Simplified
+            meshHealth = meshHealth,
+            emergentIntelligenceLevel = livingEnvironmentMesh.emergentIntelligence.value,
+            networkTopology = livingEnvironmentMesh.networkTopology.value
         )
     }
     
     private suspend fun initializeOrchestrators() {
-        personalAssistantOrchestrator = PersonalAssistantOrchestrator(context)
-        crmOrchestrator = CRMOrchestrator(context)
-        projectManagementOrchestrator = ProjectManagementOrchestrator(context)
-        analyticsOrchestrator = AnalyticsOrchestrator(context)
-        designDepartmentOrchestrator = DesignDepartmentOrchestrator(context)
-        marketingOrchestrator = MarketingOrchestrator(context)
+        // C-Suite Executive Orchestrators
+        ceoPersonalAssistantOrchestrator = CEOPersonalAssistantOrchestrator(context)
+        cooOperationsOrchestrator = COOOperationsOrchestrator(context)
+        cfoFinancialOrchestrator = CFOFinancialOrchestrator(context)
+        chroClientHROrchestrator = CHROClientHROrchestrator(context)
+        ctoDesignOrchestrator = CTODesignOrchestrator(context)
+        csoSafetyOrchestrator = CSOSafetyOrchestrator(context)
         
-        // Initialize each orchestrator
+        // Initialize all C-suite executives (6 total)
         listOf(
-            personalAssistantOrchestrator,
-            crmOrchestrator,
-            projectManagementOrchestrator,
-            analyticsOrchestrator,
-            designDepartmentOrchestrator,
-            marketingOrchestrator
+            ceoPersonalAssistantOrchestrator,
+            cooOperationsOrchestrator,
+            cfoFinancialOrchestrator,
+            chroClientHROrchestrator,
+            ctoDesignOrchestrator,
+            csoSafetyOrchestrator
         ).forEach { orchestrator ->
             orchestrator.initialize()
         }
     }
     
     private suspend fun initializeSpecializedAgents() {
-        // Personal Assistant Orchestrator Agents (8)
-        val personalAssistantAgents = listOf(
+        // CEO Personal Assistant Operational Agents
+        val ceoAgents = listOf(
             VoiceCommandAgent(),
-            // Add 7 more specialized agents for Personal Assistant
+            // Add more specialized agents for CEO
         )
         
-        // CRM Orchestrator Agents (8)
-        val crmAgents = listOf(
+        // CHRO Client Relations & HR Operational Agents
+        val chroAgents = listOf(
             ContactManagementAgent(),
-            // Add 7 more specialized agents for CRM
+            // Add more specialized agents for CHRO
         )
         
-        // Initialize all agents
-        val allAgents = personalAssistantAgents + crmAgents
+        // Initialize all operational agents
+        val allAgents = ceoAgents + chroAgents
         
         allAgents.forEach { agent ->
             try {
                 agent.initialize().getOrThrow()
                 specializedAgents[agent.agentId] = agent
-                Log.d("OrchestratorManager", "Initialized agent: ${agent.agentId}")
+                Log.d("OrchestratorManager", "Initialized operational agent: ${agent.agentId}")
             } catch (e: Exception) {
                 Log.e("OrchestratorManager", "Failed to initialize agent: ${agent.agentId}", e)
             }
@@ -197,22 +254,38 @@ class OrchestratorManager(
     
     private fun getOrchestratorForTask(task: NextGenTask): DepartmentalOrchestrator {
         return when (task.type) {
-            "voice_command", "emergency_response" -> personalAssistantOrchestrator
-            "contact_management", "lead_management" -> crmOrchestrator
-            "project_creation", "scheduling", "cost_estimation" -> projectManagementOrchestrator
-            "analytics", "reporting", "predictions" -> analyticsOrchestrator
-            "design", "3d_modeling", "blueprints" -> designDepartmentOrchestrator
-            "marketing", "proposals", "campaigns" -> marketingOrchestrator
-            else -> personalAssistantOrchestrator // Default to personal assistant
+            "voice_command", "emergency_response", "executive_decision" -> ceoPersonalAssistantOrchestrator
+            // COO: Operations & PM tasks (field ops, equipment, PM, field quality)
+            "crew_scheduling", "material_delivery", "field_issue",
+            "equipment_tracking", "maintenance", "rental", "tool_receipt",
+            "project_creation", "scheduling", "resource_allocation",
+            "field_inspection", "progress_report", "quality_check" -> cooOperationsOrchestrator
+            // CFO: Financial & Analytics tasks (estimating, accounting, analytics)
+            "cost_estimation", "bid_preparation", "value_engineering", "change_order",
+            "invoicing", "payroll", "financial_report", "budget_tracking",
+            "analytics", "reporting", "predictions", "performance_metrics" -> cfoFinancialOrchestrator
+            // CHRO: Client Relations & HR tasks (CRM, marketing, HR, client quality)
+            "contact_management", "lead_management", "client_communication",
+            "proposal_creation", "marketing_campaign", "content_creation",
+            "recruitment", "onboarding", "training", "time_tracking",
+            "client_punch_list", "client_satisfaction", "defect_resolution" -> chroClientHROrchestrator
+            // CTO: Design tasks
+            "design", "3d_modeling", "blueprints", "cad", "technical_drawing" -> ctoDesignOrchestrator
+            // CSO: Safety & Compliance tasks
+            "safety_inspection", "permit_application", "compliance_check", "incident_report" -> csoSafetyOrchestrator
+            else -> ceoPersonalAssistantOrchestrator // Default to CEO
         }
     }
     
     /**
-     * Shutdown all orchestrators and agents
+     * Shutdown all orchestrators, agents, and Living Environment Mesh
      */
     suspend fun shutdown(): Result<Unit> = try {
         Log.i("OrchestratorManager", "Shutting down Orchestrator System...")
-        
+
+        // Shutdown Living Environment Mesh
+        livingEnvironmentMesh.shutdown()
+
         // Shutdown all specialized agents
         specializedAgents.values.forEach { agent ->
             try {
@@ -221,13 +294,13 @@ class OrchestratorManager(
                 Log.w("OrchestratorManager", "Error shutting down agent: ${agent.agentId}", e)
             }
         }
-        
+
         // Stop MCP server
-        mcpServer.stop()
-        
+        mcpServer.shutdown()
+
         _systemStatus.value = SystemStatus.SHUTDOWN
         _isInitialized.value = false
-        
+
         Log.i("OrchestratorManager", "Orchestrator System shutdown complete")
         Result.success(Unit)
     } catch (e: Exception) {
@@ -236,7 +309,7 @@ class OrchestratorManager(
 }
 
 /**
- * System metrics for monitoring
+ * System metrics for monitoring including Living Environment Mesh
  */
 data class SystemMetrics(
     val totalOrchestrators: Int,
@@ -244,5 +317,8 @@ data class SystemMetrics(
     val activeAgents: Int,
     val systemStatus: SystemStatus,
     val mcpServerStatus: com.nextgenbuildpro.mcp.MCPServerStatus,
-    val uptime: Long
+    val uptime: Long,
+    val meshHealth: com.nextgenbuildpro.orchestrators.NetworkHealth? = null,
+    val emergentIntelligenceLevel: com.nextgenbuildpro.orchestrators.EmergentIntelligence? = null,
+    val networkTopology: com.nextgenbuildpro.orchestrators.NetworkTopology? = null
 )

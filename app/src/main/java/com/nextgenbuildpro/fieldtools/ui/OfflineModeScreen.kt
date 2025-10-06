@@ -269,6 +269,7 @@ fun SyncStatusCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OfflineDataCard(dataItem: OfflineDataItem) {
     Card(
@@ -373,6 +374,7 @@ fun PendingSyncCard(syncItem: PendingSyncItem) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OfflineActionCard(
     action: OfflineAction,

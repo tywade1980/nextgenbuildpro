@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.launch
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -16,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.ExperimentalMaterial3Api
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -139,35 +142,37 @@ class DialerApp(private val context: Context) : NextGenService {
     
     // === DIALING METHODS ===
     
-    suspend fun dialNumber(number: String): Result<Unit> = try {
-        Log.d("DialerApp", "Dialing number: $number")
-        
-        // Validate number
-        val validatedNumber = validatePhoneNumber(number)
-        if (validatedNumber == null) {
-            return Result.failure(IllegalArgumentException("Invalid phone number"))
+    suspend fun dialNumber(number: String): Result<Unit> {
+        return try {
+            Log.d("DialerApp", "Dialing number: $number")
+            
+            // Validate number
+            val validatedNumber = validatePhoneNumber(number)
+            if (validatedNumber == null) {
+                return Result.failure(IllegalArgumentException("Invalid phone number"))
+            }
+            
+            // Pre-call analysis
+            val callContext = smartDialer.analyzeCallContext(validatedNumber)
+            
+            // Record call attempt
+            recordCallAttempt(validatedNumber, callContext)
+            
+            // Initiate call
+            val intent = Intent(Intent.ACTION_CALL).apply {
+                data = Uri.parse("tel:$validatedNumber")
+            }
+            
+            context.startActivity(intent)
+            
+            // Update suggestions based on call
+            updateSmartSuggestions(validatedNumber)
+            
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("DialerApp", "Error dialing number: $number", e)
+            Result.failure(e)
         }
-        
-        // Pre-call analysis
-        val callContext = smartDialer.analyzeCallContext(validatedNumber)
-        
-        // Record call attempt
-        recordCallAttempt(validatedNumber, callContext)
-        
-        // Initiate call
-        val intent = Intent(Intent.ACTION_CALL).apply {
-            data = Uri.parse("tel:$validatedNumber")
-        }
-        
-        context.startActivity(intent)
-        
-        // Update suggestions based on call
-        updateSmartSuggestions(validatedNumber)
-        
-        Result.success(Unit)
-    } catch (e: Exception) {
-        Log.e("DialerApp", "Error dialing number: $number", e)
-        Result.failure(e)
     }
     
     suspend fun addDigit(digit: String) {
@@ -350,7 +355,7 @@ class DialerApp(private val context: Context) : NextGenService {
     
     // Helper classes
     
-    private inner class ContactManager {
+    private class ContactManager {
         fun initialize(context: Context) {
             Log.d("ContactManager", "Initializing contact manager")
         }
@@ -608,6 +613,7 @@ fun DialerAppUI(
     val contacts by dialerApp.contacts.collectAsState()
     val smartSuggestions by dialerApp.smartSuggestions.collectAsState()
     
+    val coroutineScope = rememberCoroutineScope()
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Keypad", "Recent", "Contacts", "Smart")
     
@@ -626,9 +632,15 @@ fun DialerAppUI(
         // Tab Content
         when (selectedTab) {
             0 -> KeypadTab(dialerApp, dialedNumber)
-            1 -> RecentCallsTab(recentCalls) { dialerApp.dialFromHistory(it) }
-            2 -> ContactsTab(contacts) { dialerApp.dialContact(it) }
-            3 -> SmartSuggestionsTab(smartSuggestions) { dialerApp.dialContact(it.contact) }
+            1 -> RecentCallsTab(recentCalls) { record: DialerApp.CallRecord -> 
+                coroutineScope.launch { dialerApp.dialFromHistory(record) }
+            }
+            2 -> ContactsTab(contacts) { contact: DialerApp.Contact -> 
+                coroutineScope.launch { dialerApp.dialContact(contact) }
+            }
+            3 -> SmartSuggestionsTab(smartSuggestions) { suggestion: DialerApp.SmartContact -> 
+                coroutineScope.launch { dialerApp.dialContact(suggestion.contact) }
+            }
         }
     }
 }
@@ -638,7 +650,7 @@ private fun KeypadTab(
     dialerApp: DialerApp,
     dialedNumber: String
 ) {
-    val context = LocalContext.current
+    LocalContext.current
     
     Column(
         modifier = Modifier
@@ -651,7 +663,7 @@ private fun KeypadTab(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Text(
                 text = if (dialedNumber.isEmpty()) "Enter number" else dialedNumber,
@@ -767,7 +779,7 @@ private fun DialerKeypadButton(
         onClick = onClick,
         modifier = modifier.aspectRatio(1f),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -789,8 +801,8 @@ private fun DialerKeypadButton(
 
 @Composable
 private fun RecentCallsTab(
-    recentCalls: List<CallRecord>,
-    onCallSelected: (CallRecord) -> Unit
+    recentCalls: List<DialerApp.CallRecord>,
+    onCallSelected: (DialerApp.CallRecord) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -803,10 +815,11 @@ private fun RecentCallsTab(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CallRecordItem(
-    call: CallRecord,
-    onCallSelected: (CallRecord) -> Unit
+    call: DialerApp.CallRecord,
+    onCallSelected: (DialerApp.CallRecord) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -859,8 +872,8 @@ private fun CallRecordItem(
 
 @Composable
 private fun ContactsTab(
-    contacts: List<Contact>,
-    onContactSelected: (Contact) -> Unit
+    contacts: List<DialerApp.Contact>,
+    onContactSelected: (DialerApp.Contact) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -873,10 +886,11 @@ private fun ContactsTab(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ContactItem(
-    contact: Contact,
-    onContactSelected: (Contact) -> Unit
+    contact: DialerApp.Contact,
+    onContactSelected: (DialerApp.Contact) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -921,8 +935,8 @@ private fun ContactItem(
 
 @Composable
 private fun SmartSuggestionsTab(
-    suggestions: List<SmartContact>,
-    onSuggestionSelected: (SmartContact) -> Unit
+    suggestions: List<DialerApp.SmartContact>,
+    onSuggestionSelected: (DialerApp.SmartContact) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -944,10 +958,11 @@ private fun SmartSuggestionsTab(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SmartSuggestionItem(
-    suggestion: SmartContact,
-    onSuggestionSelected: (SmartContact) -> Unit
+    suggestion: DialerApp.SmartContact,
+    onSuggestionSelected: (DialerApp.SmartContact) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),

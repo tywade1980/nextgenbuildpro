@@ -5,7 +5,6 @@
  * checking for the expected categories, trades, scopes, and assemblies
  */
 
-import { CatalogueDataService } from '../services/CatalogueDataService';
 import { 
   collection, 
   getDocs, 
@@ -17,8 +16,6 @@ import { firestore } from '../firebase';
 
 async function verifyCatalogue(): Promise<void> {
   console.log('🔍 Verifying catalogue seeding results...');
-  
-  const catalogueService = new CatalogueDataService();
   
   try {
     // Verify categories
@@ -132,6 +129,10 @@ async function verifyAssemblies(): Promise<void> {
   });
 }
 
+/**
+ * Verifies tasks and materials in the database
+ * Currently not used in main verification flow but available for future testing
+ */
 async function verifyTasksAndMaterials(): Promise<void> {
   console.log('📋 Verifying tasks and materials...');
   

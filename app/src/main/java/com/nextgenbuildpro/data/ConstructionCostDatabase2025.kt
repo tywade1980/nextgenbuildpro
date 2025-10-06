@@ -41,8 +41,8 @@ object ConstructionCostDatabase2025 {
     ): DetailedProjectCost {
         
         Log.d(TAG, "Calculating project cost: $projectType, ${squareFootage}sq ft, $region, $qualityLevel")
-        
-        val costDatabase = getCostDatabase(region)
+
+        getCostDatabase(region)
         val qualityMultiplier = when (qualityLevel.lowercase()) {
             "economy" -> 0.85
             "standard" -> 1.0
@@ -55,7 +55,7 @@ object ConstructionCostDatabase2025 {
         var totalCost = 0.0
         
         // Calculate costs for each phase using 2025 pricing
-        residentialTemplates.forEach { (key, template) ->
+        residentialTemplates.forEach { (_, template) ->
             val phaseCost = (squareFootage * template.costPerSqFt.average * qualityMultiplier * (regionalMultipliers[region] ?: 1.0))
             costs[template.category] = phaseCost
             totalCost += phaseCost

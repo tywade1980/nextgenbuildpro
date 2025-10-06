@@ -1,0 +1,30 @@
+# NextGen BuildPro - Local Configuration Template
+# 
+# Copy this file to 'local.properties' and replace the placeholder values
+# with your actual configuration values.
+# 
+# IMPORTANT: The 'local.properties' file should NEVER be committed to version control.
+# It is already excluded in .gitignore
+
+# Android SDK location
+# Update this path to point to your Android SDK installation
+sdk.dir=/path/to/your/android/sdk
+
+# Google API Key (optional)
+# Used for Google Maps and other Google services
+google.api.key=YOUR_GOOGLE_API_KEY
+
+# Firebase Storage URL (optional)
+# Your Firebase Storage bucket URL
+firebase.storage.url=gs://YOUR_FIREBASE_STORAGE_BUCKET.appspot.com
+
+# OpenRouter API Key (required for LLM functionality)
+# Get your API key from https://openrouter.ai/keys
+# You'll need to:
+# 1. Sign up at https://openrouter.ai
+# 2. Create an API key at https://openrouter.ai/keys
+# 3. Add credits at https://openrouter.ai/credits
+openrouter.api.key=sk-or-v1-YOUR_OPENROUTER_API_KEY
+
+# Additional custom properties can be added below
+# custom.property.name=value

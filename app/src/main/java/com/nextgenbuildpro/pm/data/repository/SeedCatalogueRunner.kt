@@ -52,7 +52,7 @@ object SeedCatalogueRunner {
             
             runBlocking {
                 // Get summary statistics
-                val categoriesResult = catalogueService.getCompleteCatalogue()
+                val categoriesResult = catalogueService.getCategoriesWithChildren()
                 if (categoriesResult.isSuccess) {
                     val categories = categoriesResult.getOrThrow()
                     
@@ -64,31 +64,31 @@ object SeedCatalogueRunner {
                     var totalAssemblies = 0
                     var totalTasks = 0
                     var totalMaterials = 0
-                    
-                    categories.forEach { categoryWithChildren ->
+
+                    for (categoryWithChildren in categories) {
                         val categoryTrades = categoryWithChildren.trades.size
                         totalTrades += categoryTrades
-                        
-                        categoryWithChildren.trades.forEach { tradeWithChildren ->
+
+                        for (tradeWithChildren in categoryWithChildren.trades) {
                             val tradeScopes = tradeWithChildren.scopes.size
                             totalScopes += tradeScopes
-                            
-                            tradeWithChildren.scopes.forEach { scopeWithChildren ->
+
+                            for (scopeWithChildren in tradeWithChildren.scopes) {
                                 val scopeAssemblies = scopeWithChildren.assemblies.size
                                 totalAssemblies += scopeAssemblies
-                                
-                                scopeWithChildren.assemblies.forEach { assemblyWithChildren ->
+
+                                for (assemblyWithChildren in scopeWithChildren.assemblies) {
                                     totalTasks += assemblyWithChildren.tasks.size
                                     totalMaterials += assemblyWithChildren.materials.size
-                                    
+
                                     // Count materials in tasks
-                                    assemblyWithChildren.tasks.forEach { taskWithMaterials ->
+                                    for (taskWithMaterials in assemblyWithChildren.tasks) {
                                         totalMaterials += taskWithMaterials.materials.size
                                     }
                                 }
                             }
                         }
-                        
+
                         Log.d(TAG, "  Category '${categoryWithChildren.category.name}': ${categoryTrades} trades")
                     }
                     

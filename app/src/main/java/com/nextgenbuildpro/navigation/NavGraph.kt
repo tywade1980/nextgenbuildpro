@@ -324,7 +324,7 @@ fun NavGraph(navController: NavHostController) {
             arguments = listOf(navArgument("leadId") { type = NavType.StringType })
         ) { backStackEntry ->
             val leadId = backStackEntry.arguments?.getString("leadId") ?: ""
-            com.nextgenbuildpro.clientengagement.ui.DigitalSignatureScreen(
+            DigitalSignatureScreen(
                 navController = navController,
                 leadId = leadId
             )
@@ -336,7 +336,7 @@ fun NavGraph(navController: NavHostController) {
             arguments = listOf(navArgument("documentId") { type = NavType.StringType })
         ) { backStackEntry ->
             val documentId = backStackEntry.arguments?.getString("documentId") ?: ""
-            com.nextgenbuildpro.clientengagement.ui.DigitalSignatureScreen(
+            DigitalSignatureScreen(
                 navController = navController,
                 documentId = documentId
             )

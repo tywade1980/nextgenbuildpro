@@ -42,7 +42,7 @@ fun EnhancedEstimateEditorScreen(
     
     // Initialize services
     val templateEstimateRepository = remember { TemplateEstimateRepository(context) }
-    val calculationEngine = remember { CalculationEngineService() }
+    remember { CalculationEngineService() }
     
     // State for estimate
     var estimate by remember { mutableStateOf<TemplateEstimate?>(null) }

@@ -29,7 +29,7 @@ class AssemblyCatalogueService(
         contextMode: ContextMode? = null
     ): List<AssemblySearchResult> {
         try {
-            val criteria = CatalogueSearchCriteria(
+            val criteria = HierarchicalCatalogueSearchCriteria(
                 keyword = keyword,
                 tradeType = tradeType,
                 projectType = projectType
@@ -67,7 +67,8 @@ class AssemblyCatalogueService(
                 cat.projectTypes.forEach { projectType ->
                     projectType.trades.forEach { trade ->
                         trade.masterAssembly.assemblies.find { it.id == assemblyId }?.let { foundAssembly ->
-                            return convertToAssemblyDetails(foundAssembly)
+                            // TODO: Implement convertToAssemblyDetails for Assembly type
+                            return null
                         }
                     }
                 }

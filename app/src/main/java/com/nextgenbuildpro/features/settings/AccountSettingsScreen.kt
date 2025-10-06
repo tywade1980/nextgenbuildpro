@@ -158,6 +158,7 @@ fun AccountSettingsScreen(navController: NavController) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingItem(
     setting: AccountSetting,

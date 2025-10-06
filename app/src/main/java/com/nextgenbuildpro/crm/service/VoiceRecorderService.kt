@@ -10,6 +10,11 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
 
 /**
  * Service for recording voice notes
@@ -143,22 +148,65 @@ class VoiceRecorderService(private val context: Context) {
 
             if (apiKey.isNullOrEmpty()) {
                 Log.e(TAG, "Speech API key not found in secure storage")
-                return "Error: Speech API key not configured"
+                return "Error: Speech API key not configured. Please configure your OpenAI API key in settings."
             }
 
-            // In a production app, this would use a real speech-to-text API with the apiKey
-            // For now, we'll return a more detailed placeholder
-
-            // TODO: Implement actual API call to speech-to-text service
-            // Example implementation with a hypothetical API client:
-            // val speechClient = SpeechClient.create(apiKey)
-            // return speechClient.transcribe(File(filePath))
-
-            return "Transcription of audio recording at ${com.nextgenbuildpro.core.DateUtils.formatTimestamp(System.currentTimeMillis())} " +
-                   "(API key: ${apiKey.take(5)}...)"
+            // Use OpenAI Whisper API for speech-to-text transcription
+            return transcribeWithWhisperAPI(filePath, apiKey)
         } catch (e: Exception) {
             Log.e(TAG, "Error transcribing audio", e)
             return "Error transcribing audio: ${e.message}"
+        }
+    }
+
+    /**
+     * Transcribe audio using OpenAI's Whisper API
+     */
+    private suspend fun transcribeWithWhisperAPI(filePath: String, apiKey: String): String {
+        return try {
+            val file = java.io.File(filePath)
+            if (!file.exists()) {
+                return "Error: Audio file not found"
+            }
+
+            // Create multipart request for Whisper API
+            val client = OkHttpClient.Builder()
+                .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .build()
+
+            val requestBody = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart(
+                    "file",
+                    file.name,
+                    file.asRequestBody("audio/mpeg".toMediaType())
+                )
+                .addFormDataPart("model", "whisper-1")
+                .addFormDataPart("language", "en") // English for construction terminology
+                .addFormDataPart("response_format", "text")
+                .build()
+
+            val request = Request.Builder()
+                .url("https://api.openai.com/v1/audio/transcriptions")
+                .addHeader("Authorization", "Bearer $apiKey")
+                .post(requestBody)
+                .build()
+
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string()
+
+            if (response.isSuccessful && responseBody != null) {
+                Log.d(TAG, "Audio transcription successful")
+                responseBody.trim()
+            } else {
+                Log.e(TAG, "Whisper API error: ${response.code} - ${responseBody}")
+                "Error: Failed to transcribe audio (HTTP ${response.code})"
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error calling Whisper API", e)
+            "Error: Failed to transcribe audio - ${e.message}"
         }
     }
 }
