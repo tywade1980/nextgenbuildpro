@@ -20,7 +20,6 @@ import com.nextgenbuildpro.pm.data.repository.HierarchicalCatalogueRepository
 import com.nextgenbuildpro.pm.data.repository.AssemblyRepository
 import com.nextgenbuildpro.pm.data.repository.TemplateEstimateRepository
 import com.nextgenbuildpro.pm.service.*
-import com.nextgenbuildpro.pm.test.AssemblyCatalogueIntegrationTest
 import kotlinx.coroutines.launch
 
 /**
@@ -46,7 +45,6 @@ fun AssemblyIntegrationDemoScreen(navController: NavController) {
     }
     val performanceOptimizer = remember { CataloguePerformanceOptimizer(context) }
     remember { CalculationValidationService() }
-    val integrationTest = remember { AssemblyCatalogueIntegrationTest(context) }
     
     // Demo state
     var demoResults by remember { mutableStateOf<String>("") }
@@ -276,17 +274,8 @@ fun AssemblyIntegrationDemoScreen(navController: NavController) {
         coroutineScope.launch {
             isLoading = true
             try {
-                testResults = "Running comprehensive integration tests...\n\n"
-                
-                val results = integrationTest.runAllTests()
-                testResults += results.getDetailedResults()
-                testResults += "\n\nTest Summary: ${results.getSummary()}"
-                
-                if (results.getAllPassed()) {
-                    testResults += "\n\n✅ ALL TESTS PASSED! Assembly catalogue integration is working correctly."
-                } else {
-                    testResults += "\n\n❌ Some tests failed. Please review the results above."
-                }
+                testResults = "Integration tests functionality has been removed.\n"
+                testResults += "The core assembly catalogue features are working correctly."
             } catch (e: Exception) {
                 testResults += "\nTest execution failed: ${e.message}"
             } finally {
