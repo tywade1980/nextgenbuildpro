@@ -225,16 +225,17 @@ enum class MessageType {
 }
 
 /**
- * Task representation in the NextGen system
+ * Task representation in the NextGen system (v2.0)
  */
 data class NextGenTask(
     val id: EntityId = UUID.randomUUID().toString(),
     val title: String = "",
     val type: String = "",
     val description: String,
-    val assignedAgent: AgentType,
+    val type: String = "generic",
+    val assignedAgent: AgentType = AgentType.ORCHESTRATOR,
     val priority: Priority,
-    val status: TaskStatus,
+    val status: TaskStatus = TaskStatus.PENDING,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now(),
     val dueDate: LocalDateTime? = null,

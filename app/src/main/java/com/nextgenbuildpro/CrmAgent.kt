@@ -18,7 +18,13 @@ import java.util.Locale
 /**
  * CRM Agent for NextGenBuildPro
  * 
- * Features:
+ * @deprecated This class uses the legacy agent pattern and will be removed in a future version.
+ * Please migrate to the v2.0 agent framework:
+ * - Use `CRMOrchestrator` for department-level CRM coordination
+ * - Use `ContactManagementAgent` for contact-specific operations
+ * - See AGENT_FRAMEWORK_V2.md for migration guide
+ * 
+ * Legacy Features:
  * - Customer relationship management
  * - Call scheduling and management
  * - Automated follow-ups
@@ -26,6 +32,14 @@ import java.util.Locale
  * - Communication history tracking
  * - Smart message templates
  */
+@Deprecated(
+    message = "Use CRMOrchestrator and specialized agents from the v2.0 framework",
+    replaceWith = ReplaceWith(
+        "CRMOrchestrator(context)",
+        "com.nextgenbuildpro.orchestrators.CRMOrchestrator"
+    ),
+    level = DeprecationLevel.WARNING
+)
 class CrmAgent(private val context: Context) {
 
     // Maximum number of items to keep in history lists
