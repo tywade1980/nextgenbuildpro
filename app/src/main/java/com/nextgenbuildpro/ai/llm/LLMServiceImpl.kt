@@ -121,7 +121,7 @@ class LLMServiceImpl(
             model = ModelId("gpt-4"), // Use GPT-4 for construction expertise
             messages = messages,
             maxTokens = 1000,
-            temperature = 0.7f
+            temperature = 0.7
         )
 
         val completion = openAI.chatCompletion(chatCompletionRequest)

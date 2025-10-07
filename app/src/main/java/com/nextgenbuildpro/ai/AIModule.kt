@@ -2,6 +2,7 @@ package com.nextgenbuildpro.ai
 
 import android.content.Context
 import com.nextgenbuildpro.core.AIAssistant
+import com.nextgenbuildpro.core.ApiKeyManager
 import com.nextgenbuildpro.ai.llm.LLMService
 import com.nextgenbuildpro.ai.llm.LLMServiceImpl
 import com.nextgenbuildpro.core.api.impl.FirestoreServiceImpl
@@ -62,7 +63,15 @@ object AIModule {
             val apiUsageRegistry = ApiUsageRegistryImpl(context)
             val firestoreService = FirestoreServiceImpl(configService, apiUsageRegistry)
             
-            llmService = LLMServiceImpl(firestoreService)
+            // Get OpenAI API key from ApiKeyManager or use empty string as fallback
+            val openAIApiKey = try {
+                ApiKeyManager.getOpenAIKey()
+            } catch (e: Exception) {
+                android.util.Log.w("AIModule", "Could not get OpenAI API key, using empty string", e)
+                ""
+            }
+            
+            llmService = LLMServiceImpl(firestoreService, openAIApiKey)
         } catch (e: Exception) {
             android.util.Log.e("AIModule", "Failed to initialize LLM service", e)
         }
