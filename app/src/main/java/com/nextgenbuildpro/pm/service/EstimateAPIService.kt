@@ -51,8 +51,8 @@ class EstimateAPIService(private val context: Context) {
                     id = lead.id,
                     name = lead.name,
                     phone = lead.phone,
-                    email = lead.email,
-                    address = "${lead.address.street}, ${lead.address.city}, ${lead.address.state}"
+                    email = lead.email ?: "",
+                    address = lead.address
                 )
             }
             

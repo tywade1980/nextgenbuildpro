@@ -333,9 +333,10 @@ class SystemOptimizationService(private val context: Context) {
     /**
      * Cache result
      */
-    private fun cacheResult(requestId: String, result: Result<Any>, requestType: String) {
+    private fun <T> cacheResult(requestId: String, result: Result<T>, requestType: String) {
+        @Suppress("UNCHECKED_CAST")
         val entry = CacheEntry(
-            data = result,
+            data = result as Result<Any>,
             requestType = requestType,
             createdAt = LocalDateTime.now(),
             accessCount = 1,
