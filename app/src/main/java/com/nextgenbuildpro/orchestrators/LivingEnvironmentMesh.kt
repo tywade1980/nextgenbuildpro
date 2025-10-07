@@ -103,7 +103,7 @@ class LivingEnvironmentMesh {
 
             // Analyze message context for optimal routing
             val contextAnalysis = analyzeMessageContext(message)
-            val optimalPath = findOptimalPath(message.sender, message.targetAgent ?: AgentType.ORCHESTRATOR, contextAnalysis)
+            val optimalPath = findOptimalPath(message.fromAgent, message.toAgent, contextAnalysis)
 
             val route = MessageRoute(
                 id = routeId,
@@ -354,6 +354,7 @@ class LivingEnvironmentMesh {
                 Priority.HIGH -> 0.8
                 Priority.MEDIUM -> 0.6
                 Priority.LOW -> 0.4
+                Priority.EMERGENCY -> 1.0
             },
             complexity = calculateMessageComplexity(message),
             domain = inferMessageDomain(message),

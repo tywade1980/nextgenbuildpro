@@ -94,9 +94,9 @@ class OrchestratorManager(private val context: Context) {
         // Create agent message for routing
         val message = AgentMessage(
             id = task.id,
-            sender = AgentType.ORCHESTRATOR,
-            targetAgent = task.assignedAgent,
-            messageType = MessageType.TASK_REQUEST,
+            fromAgent = AgentType.ORCHESTRATOR,
+            toAgent = task.assignedAgent,
+            messageType = MessageType.COMMAND,
             content = task.description,
             priority = task.priority,
             metadata = task.metadata
