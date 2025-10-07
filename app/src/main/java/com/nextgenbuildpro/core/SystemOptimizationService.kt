@@ -106,6 +106,7 @@ class SystemOptimizationService(private val context: Context) {
             if (cachedResult != null && cacheEnabled) {
                 Log.d(TAG, "Cache hit for request: $requestId")
                 successfulRequests++
+                @Suppress("UNCHECKED_CAST")
                 return cachedResult as Result<T>
             }
 
@@ -188,25 +189,27 @@ class SystemOptimizationService(private val context: Context) {
     /**
      * Prefetch data based on usage patterns
      */
-    suspend fun prefetchData(patterns: List<UsagePattern>): Result<Unit> = try {
-        if (!prefetchEnabled) return Result.success(Unit)
+    suspend fun prefetchData(patterns: List<UsagePattern>): Result<Unit> {
+        return try {
+            if (!prefetchEnabled) return Result.success(Unit)
 
-        patterns.forEach { pattern ->
-            val prefetchRequest = PrefetchRequest(
-                resourceId = pattern.resourceId,
-                priority = pattern.priority,
-                estimatedSize = pattern.estimatedSize,
-                expiresAt = LocalDateTime.now().plusMinutes(30)
-            )
+            patterns.forEach { pattern ->
+                val prefetchRequest = PrefetchRequest(
+                    resourceId = pattern.resourceId,
+                    priority = pattern.priority,
+                    estimatedSize = pattern.estimatedSize,
+                    expiresAt = LocalDateTime.now().plusMinutes(30)
+                )
 
-            prefetchQueue.add(prefetchRequest)
+                prefetchQueue.add(prefetchRequest)
+            }
+
+            Log.d(TAG, "Added ${patterns.size} items to prefetch queue")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to prefetch data", e)
+            Result.failure(e)
         }
-
-        Log.d(TAG, "Added ${patterns.size} items to prefetch queue")
-        Result.success(Unit)
-    } catch (e: Exception) {
-        Log.e(TAG, "Failed to prefetch data", e)
-        Result.failure(e)
     }
 
     /**
@@ -330,9 +333,10 @@ class SystemOptimizationService(private val context: Context) {
     /**
      * Cache result
      */
-    private fun cacheResult(requestId: String, result: Result<Any>, requestType: String) {
+    private fun <T> cacheResult(requestId: String, result: Result<T>, requestType: String) {
+        @Suppress("UNCHECKED_CAST")
         val entry = CacheEntry(
-            data = result,
+            data = result as Result<Any>,
             requestType = requestType,
             createdAt = LocalDateTime.now(),
             accessCount = 1,

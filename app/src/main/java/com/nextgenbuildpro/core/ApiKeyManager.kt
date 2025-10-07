@@ -73,6 +73,14 @@ object ApiKeyManager {
     }
 
     /**
+     * Get the OpenAI API key
+     * @return The OpenAI API key or empty string if not found
+     */
+    fun getOpenAIKey(): String {
+        return properties.getProperty("openai.api.key", "")
+    }
+
+    /**
      * Get a property value by key
      * @param key The property key
      * @param defaultValue The default value to return if the property is not found

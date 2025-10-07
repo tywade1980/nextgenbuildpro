@@ -124,7 +124,11 @@ fun AssemblyDetailScreen(
                     }
                 }
                 assembly != null -> {
-                    AssemblyDetailContent(assembly!!)
+                    AssemblyDetailContent(
+                        assembly = assembly!!,
+                        navController = navController,
+                        assemblyId = assemblyId
+                    )
                 }
             }
         }
@@ -132,7 +136,11 @@ fun AssemblyDetailScreen(
 }
 
 @Composable
-fun AssemblyDetailContent(assembly: Assembly) {
+fun AssemblyDetailContent(
+    assembly: Assembly,
+    navController: NavController,
+    assemblyId: String
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()

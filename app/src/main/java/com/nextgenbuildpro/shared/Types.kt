@@ -230,7 +230,6 @@ enum class MessageType {
 data class NextGenTask(
     val id: EntityId = UUID.randomUUID().toString(),
     val title: String = "",
-    val type: String = "",
     val description: String,
     val type: String = "generic",
     val assignedAgent: AgentType = AgentType.ORCHESTRATOR,
