@@ -1,4 +1,14 @@
-# NextGen BuildPro - Construction Management Platform
+# ⚠️ OUTDATED FILE - DO NOT USE ⚠️
+
+> **🚨 THIS FILE IS ARCHIVED AND CONTAINS OUTDATED INFORMATION 🚨**
+> 
+> **Please see [README.md](README.md) for current, accurate documentation.**
+> 
+> This file contains aspirational and false claims that have been removed from the project documentation. It is kept only for historical reference. The claims about 10,000+ users, quantum computing, awards, and "completed" features were never accurate and have been corrected in the current README.
+
+---
+
+# NextGen BuildPro - Construction Management Platform (ARCHIVED VERSION)
 
 > ⚠️ **DEVELOPMENT STATUS**: This project is currently in active development and is NOT production-ready. Many features described in documentation are planned but not yet fully implemented.
 

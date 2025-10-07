@@ -108,3 +108,8 @@ Instead of claiming to be a revolutionary AI OS that doesn't work, it's now pres
 The code for future AI features is there, but it's clearly marked as aspirational rather than current functionality.
 
 This is a much better foundation for continued development.
+
+## Important Note About README Files
+
+- **README.md** - This is the CURRENT, ACCURATE documentation. Always refer to this file.
+- **README_OLD_BACKUP.md** - This contains the outdated aspirational content with false claims. It has been clearly marked as archived and should NOT be used. It's kept only for historical reference to understand what was fixed.
