@@ -1,6 +1,7 @@
 package com.nextgenbuildpro.agents.personal_assistant
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
@@ -306,9 +307,9 @@ class VoiceAssistantAgent(
                 return@withContext Result.success(Unit)
             }
             
-            val intent = android.content.Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, java.util.Locale.getDefault())
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
                 putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
                 putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
             }
@@ -398,6 +399,9 @@ class VoiceAssistantAgent(
         return try {
             Log.d(TAG, "Querying external LLM for input: $input")
             
+            // Set state to Processing while waiting for LLM response
+            _conversationState.value = ConversationState.Processing
+            
             val context = LLMContext(
                 conversationId = currentConversationId ?: UUID.randomUUID().toString(),
                 systemPrompt = buildSystemPrompt(),
@@ -415,10 +419,12 @@ class VoiceAssistantAgent(
                 onSuccess = { llmResponse ->
                     Log.d(TAG, "LLM response received: ${llmResponse.content.take(100)}...")
                     currentConversationId = llmResponse.conversationId
+                    _conversationState.value = ConversationState.Ready
                     llmResponse.content
                 },
                 onFailure = { error ->
                     Log.e(TAG, "LLM query failed", error)
+                    _conversationState.value = ConversationState.Error(error.message ?: "Unknown error")
                     "I apologize, but I'm having trouble connecting to my knowledge base. Please try again."
                 }
             )
