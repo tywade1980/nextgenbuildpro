@@ -89,7 +89,12 @@ class CFOFinancialOrchestrator(
     private val constructionPricingData = initializeConstructionPricing()
     private val multiLLMConfig = initializeMultiLLMSystem()
     
-    override val subAgents: List<SubAgent> = emptyList()
+    override val subAgents: List<SubAgent> = listOf(
+        // Cost Database Agent - manages construction cost data
+        com.nextgenbuildpro.agents.estimating.CostDatabaseAgent()
+        // Additional agents would be added here as they are implemented:
+        // EstimatorAgent(), ValueEngineerAgent(), AccountantAgent(), etc.
+    )
     
     /**
      * Initialize construction pricing knowledge base with 2025+ data

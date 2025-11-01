@@ -85,6 +85,13 @@ class CEOPersonalAssistantOrchestrator(
     private val userPreferences = mutableMapOf<String, Any>()
     private val activeConversations = mutableMapOf<String, Conversation>()
     
+    // Initialize LLM Service for sub-agents
+    private val llmService: com.nextgenbuildpro.ai.llm.LLMService by lazy {
+        // Get the LLM service from the API module
+        com.nextgenbuildpro.core.api.di.ApiModule.provideLLMService(context)
+    }
+    private val activeConversations = mutableMapOf<String, Conversation>()
+    
     // Multi-LLM configuration for executive intelligence
     private val multiLLMConfig = initializeMultiLLMSystem()
     
@@ -92,7 +99,16 @@ class CEOPersonalAssistantOrchestrator(
     private val executiveKnowledge = initializeExecutiveKnowledge()
     
     // Sub-agents for Personal Assistant department
-    override val subAgents: List<SubAgent> = emptyList() // Will be populated with 5-8 specialized agents
+    override val subAgents: List<SubAgent> by lazy {
+        listOf(
+            // Voice Assistant Agent - handles voice command processing
+            com.nextgenbuildpro.agents.personal_assistant.VoiceAssistantAgent(context, llmService),
+            // Enhanced Voice Command Agent - advanced NLP and command routing
+            com.nextgenbuildpro.agents.personal_assistant.EnhancedVoiceCommandAgent(llmService)
+            // Additional agents would be added here as they are implemented:
+            // SchedulerAgent(), NotificationAgent(), ContextAwarenessAgent(), etc.
+        )
+    }
     
     private fun initializeMultiLLMSystem(): MultiLLMConfig {
         return MultiLLMConfig(
