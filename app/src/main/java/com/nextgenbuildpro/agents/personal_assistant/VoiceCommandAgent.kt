@@ -662,27 +662,6 @@ class VoiceCommandAgent : SpecializedAgent {
             }
         }
     }
-                        language = language,
-                    confidence = 0.87f,
-                    targetOrchestrator = AgentType.COO_OPERATIONS_ORCHESTRATOR,
-                    permissionsRequired = listOf(Permission.ACCESS_CAMERA)
-                )
-            }
-            
-            // === DEFAULT/GENERAL QUERY ===
-            else -> {
-                EnhancedVoiceCommand(
-                    action = "general_query",
-                    category = "general",
-                    entities = mapOf("query" to normalizedInput),
-                    language = language,
-                    confidence = 0.70f,
-                    targetOrchestrator = AgentType.CEO_PERSONAL_ASSISTANT,
-                    permissionsRequired = listOf(Permission.INTERNET_ACCESS)
-                )
-            }
-        }
-    }
     
     private suspend fun executeVoiceCommand(command: EnhancedVoiceCommand): String {
         Log.d("VoiceCommandAgent", "Executing ${command.action} for ${command.category} (confidence: ${command.confidence})")

@@ -576,9 +576,27 @@ class CEOPersonalAssistantOrchestrator(
      * Check if required permissions are granted for voice command
      */
     private fun checkPermissions(command: ParsedCommand): Boolean {
+        // Check if command intent requires sensitive permissions
+        val sensitiveCommands = listOf(
+            "MAKE_CALL", "SEND_SMS", "CAPTURE_PHOTO", "EMERGENCY", 
+            "SAFETY", "CREATE_CONTACT", "SCHEDULE", "CLOCK_IN"
+        )
+        
+        val requiresPermission = sensitiveCommands.any { command.intent.contains(it, ignoreCase = true) }
+        
+        if (!requiresPermission) {
+            // Commands like navigation, list operations don't need special permissions
+            return true
+        }
+        
+        // For sensitive commands, log the permission requirement
         // In a full implementation, this would check actual Android permissions
-        // For now, we'll assume permissions are granted for voice commands
-        Log.d(TAG, "Checking permissions for command: ${command.intent}")
+        // using context.checkSelfPermission() or PermissionManager
+        Log.d(TAG, "Sensitive command detected: ${command.intent}")
+        Log.d(TAG, "Permission check would be performed here for Android permissions")
+        
+        // For now, we'll allow commands but log the requirement
+        // TODO: Implement actual permission checking with Android PermissionManager
         return true
     }
     
