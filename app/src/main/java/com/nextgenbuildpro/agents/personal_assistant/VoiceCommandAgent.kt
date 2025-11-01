@@ -3,6 +3,7 @@ package com.nextgenbuildpro.agents.personal_assistant
 import android.util.Log
 import com.nextgenbuildpro.shared.*
 import com.nextgenbuildpro.mcp.MCPServer
+import com.nextgenbuildpro.ai.llm.LLMService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -13,21 +14,21 @@ import kotlinx.coroutines.flow.*
  * Provides full voice command access to every feature, service, and orchestrator.
  * Handles Spanish and English voice recognition with construction-specific vocabulary.
  * 
- * This agent has complete control over:
- * - All C-suite orchestrators (COO, CFO, CHRO, CTO, CSO)
- * - All feature modules (leads, estimates, projects, calendar, etc.)
- * - All services (CRM, PM, Analytics, Design, Safety, etc.)
- * - System navigation and UI control
- * - Data operations (CRUD on all entities)
- * - Emergency and safety protocols
+ * This agent now delegates complex requests to EnhancedVoiceCommandAgent when LLM service
+ * is available, providing backward compatibility with simple pattern matching as fallback.
  */
-class VoiceCommandAgent : SpecializedAgent {
+class VoiceCommandAgent(
+    private val llmService: LLMService? = null
+) : SpecializedAgent {
     override val agentId = "voice_command_agent"
     override val agentType = AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR
     override val specialization = "Comprehensive voice command processing with full application control"
     
     private val mcpServer = MCPServer.getInstance()
     private var mcpConnection: com.nextgenbuildpro.mcp.MCPConnection? = null
+    
+    // Enhanced agent for LLM-powered processing
+    private var enhancedAgent: EnhancedVoiceCommandAgent? = null
     
     private val _isActive = MutableStateFlow(false)
     override val isActive: StateFlow<Boolean> = _isActive.asStateFlow()
@@ -177,6 +178,13 @@ class VoiceCommandAgent : SpecializedAgent {
     override suspend fun initialize(): Result<Unit> = try {
         Log.i("VoiceCommandAgent", "Initializing Voice Command Agent...")
         
+        // Initialize enhanced agent if LLM service is available
+        if (llmService != null) {
+            enhancedAgent = EnhancedVoiceCommandAgent(llmService)
+            enhancedAgent?.initialize()
+            Log.i("VoiceCommandAgent", "Enhanced voice agent initialized with LLM capabilities")
+        }
+        
         val connectionResult = mcpServer.createConnection(agentId, agentType)
         connectionResult.fold(
             onSuccess = { connection ->
@@ -199,23 +207,28 @@ class VoiceCommandAgent : SpecializedAgent {
         return try {
             Log.d("VoiceCommandAgent", "Processing voice command: ${task.description}")
             
-            val voiceInput = task.metadata["voice_input"] as? String
-                ?: return Result.failure(IllegalArgumentException("No voice input provided"))
+            val voiceInput = task.metadata["voice_input"] as? String ?: task.description
             
+            // Try enhanced agent first if available
+            if (enhancedAgent != null && shouldUseEnhancedAgent(voiceInput)) {
+                Log.d("VoiceCommandAgent", "Delegating to enhanced agent for LLM processing")
+                return enhancedAgent!!.processTask(task)
+            }
+            
+            // Fallback to simple pattern matching
+            Log.d("VoiceCommandAgent", "Using simple pattern matching for voice command")
             val processedCommand = processVoiceCommand(voiceInput)
             val executionResult = executeVoiceCommand(processedCommand)
             
             val completedTask = task.copy(
                 status = TaskStatus.COMPLETED,
-                progress = 1.0f,
+                result = mapOf("response" to result),
                 metadata = task.metadata + mapOf(
                     "processed_command" to processedCommand,
                     "execution_result" to executionResult,
                     "confidence_score" to calculateConfidenceScore(voiceInput),
                     "language_detected" to detectLanguage(voiceInput),
-                    "command_category" to determineCategory(voiceInput),
-                    "target_orchestrator" to processedCommand.targetOrchestrator?.name,
-                    "permissions_required" to processedCommand.permissionsRequired
+                    "processing_mode" to "pattern_matching"
                 )
             )
             
@@ -227,19 +240,29 @@ class VoiceCommandAgent : SpecializedAgent {
     }
     
     /**
-     * Determine command category for routing
+     * Determine if enhanced agent should be used for this request
      */
-    private fun determineCategory(input: String): String {
-        val normalizedInput = input.lowercase()
-        for ((category, keywords) in commandCategories) {
-            if (keywords.any { normalizedInput.contains(it) }) {
-                return category
-            }
+    private fun shouldUseEnhancedAgent(input: String): Boolean {
+        // Use enhanced agent for complex requests that need LLM or web tools
+        val complexPatterns = listOf(
+            "search", "find", "look up", "get information",
+            "buscar", "encontrar", "busca",
+            "what is", "how to", "why", "when",
+            "qué es", "cómo", "por qué", "cuándo",
+            "research", "investigate", "analyze",
+            "investigar", "analizar",
+            "website", "web page", "url", "link",
+            "sitio web", "página web",
+            "price", "cost", "rates", "pricing",
+            "precio", "costo", "tarifas"
+        )
+        
+        return complexPatterns.any { pattern -> 
+            input.contains(pattern, ignoreCase = true)
         }
-        return "general"
     }
     
-    private suspend fun processVoiceCommand(voiceInput: String): EnhancedVoiceCommand {
+    private suspend fun processVoiceCommand(voiceInput: String): VoiceCommand {
         val normalizedInput = voiceInput.lowercase().trim()
         val language = detectLanguage(normalizedInput)
         val category = determineCategory(normalizedInput)
@@ -1089,6 +1112,7 @@ class VoiceCommandAgent : SpecializedAgent {
     }
     
     override suspend fun shutdown(): Result<Unit> = try {
+        enhancedAgent?.shutdown()
         mcpConnection?.close()
         _isActive.value = false
         Log.i("VoiceCommandAgent", "Voice Command Agent shut down successfully")
