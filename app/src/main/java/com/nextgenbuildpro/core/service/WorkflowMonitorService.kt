@@ -512,8 +512,13 @@ class WorkflowMonitorService(
     }
 }
 
-// Data classes for workflow monitoring
+// ===== INTERNAL DATA CLASSES =====
+// These are kept private to WorkflowMonitorService to encapsulate monitoring implementation details
 
+/**
+ * Internal representation of a user action for workflow monitoring
+ * Intentionally private to avoid coupling external code to monitoring internals
+ */
 private data class UserAction(
     val userId: String,
     val action: String,
@@ -522,6 +527,10 @@ private data class UserAction(
     val context: Map<String, Any>
 )
 
+/**
+ * Represents an active workflow session being monitored
+ * Note: Uses MutableList for steps as sessions are built incrementally during monitoring
+ */
 private data class WorkflowSession(
     val sessionId: String,
     val userId: String,
