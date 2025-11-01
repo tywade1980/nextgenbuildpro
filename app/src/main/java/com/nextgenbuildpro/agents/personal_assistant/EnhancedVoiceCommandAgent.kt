@@ -27,8 +27,8 @@ class EnhancedVoiceCommandAgent(
     private val llmService: LLMService
 ) : SubAgent {
     override val agentId = "enhanced_voice_command_agent"
-    override val agentType = AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR
-    override val departmentHead = AgentType.CEO_PERSONAL_ASSISTANT
+    override val agentType = AgentType.COO_OPERATIONS_ORCHESTRATOR
+    override val departmentHead = AgentType.COO_OPERATIONS_ORCHESTRATOR
     override val subAgentRole = "Natural Language Processing and Tool Orchestration"
     override val specialization = "Voice command processing with full LLM and web tool integration"
     

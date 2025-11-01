@@ -52,7 +52,7 @@ class VoiceAssistantAgent(
     
     override val agentId: String = "voice_assistant_agent_${UUID.randomUUID()}"
     override val agentType: AgentType = AgentType.SUB_AGENT
-    override val departmentHead: AgentType = AgentType.CEO_PERSONAL_ASSISTANT
+    override val departmentHead: AgentType = AgentType.COO_OPERATIONS_ORCHESTRATOR
     override val subAgentRole: String = "Voice Assistant with External LLM Integration"
     override val specialization: String = "Voice-enabled AI assistance with external data retrieval"
     

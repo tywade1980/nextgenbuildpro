@@ -228,7 +228,7 @@ data class NextGenTask(
     val title: String = "",
     val description: String,
     val type: String = "generic",
-    val assignedAgent: AgentType = AgentType.ORCHESTRATOR,
+    val assignedAgent: AgentType = AgentType.COO_OPERATIONS_ORCHESTRATOR,
     val priority: Priority,
     val status: TaskStatus = TaskStatus.PENDING,
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -1301,9 +1301,10 @@ enum class SuggestionStatus {
 }
 
 /**
- * Learning agent interface for agents that learn from data
+ * Workflow learning agent interface for agents that learn from workflow patterns
+ * This extends SpecializedAgent and provides workflow-specific learning capabilities
  */
-interface LearningAgent : SpecializedAgent {
+interface WorkflowLearningAgent : SpecializedAgent {
     /**
      * Learn from knowledge base entries
      */

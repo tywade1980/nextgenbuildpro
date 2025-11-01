@@ -66,7 +66,7 @@ class CEOPersonalAssistantOrchestrator(
         private const val TAG = "CEOPersonalAssistantOrchestrator"
     }
     
-    override val agentType: AgentType = AgentType.CEO_PERSONAL_ASSISTANT
+    override val agentType: AgentType = AgentType.COO_OPERATIONS_ORCHESTRATOR
     override val departmentName: String = "CEO - Personal Assistant"
     
     private val _status = MutableStateFlow(SystemStatus.INITIALIZING)
@@ -522,7 +522,7 @@ class CEOPersonalAssistantOrchestrator(
             type = "voice_command",
             priority = Priority.HIGH,
             status = TaskStatus.PENDING,
-            assignedAgent = AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR,
+            assignedAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR,
             metadata = mapOf("voice_input" to command),
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now()

@@ -21,7 +21,7 @@ class VoiceCommandAgent(
     private val llmService: LLMService? = null
 ) : SpecializedAgent {
     override val agentId = "voice_command_agent"
-    override val agentType = AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR
+    override val agentType = AgentType.COO_OPERATIONS_ORCHESTRATOR
     override val specialization = "Comprehensive voice command processing with full application control"
     
     private val mcpServer = MCPServer.getInstance()
@@ -679,7 +679,7 @@ class VoiceCommandAgent(
                     entities = mapOf("query" to normalizedInput),
                     language = language,
                     confidence = 0.70f,
-                    targetOrchestrator = AgentType.CEO_PERSONAL_ASSISTANT,
+                    targetOrchestrator = AgentType.COO_OPERATIONS_ORCHESTRATOR,  // Route to COO for general operations
                     permissionsRequired = listOf(Permission.INTERNET_ACCESS)
                 )
             }
