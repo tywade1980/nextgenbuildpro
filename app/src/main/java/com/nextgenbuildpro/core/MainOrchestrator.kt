@@ -2,6 +2,7 @@ package com.nextgenbuildpro.core
 
 import com.nextgenbuildpro.shared.*
 import com.nextgenbuildpro.orchestrators.OrchestratorManager
+import com.nextgenbuildpro.core.service.LearningSystemManager
 import com.nextgenbuildpro.env.LivingEnv
 import com.nextgenbuildpro.apps.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +34,9 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     // New v2.0 orchestrator system
     private val orchestratorManager = OrchestratorManager(context)
     
+    // Learning system
+    private val learningSystemManager = LearningSystemManager(context)
+    
     // System state
     private val _systemStatus = MutableStateFlow(SystemStatus.INITIALIZING)
     val systemStatus: StateFlow<SystemStatus> = _systemStatus.asStateFlow()
@@ -55,6 +59,10 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
             
             // Initialize new orchestrator system
             orchestratorManager.initialize().getOrThrow()
+            
+            // Initialize learning system
+            learningSystemManager.initialize().getOrThrow()
+            learningSystemManager.startLearning().getOrThrow()
             
             // Initialize core components
             initializeComponents()
@@ -84,6 +92,9 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
             Log.i("MainOrchestrator", "Shutting down NextGen BuildPro v2.0 System...")
             
             _systemStatus.value = SystemStatus.SHUTDOWN
+            
+            // Shutdown learning system
+            learningSystemManager.shutdown()
             
             // Shutdown orchestrator system
             orchestratorManager.shutdown()
@@ -973,3 +984,75 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         }
     }
 }
+    // ===== LEARNING SYSTEM ACCESS METHODS =====
+    
+    /**
+     * Get the learning system manager
+     */
+    fun getLearningSystemManager(): LearningSystemManager = learningSystemManager
+    
+    /**
+     * Add knowledge to the knowledge base
+     */
+    suspend fun addKnowledge(
+        title: String,
+        content: String,
+        category: KnowledgeCategory,
+        tags: List<String> = emptyList()
+    ): Result<KnowledgeEntry> {
+        return learningSystemManager.addKnowledge(title, content, category, tags)
+    }
+    
+    /**
+     * Search the knowledge base
+     */
+    suspend fun searchKnowledge(
+        query: String,
+        categories: List<KnowledgeCategory> = emptyList(),
+        tags: List<String> = emptyList()
+    ): Result<List<KnowledgeEntry>> {
+        return learningSystemManager.searchKnowledge(query, categories, tags)
+    }
+    
+    /**
+     * Get pending automation suggestions
+     */
+    suspend fun getPendingAutomationSuggestions(): Result<List<AutomationSuggestion>> {
+        return learningSystemManager.getPendingSuggestions()
+    }
+    
+    /**
+     * Approve an automation suggestion
+     */
+    suspend fun approveAutomation(
+        suggestionId: EntityId,
+        approverName: String,
+        comments: String? = null
+    ): Result<AutomationSuggestion> {
+        return learningSystemManager.approveSuggestion(suggestionId, approverName, comments)
+    }
+    
+    /**
+     * Reject an automation suggestion
+     */
+    suspend fun rejectAutomation(
+        suggestionId: EntityId,
+        reviewerName: String,
+        reason: String
+    ): Result<AutomationSuggestion> {
+        return learningSystemManager.rejectSuggestion(suggestionId, reviewerName, reason)
+    }
+    
+    /**
+     * Get learning system statistics
+     */
+    suspend fun getLearningSystemStats(): Result<SystemLearningStats> {
+        return learningSystemManager.getLearningStats()
+    }
+    
+    /**
+     * Generate learning system report
+     */
+    suspend fun generateLearningReport(): Result<String> {
+        return learningSystemManager.generateReport()
+    }
