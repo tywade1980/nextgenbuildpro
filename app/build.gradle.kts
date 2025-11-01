@@ -84,6 +84,12 @@ dependencies {
     implementation("com.google.mlkit:object-detection-custom:17.0.2")
     implementation("com.google.mlkit:image-labeling:17.0.9")
     implementation("com.google.mlkit:image-labeling-custom:17.0.3")
+    
+    // ML Kit Generative AI - For on-device inference with Gemini Nano
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    
+    // OkHttp for web search capabilities
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // OpenAI API - Latest stable
     implementation("com.aallam.openai:openai-client:3.8.2")
