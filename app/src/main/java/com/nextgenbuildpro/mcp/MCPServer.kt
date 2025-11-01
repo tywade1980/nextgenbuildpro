@@ -2,6 +2,7 @@ package com.nextgenbuildpro.mcp
 
 import android.util.Log
 import com.nextgenbuildpro.shared.*
+import com.nextgenbuildpro.mcp.tools.WebTools
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.concurrent.ConcurrentHashMap
@@ -115,6 +116,18 @@ class MCPServer private constructor() {
         systemResources.forEach { resource ->
             resourceRegistry[resource.id] = resource
         }
+        
+        // Register web tools
+        WebTools.getAvailableTools().forEach { tool ->
+            resourceRegistry[tool.toolId] = MCPResource(
+                id = tool.toolId,
+                name = tool.toolName,
+                type = "web_tool",
+                description = tool.description
+            )
+        }
+        
+        Log.i("MCPServer", "Registered ${resourceRegistry.size} resources including web tools")
     }
     
     private fun startMessageProcessor() {
