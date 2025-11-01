@@ -164,4 +164,4 @@ if (require.main === module) {
     });
 }
 
-export { verifyCatalogue };
+export { verifyCatalogue, verifyTasksAndMaterials };

@@ -67,8 +67,7 @@ class AssemblyCatalogueService(
                 cat.projectTypes.forEach { projectType ->
                     projectType.trades.forEach { trade ->
                         trade.masterAssembly.assemblies.find { it.id == assemblyId }?.let { foundAssembly ->
-                            // TODO: Implement convertToAssemblyDetails for Assembly type
-                            return null
+                            return convertToAssemblyDetails(foundAssembly)
                         }
                     }
                 }
