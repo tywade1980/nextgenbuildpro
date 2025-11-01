@@ -247,7 +247,7 @@ class VoiceCommandAgent : SpecializedAgent {
         // Comprehensive command routing to ALL application functions
         return when {
             // === LEADS MANAGEMENT ===
-            normalizedInput.matches(Regex(".*(new|create|add)\\s+lead.*")) -> {
+            normalizedInput.matches(Regex(".*(new|create|add)\s+lead.*")) -> {
                 EnhancedVoiceCommand(
                     action = "create_lead",
                     category = "leads",
@@ -258,7 +258,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.WRITE_CONTACTS, Permission.INTERNET_ACCESS)
                 )
             }
-            normalizedInput.matches(Regex(".*(show|list|view|display)\\s+(all\\s+)?leads.*")) -> {
+            normalizedInput.matches(Regex(".*(show|list|view|display)\s+(all\s+)?leads.*")) -> {
                 EnhancedVoiceCommand(
                     action = "list_leads",
                     category = "leads",
@@ -269,7 +269,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.READ_CONTACTS, Permission.INTERNET_ACCESS)
                 )
             }
-            normalizedInput.matches(Regex(".*(open|view)\\s+lead.*")) -> {
+            normalizedInput.matches(Regex(".*(open|view)\s+lead.*")) -> {
                 EnhancedVoiceCommand(
                     action = "view_lead",
                     category = "leads",
@@ -293,7 +293,7 @@ class VoiceCommandAgent : SpecializedAgent {
             }
             
             // === ESTIMATES MANAGEMENT ===
-            normalizedInput.matches(Regex(".*(new|create|add|generate)\\s+(estimate|quote|bid).*")) -> {
+            normalizedInput.matches(Regex(".*(new|create|add|generate)\s+(estimate|quote|bid).*")) -> {
                 EnhancedVoiceCommand(
                     action = "create_estimate",
                     category = "estimates",
@@ -304,7 +304,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_STORAGE)
                 )
             }
-            normalizedInput.matches(Regex(".*(show|list|view)\\s+(all\\s+)?(estimates|quotes|bids).*")) -> {
+            normalizedInput.matches(Regex(".*(show|list|view)\s+(all\s+)?(estimates|quotes|bids).*")) -> {
                 EnhancedVoiceCommand(
                     action = "list_estimates",
                     category = "estimates",
@@ -339,7 +339,7 @@ class VoiceCommandAgent : SpecializedAgent {
             }
             
             // === PROJECTS MANAGEMENT ===
-            normalizedInput.matches(Regex(".*(new|create|add|start)\\s+(project|job).*")) -> {
+            normalizedInput.matches(Regex(".*(new|create|add|start)\s+(project|job).*")) -> {
                 EnhancedVoiceCommand(
                     action = "create_project",
                     category = "projects",
@@ -350,7 +350,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_LOCATION)
                 )
             }
-            normalizedInput.matches(Regex(".*(show|list|view)\\s+(all\\s+)?(projects|jobs).*")) -> {
+            normalizedInput.matches(Regex(".*(show|list|view)\s+(all\s+)?(projects|jobs).*")) -> {
                 EnhancedVoiceCommand(
                     action = "list_projects",
                     category = "projects",
@@ -361,7 +361,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.INTERNET_ACCESS)
                 )
             }
-            normalizedInput.matches(Regex(".*(open|view)\\s+(project|job).*")) -> {
+            normalizedInput.matches(Regex(".*(open|view)\s+(project|job).*")) -> {
                 EnhancedVoiceCommand(
                     action = "view_project",
                     category = "projects",
@@ -372,7 +372,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.INTERNET_ACCESS)
                 )
             }
-            normalizedInput.matches(Regex(".*(project|job)\\s+status.*")) -> {
+            normalizedInput.matches(Regex(".*(project|job)\s+status.*")) -> {
                 EnhancedVoiceCommand(
                     action = "project_status",
                     category = "projects",
@@ -386,7 +386,7 @@ class VoiceCommandAgent : SpecializedAgent {
             
             // === CONTACTS/CRM ===
             normalizedInput.contains("add contact") || normalizedInput.contains("agregar contacto") ||
-            normalizedInput.matches(Regex(".*(new|create|add)\\s+(contact|client|customer).*")) -> {
+            normalizedInput.matches(Regex(".*(new|create|add)\s+(contact|client|customer).*")) -> {
                 EnhancedVoiceCommand(
                     action = "create_contact",
                     category = "contacts",
@@ -397,7 +397,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.WRITE_CONTACTS, Permission.READ_CONTACTS)
                 )
             }
-            normalizedInput.matches(Regex(".*(show|list|view)\\s+(all\\s+)?(contacts|clients|customers).*")) -> {
+            normalizedInput.matches(Regex(".*(show|list|view)\s+(all\s+)?(contacts|clients|customers).*")) -> {
                 EnhancedVoiceCommand(
                     action = "list_contacts",
                     category = "contacts",
@@ -433,7 +433,7 @@ class VoiceCommandAgent : SpecializedAgent {
             
             // === CALENDAR/SCHEDULING ===
             normalizedInput.contains("schedule") || normalizedInput.contains("programar") ||
-            normalizedInput.matches(Regex(".*(new|create|add|schedule)\\s+(event|appointment|meeting).*")) -> {
+            normalizedInput.matches(Regex(".*(new|create|add|schedule)\s+(event|appointment|meeting).*")) -> {
                 EnhancedVoiceCommand(
                     action = "create_event",
                     category = "calendar",
@@ -444,7 +444,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.WRITE_CALENDAR, Permission.READ_CALENDAR)
                 )
             }
-            normalizedInput.matches(Regex(".*(show|view|open)\\s+calendar.*")) -> {
+            normalizedInput.matches(Regex(".*(show|view|open)\s+calendar.*")) -> {
                 EnhancedVoiceCommand(
                     action = "view_calendar",
                     category = "calendar",
@@ -455,7 +455,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.READ_CALENDAR)
                 )
             }
-            normalizedInput.matches(Regex(".*next\\s+(appointment|meeting|event).*")) -> {
+            normalizedInput.matches(Regex(".*next\s+(appointment|meeting|event).*")) -> {
                 EnhancedVoiceCommand(
                     action = "next_appointment",
                     category = "calendar",
@@ -468,7 +468,7 @@ class VoiceCommandAgent : SpecializedAgent {
             }
             
             // === TASKS ===
-            normalizedInput.matches(Regex(".*(new|create|add)\\s+task.*")) -> {
+            normalizedInput.matches(Regex(".*(new|create|add)\s+task.*")) -> {
                 EnhancedVoiceCommand(
                     action = "create_task",
                     category = "tasks",
@@ -479,7 +479,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.INTERNET_ACCESS)
                 )
             }
-            normalizedInput.matches(Regex(".*(show|list|view)\\s+(all\\s+)?tasks.*")) -> {
+            normalizedInput.matches(Regex(".*(show|list|view)\s+(all\s+)?tasks.*")) -> {
                 EnhancedVoiceCommand(
                     action = "list_tasks",
                     category = "tasks",
@@ -515,7 +515,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.MAKE_CALLS, Permission.SEND_SMS, Permission.ACCESS_LOCATION)
                 )
             }
-            normalizedInput.matches(Regex(".*safety\\s+(report|incident).*")) -> {
+            normalizedInput.matches(Regex(".*safety\s+(report|incident).*")) -> {
                 EnhancedVoiceCommand(
                     action = "create_safety_report",
                     category = "safety",
@@ -529,7 +529,7 @@ class VoiceCommandAgent : SpecializedAgent {
             
             // === FILES & PHOTOS ===
             normalizedInput.contains("take photo") || normalizedInput.contains("tomar foto") ||
-            normalizedInput.matches(Regex(".*(take|capture|snap)\\s+(photo|picture).*")) -> {
+            normalizedInput.matches(Regex(".*(take|capture|snap)\s+(photo|picture).*")) -> {
                 EnhancedVoiceCommand(
                     action = "take_photo",
                     category = "files",
@@ -540,7 +540,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.ACCESS_CAMERA, Permission.ACCESS_STORAGE)
                 )
             }
-            normalizedInput.matches(Regex(".*(open|view)\\s+camera.*")) -> {
+            normalizedInput.matches(Regex(".*(open|view)\s+camera.*")) -> {
                 EnhancedVoiceCommand(
                     action = "open_camera",
                     category = "files",
@@ -553,7 +553,7 @@ class VoiceCommandAgent : SpecializedAgent {
             }
             
             // === TIME CLOCK ===
-            normalizedInput.matches(Regex(".*clock\\s+in.*")) -> {
+            normalizedInput.matches(Regex(".*clock\s+in.*")) -> {
                 EnhancedVoiceCommand(
                     action = "clock_in",
                     category = "timeclock",
@@ -564,7 +564,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.INTERNET_ACCESS, Permission.ACCESS_LOCATION)
                 )
             }
-            normalizedInput.matches(Regex(".*clock\\s+out.*")) -> {
+            normalizedInput.matches(Regex(".*clock\s+out.*")) -> {
                 EnhancedVoiceCommand(
                     action = "clock_out",
                     category = "timeclock",
@@ -577,7 +577,7 @@ class VoiceCommandAgent : SpecializedAgent {
             }
             
             // === ANALYTICS & REPORTING ===
-            normalizedInput.matches(Regex(".*(generate|create|show)\\s+(report|analytics).*")) -> {
+            normalizedInput.matches(Regex(".*(generate|create|show)\s+(report|analytics).*")) -> {
                 EnhancedVoiceCommand(
                     action = "generate_report",
                     category = "analytics",
@@ -588,7 +588,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = listOf(Permission.INTERNET_ACCESS)
                 )
             }
-            normalizedInput.matches(Regex(".*(show|view|open)\\s+(dashboard|metrics|performance).*")) -> {
+            normalizedInput.matches(Regex(".*(show|view|open)\s+(dashboard|metrics|performance).*")) -> {
                 EnhancedVoiceCommand(
                     action = "view_dashboard",
                     category = "analytics",
@@ -601,7 +601,7 @@ class VoiceCommandAgent : SpecializedAgent {
             }
             
             // === NAVIGATION ===
-            normalizedInput.matches(Regex(".*(go|navigate|open)\\s+(home|to\\s+home).*")) -> {
+            normalizedInput.matches(Regex(".*(go|navigate|open)\s+(home|to\s+home).*")) -> {
                 EnhancedVoiceCommand(
                     action = "navigate_home",
                     category = "navigation",
@@ -612,7 +612,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = emptyList()
                 )
             }
-            normalizedInput.matches(Regex(".*go\\s+back.*|.*navigate\\s+back.*")) -> {
+            normalizedInput.matches(Regex(".*go\s+back.*|.*navigate\s+back.*")) -> {
                 EnhancedVoiceCommand(
                     action = "navigate_back",
                     category = "navigation",
@@ -623,7 +623,7 @@ class VoiceCommandAgent : SpecializedAgent {
                     permissionsRequired = emptyList()
                 )
             }
-            normalizedInput.matches(Regex(".*(open|show|go\\s+to)\\s+settings.*")) -> {
+            normalizedInput.matches(Regex(".*(open|show|go\s+to)\s+settings.*")) -> {
                 EnhancedVoiceCommand(
                     action = "open_settings",
                     category = "system",
@@ -662,27 +662,23 @@ class VoiceCommandAgent : SpecializedAgent {
             }
         }
     }
-                    language = language,
-                    confidence = 0.87f
+                        language = language,
+                    confidence = 0.87f,
+                    targetOrchestrator = AgentType.COO_OPERATIONS_ORCHESTRATOR,
+                    permissionsRequired = listOf(Permission.ACCESS_CAMERA)
                 )
             }
             
-            normalizedInput.contains("emergency") || normalizedInput.contains("emergencia") -> {
-                VoiceCommand(
-                    action = "emergency_response",
-                    entities = extractEmergencyInfo(normalizedInput),
-                    language = language,
-                    confidence = 0.98f,
-                    priority = "HIGH"
-                )
-            }
-            
+            // === DEFAULT/GENERAL QUERY ===
             else -> {
-                VoiceCommand(
+                EnhancedVoiceCommand(
                     action = "general_query",
+                    category = "general",
                     entities = mapOf("query" to normalizedInput),
                     language = language,
-                    confidence = 0.70f
+                    confidence = 0.70f,
+                    targetOrchestrator = AgentType.CEO_PERSONAL_ASSISTANT,
+                    permissionsRequired = listOf(Permission.INTERNET_ACCESS)
                 )
             }
         }
@@ -976,56 +972,56 @@ class VoiceCommandAgent : SpecializedAgent {
     
     private fun extractLeadInfo(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val namePattern = """(?:lead|cliente)\\s+(?:for\\s+)?([A-Za-z\\s]+)""".toRegex(RegexOption.IGNORE_CASE)
+        val namePattern = """(?:lead|cliente)\s+(?:for\s+)?([A-Za-z\s]+)""".toRegex(RegexOption.IGNORE_CASE)
         namePattern.find(input)?.let { entities["name"] = it.groupValues[1].trim() }
         return entities + extractContactInfo(input)
     }
     
     private fun extractLeadReference(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val idPattern = """lead\\s+(?:id\\s+)?(\\d+|\\w+)""".toRegex(RegexOption.IGNORE_CASE)
+        val idPattern = """lead\s+(?:id\s+)?(\d+|\w+)""".toRegex(RegexOption.IGNORE_CASE)
         idPattern.find(input)?.let { entities["lead_id"] = it.groupValues[1] }
         return entities
     }
     
     private fun extractEstimateInfo(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val projectPattern = """(?:for|estimate for)\\s+([A-Za-z\\s]+)""".toRegex(RegexOption.IGNORE_CASE)
+        val projectPattern = """(?:for|estimate for)\s+([A-Za-z\s]+)""".toRegex(RegexOption.IGNORE_CASE)
         projectPattern.find(input)?.let { entities["project_name"] = it.groupValues[1].trim() }
         return entities
     }
     
     private fun extractEstimateReference(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val idPattern = """estimate\\s+(?:id\\s+|number\\s+)?(\\d+|\\w+)""".toRegex(RegexOption.IGNORE_CASE)
+        val idPattern = """estimate\s+(?:id\s+|number\s+)?(\d+|\w+)""".toRegex(RegexOption.IGNORE_CASE)
         idPattern.find(input)?.let { entities["estimate_id"] = it.groupValues[1] }
         return entities
     }
     
     private fun extractRecipientInfo(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val recipientPattern = """(?:to|send to|email to)\\s+([A-Za-z\\s]+)""".toRegex(RegexOption.IGNORE_CASE)
+        val recipientPattern = """(?:to|send to|email to)\s+([A-Za-z\s]+)""".toRegex(RegexOption.IGNORE_CASE)
         recipientPattern.find(input)?.let { entities["recipient"] = it.groupValues[1].trim() }
         return entities
     }
     
     private fun extractProjectReference(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val idPattern = """(?:project|job)\\s+(?:id\\s+|number\\s+)?(\\d+|\\w+)""".toRegex(RegexOption.IGNORE_CASE)
+        val idPattern = """(?:project|job)\s+(?:id\s+|number\s+)?(\d+|\w+)""".toRegex(RegexOption.IGNORE_CASE)
         idPattern.find(input)?.let { entities["project_id"] = it.groupValues[1] }
         return entities
     }
     
     private fun extractContactReference(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val namePattern = """(?:call|text|email|contact)\\s+([A-Za-z\\s]+)""".toRegex(RegexOption.IGNORE_CASE)
+        val namePattern = """(?:call|text|email|contact)\s+([A-Za-z\s]+)""".toRegex(RegexOption.IGNORE_CASE)
         namePattern.find(input)?.let { entities["contact"] = it.groupValues[1].trim() }
         return entities + extractContactInfo(input)
     }
     
     private fun extractMessageContent(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val messagePattern = """(?:saying|message|text)\\s+["\']?(.+?)["\']?$""".toRegex(RegexOption.IGNORE_CASE)
+        val messagePattern = """(?:saying|message|text)\s+["\']?(.+?)["\']?$""".toRegex(RegexOption.IGNORE_CASE)
         messagePattern.find(input)?.let { entities["message"] = it.groupValues[1].trim() }
         return entities
     }
@@ -1040,7 +1036,7 @@ class VoiceCommandAgent : SpecializedAgent {
     
     private fun extractTaskInfo(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val taskPattern = """task\\s+(?:to\\s+)?(.+?)(?:\\s+by\\s+(.+))?$""".toRegex(RegexOption.IGNORE_CASE)
+        val taskPattern = """task\s+(?:to\s+)?(.+?)(?:\s+by\s+(.+))?$""".toRegex(RegexOption.IGNORE_CASE)
         taskPattern.find(input)?.let { 
             entities["task"] = it.groupValues[1].trim()
             if (it.groupValues[2].isNotEmpty()) entities["deadline"] = it.groupValues[2].trim()
@@ -1050,7 +1046,7 @@ class VoiceCommandAgent : SpecializedAgent {
     
     private fun extractTaskReference(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val idPattern = """task\\s+(?:id\\s+|number\\s+)?(\\d+|\\w+)""".toRegex(RegexOption.IGNORE_CASE)
+        val idPattern = """task\s+(?:id\s+|number\s+)?(\d+|\w+)""".toRegex(RegexOption.IGNORE_CASE)
         idPattern.find(input)?.let { entities["task_id"] = it.groupValues[1] }
         return entities
     }
@@ -1069,7 +1065,7 @@ class VoiceCommandAgent : SpecializedAgent {
     
     private fun extractLocationInfo(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val locationPattern = """(?:at|location|site)\\s+([A-Za-z\\s]+)""".toRegex(RegexOption.IGNORE_CASE)
+        val locationPattern = """(?:at|location|site)\s+([A-Za-z\s]+)""".toRegex(RegexOption.IGNORE_CASE)
         locationPattern.find(input)?.let { entities["location"] = it.groupValues[1].trim() }
         return entities
     }
@@ -1100,7 +1096,7 @@ class VoiceCommandAgent : SpecializedAgent {
     
     private fun extractSearchQuery(input: String): Map<String, Any> {
         val entities = mutableMapOf<String, Any>()
-        val searchPattern = """search\\s+(?:for\\s+)?(.+)$""".toRegex(RegexOption.IGNORE_CASE)
+        val searchPattern = """search\s+(?:for\s+)?(.+)$""".toRegex(RegexOption.IGNORE_CASE)
         searchPattern.find(input)?.let { entities["query"] = it.groupValues[1].trim() }
         return entities
     }
