@@ -232,6 +232,8 @@ class OpenRouterService(
             try {
                 AgentType.valueOf(name)
             } catch (e: IllegalArgumentException) {
+                // Log invalid agent types for debugging data consistency issues
+                Log.d(TAG, "Skipping invalid agent type in conversation $conversationId: $name")
                 null // Skip invalid agent types
             }
         }
@@ -239,7 +241,10 @@ class OpenRouterService(
         val conversation = LLMConversation(
             id = data["id"] as? String ?: conversationId,
             participants = participants,
-            messages = emptyList(), // Messages stored separately for scalability
+            // Messages stored separately in subcollection for scalability
+            // Retrieve via: firestoreService.getCollection(CONVERSATIONS_COLLECTION)
+            //   .document(conversationId).collection("messages")
+            messages = emptyList(),
             startTime = LocalDateTime.parse(data["startTime"] as? String ?: LocalDateTime.now().toString()),
             lastUpdate = LocalDateTime.parse(data["lastUpdate"] as? String ?: LocalDateTime.now().toString()),
             status = ConversationStatus.valueOf(data["status"] as? String ?: "ACTIVE"),

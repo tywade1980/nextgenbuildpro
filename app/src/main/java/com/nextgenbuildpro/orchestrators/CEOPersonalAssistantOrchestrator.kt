@@ -90,7 +90,6 @@ class CEOPersonalAssistantOrchestrator(
         // Get the LLM service from the API module
         com.nextgenbuildpro.core.api.di.ApiModule.provideLLMService(context)
     }
-    private val activeConversations = mutableMapOf<String, Conversation>()
     
     // Multi-LLM configuration for executive intelligence
     private val multiLLMConfig = initializeMultiLLMSystem()

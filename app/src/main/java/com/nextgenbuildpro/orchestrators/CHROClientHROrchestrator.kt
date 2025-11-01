@@ -85,12 +85,12 @@ class CHROClientHROrchestrator(
     // Construction marketing knowledge base
     private val marketingKnowledge = initializeMarketingKnowledge()
     
-    override val subAgents: List<SubAgent> = listOf(
-        // Contact Management Agent - handles CRM operations
-        com.nextgenbuildpro.agents.crm.ContactManagementAgent(context)
-        // Additional agents would be added here as they are implemented:
-        // LeadScoringAgent(), MarketingStrategistAgent(), BrandDesignerAgent(), etc.
-    )
+    override val subAgents: List<SubAgent> = emptyList()
+    // Note: ContactManagementAgent implements SpecializedAgent (not SubAgent)
+    // It will be integrated separately when we create a proper SubAgent wrapper
+    // or when we update the agent to implement the SubAgent interface
+    // Additional agents to be implemented:
+    // LeadScoringAgent(), MarketingStrategistAgent(), BrandDesignerAgent(), etc.
     
     private fun initializeMultiLLMSystem(): MultiLLMConfig {
         return MultiLLMConfig(
