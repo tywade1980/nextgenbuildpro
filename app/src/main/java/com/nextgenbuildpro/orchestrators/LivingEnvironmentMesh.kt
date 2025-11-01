@@ -243,8 +243,8 @@ class LivingEnvironmentMesh {
      * Initialize network topology with optimal connections
      */
     private fun initializeNetworkTopology() {
-        // Create hub-and-spoke topology initially
-        val hubAgent = AgentType.ORCHESTRATOR
+        // Create hub-and-spoke topology with COO as the central hub for operations
+        val hubAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR
 
         agentNodes.keys.filter { it != hubAgent }.forEach { agent ->
             createConnection(hubAgent, agent, ConnectionType.DIRECT)
@@ -363,11 +363,12 @@ class LivingEnvironmentMesh {
     }
 
     private fun findOptimalPath(from: AgentType, to: AgentType, context: MessageContext): List<AgentType> {
-        // Simple pathfinding for now - direct path or through orchestrator
+        // Simple pathfinding for now - direct path or through COO hub
         return if (connections.containsKey("${from.name}_${to.name}")) {
             listOf(from, to)
         } else {
-            listOf(from, AgentType.ORCHESTRATOR, to)
+            // Route through COO as the operations hub
+            listOf(from, AgentType.COO_OPERATIONS_ORCHESTRATOR, to)
         }
     }
 
@@ -450,7 +451,11 @@ class LivingEnvironmentMesh {
 
     private fun getAgentCapabilities(agentType: AgentType): List<String> {
         return when (agentType) {
-            AgentType.ORCHESTRATOR -> listOf("coordination", "decision_making", "communication")
+            AgentType.COO_OPERATIONS_ORCHESTRATOR -> listOf("operations", "project_management", "coordination", "field_operations")
+            AgentType.CFO_FINANCIAL_ORCHESTRATOR -> listOf("cost_analysis", "financial_management", "analytics", "budgeting")
+            AgentType.CHRO_CLIENT_HR_ORCHESTRATOR -> listOf("crm", "hr", "marketing", "client_relations")
+            AgentType.CTO_DESIGN_ORCHESTRATOR -> listOf("design", "cad", "3d_modeling", "technical_documentation")
+            AgentType.CSO_SAFETY_ORCHESTRATOR -> listOf("safety", "compliance", "permits", "osha")
             AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR -> listOf("scheduling", "resource_allocation", "monitoring")
             AgentType.CRM_ORCHESTRATOR -> listOf("contact_management", "lead_scoring", "communication")
             AgentType.ESTIMATING_DEPARTMENT_ORCHESTRATOR -> listOf("cost_analysis", "bidding", "pricing")
@@ -463,10 +468,19 @@ class LivingEnvironmentMesh {
 
     private fun calculateBaseLatency(from: AgentType, to: AgentType): Long {
         // Simulate network latency based on agent types
+        val hubAgents = setOf(
+            AgentType.COO_OPERATIONS_ORCHESTRATOR,
+            AgentType.CFO_FINANCIAL_ORCHESTRATOR,
+            AgentType.CHRO_CLIENT_HR_ORCHESTRATOR,
+            AgentType.CTO_DESIGN_ORCHESTRATOR,
+            AgentType.CSO_SAFETY_ORCHESTRATOR
+        )
+        
         return when {
             from == to -> 10L // Local
-            from == AgentType.ORCHESTRATOR || to == AgentType.ORCHESTRATOR -> 50L // Hub communication
-            else -> 100L // Cross-department
+            from in hubAgents && to in hubAgents -> 50L // C-Suite communication
+            from in hubAgents || to in hubAgents -> 75L // Hub to/from sub-agent
+            else -> 100L // Sub-agent to sub-agent
         }
     }
 
@@ -506,8 +520,8 @@ class LivingEnvironmentMesh {
             connectionCount = 0
         )
 
-        // Re-establish connections
-        val hubAgent = AgentType.ORCHESTRATOR
+        // Re-establish connections with COO hub
+        val hubAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR
         if (agentType != hubAgent) {
             createConnection(hubAgent, agentType, ConnectionType.DIRECT)
         }

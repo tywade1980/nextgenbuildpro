@@ -35,23 +35,19 @@ enum class SystemStatus {
 
 /**
  * Agent types in the NextGen ecosystem
- * Structured as corporate C-suite executives with operational agents beneath
+ * Flat C-Suite structure: 5 executive orchestrators with specialized sub-agents
  */
 enum class AgentType {
-    ORCHESTRATOR,
-    // CEO Level - Main Personal Assistant (directs the orchestrator)
-    CEO_PERSONAL_ASSISTANT,
-    PERSONAL_ASSISTANT_ORCHESTRATOR,  // Alias for CEO Personal Assistant
-    // C-Suite Department Heads (Orchestrators)
+    // C-Suite Executive Orchestrators (5 primary)
     COO_OPERATIONS_ORCHESTRATOR,      // COO: Operations & Project Management
     CFO_FINANCIAL_ORCHESTRATOR,        // CFO: Financial & Analytics
     CHRO_CLIENT_HR_ORCHESTRATOR,       // CHRO/CMO: Client Relations & HR
     CTO_DESIGN_ORCHESTRATOR,           // CTO: Design & Technology
     CSO_SAFETY_ORCHESTRATOR,           // CSO: Safety & Compliance
-    // Department-level Orchestrators (aliases and specific departments)
-    CRM_ORCHESTRATOR,                  // Customer Relationship Management
-    PROJECT_MANAGEMENT_ORCHESTRATOR,   // Project Management
-    ANALYTICS_ORCHESTRATOR,            // Analytics & Reporting
+    // Department-level Orchestrators (aliases mapped to C-Suite)
+    CRM_ORCHESTRATOR,                  // Customer Relationship Management (CHRO)
+    PROJECT_MANAGEMENT_ORCHESTRATOR,   // Project Management (COO)
+    ANALYTICS_ORCHESTRATOR,            // Analytics & Reporting (CFO)
     DESIGN_DEPARTMENT_ORCHESTRATOR,    // Design Department (CTO)
     ESTIMATING_DEPARTMENT_ORCHESTRATOR, // Estimating (CFO)
     MARKETING_ORCHESTRATOR,            // Marketing (CHRO/CMO)

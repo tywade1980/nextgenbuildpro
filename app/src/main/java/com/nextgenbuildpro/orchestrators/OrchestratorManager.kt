@@ -24,8 +24,7 @@ class OrchestratorManager(private val context: Context) {
     private val navigationManager = IntuitiveNavigationManager()
     private val livingEnvironmentMesh = LivingEnvironmentMesh()
     
-    // C-Suite Executive Orchestrators
-    private lateinit var ceoPersonalAssistantOrchestrator: CEOPersonalAssistantOrchestrator
+    // C-Suite Executive Orchestrators (5 total - no CEO/Personal Assistant layer)
     private lateinit var cooOperationsOrchestrator: COOOperationsOrchestrator
     private lateinit var cfoFinancialOrchestrator: CFOFinancialOrchestrator
     private lateinit var chroClientHROrchestrator: CHROClientHROrchestrator
@@ -52,9 +51,13 @@ class OrchestratorManager(private val context: Context) {
         // Start MCP server
         mcpServer.start().getOrThrow()
 
-        // Initialize Living Environment Mesh
+        // Initialize Living Environment Mesh with C-Suite orchestrators
         val availableAgents = listOf(
-            AgentType.ORCHESTRATOR,
+            AgentType.COO_OPERATIONS_ORCHESTRATOR,
+            AgentType.CFO_FINANCIAL_ORCHESTRATOR,
+            AgentType.CHRO_CLIENT_HR_ORCHESTRATOR,
+            AgentType.CTO_DESIGN_ORCHESTRATOR,
+            AgentType.CSO_SAFETY_ORCHESTRATOR,
             AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR,
             AgentType.CRM_ORCHESTRATOR,
             AgentType.ESTIMATING_DEPARTMENT_ORCHESTRATOR,
@@ -94,8 +97,8 @@ class OrchestratorManager(private val context: Context) {
         // Create agent message for routing
         val message = AgentMessage(
             id = task.id,
-            fromAgent = AgentType.ORCHESTRATOR,
-            toAgent = task.assignedAgent,
+            fromAgent = task.assignedAgent ?: AgentType.COO_OPERATIONS_ORCHESTRATOR,
+            toAgent = task.assignedAgent ?: AgentType.COO_OPERATIONS_ORCHESTRATOR,
             messageType = MessageType.COMMAND,
             content = task.description,
             priority = task.priority,
@@ -116,8 +119,8 @@ class OrchestratorManager(private val context: Context) {
         val interactionTime = System.currentTimeMillis() - startTime
         livingEnvironmentMesh.recordInteraction(
             AgentInteraction(
-                fromAgent = AgentType.ORCHESTRATOR,
-                toAgent = task.assignedAgent ?: AgentType.ORCHESTRATOR,
+                fromAgent = task.assignedAgent ?: AgentType.COO_OPERATIONS_ORCHESTRATOR,
+                toAgent = task.assignedAgent ?: AgentType.COO_OPERATIONS_ORCHESTRATOR,
                 type = "task_execution",
                 success = result.isSuccess,
                 responseTimeMs = interactionTime,
@@ -160,7 +163,7 @@ class OrchestratorManager(private val context: Context) {
                 id = "voice_${System.currentTimeMillis()}",
                 type = "voice_command",
                 description = "Process voice command: $voiceInput",
-                assignedAgent = AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR,
+                assignedAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR,
                 priority = Priority.HIGH,
                 status = TaskStatus.PENDING,
                 metadata = mapOf("voice_input" to voiceInput)
@@ -186,7 +189,7 @@ class OrchestratorManager(private val context: Context) {
         val meshHealth = livingEnvironmentMesh.getNetworkHealth()
 
         return SystemMetrics(
-            totalOrchestrators = 6, // 6 C-suite executives
+            totalOrchestrators = 5, // 5 C-suite executives (flat structure)
             totalSpecializedAgents = specializedAgents.size,
             activeAgents = activeAgents,
             systemStatus = _systemStatus.value,
@@ -199,17 +202,15 @@ class OrchestratorManager(private val context: Context) {
     }
     
     private suspend fun initializeOrchestrators() {
-        // C-Suite Executive Orchestrators
-        ceoPersonalAssistantOrchestrator = CEOPersonalAssistantOrchestrator(context)
+        // C-Suite Executive Orchestrators (5 total - flat structure)
         cooOperationsOrchestrator = COOOperationsOrchestrator(context)
         cfoFinancialOrchestrator = CFOFinancialOrchestrator(context)
         chroClientHROrchestrator = CHROClientHROrchestrator(context)
         ctoDesignOrchestrator = CTODesignOrchestrator(context)
         csoSafetyOrchestrator = CSOSafetyOrchestrator(context)
         
-        // Initialize all C-suite executives (6 total)
+        // Initialize all 5 C-suite executives
         listOf(
-            ceoPersonalAssistantOrchestrator,
             cooOperationsOrchestrator,
             cfoFinancialOrchestrator,
             chroClientHROrchestrator,
@@ -221,20 +222,20 @@ class OrchestratorManager(private val context: Context) {
     }
     
     private suspend fun initializeSpecializedAgents() {
-        // CEO Personal Assistant Operational Agents
-        val ceoAgents = listOf(
-            VoiceCommandAgent(),
-            // Add more specialized agents for CEO
+        // COO Operations Operational Agents
+        val cooAgents = listOf(
+            // Add operational agents for COO
         )
         
         // CHRO Client Relations & HR Operational Agents
         val chroAgents = listOf(
             ContactManagementAgent(),
+            VoiceCommandAgent(),  // Voice commands now handled by CHRO or routed appropriately
             // Add more specialized agents for CHRO
         )
         
         // Initialize all operational agents
-        val allAgents = ceoAgents + chroAgents
+        val allAgents = cooAgents + chroAgents
         
         allAgents.forEach { agent ->
             try {
@@ -254,7 +255,8 @@ class OrchestratorManager(private val context: Context) {
     
     private fun getOrchestratorForTask(task: NextGenTask): DepartmentalOrchestrator {
         return when (task.type) {
-            "voice_command", "emergency_response", "executive_decision" -> ceoPersonalAssistantOrchestrator
+            // Voice commands routed to appropriate orchestrator based on content
+            "voice_command" -> determineOrchestratorFromVoice(task)
             // COO: Operations & PM tasks (field ops, equipment, PM, field quality)
             "crew_scheduling", "material_delivery", "field_issue",
             "equipment_tracking", "maintenance", "rental", "tool_receipt",
@@ -273,7 +275,19 @@ class OrchestratorManager(private val context: Context) {
             "design", "3d_modeling", "blueprints", "cad", "technical_drawing" -> ctoDesignOrchestrator
             // CSO: Safety & Compliance tasks
             "safety_inspection", "permit_application", "compliance_check", "incident_report" -> csoSafetyOrchestrator
-            else -> ceoPersonalAssistantOrchestrator // Default to CEO
+            // Default to COO for general operations
+            else -> cooOperationsOrchestrator
+        }
+    }
+    
+    private fun determineOrchestratorFromVoice(task: NextGenTask): DepartmentalOrchestrator {
+        val command = task.description.lowercase()
+        return when {
+            command.contains("lead") || command.contains("contact") || command.contains("client") -> chroClientHROrchestrator
+            command.contains("estimate") || command.contains("cost") || command.contains("budget") -> cfoFinancialOrchestrator
+            command.contains("safety") || command.contains("incident") || command.contains("permit") -> csoSafetyOrchestrator
+            command.contains("design") || command.contains("blueprint") || command.contains("cad") -> ctoDesignOrchestrator
+            else -> cooOperationsOrchestrator // Default to operations
         }
     }
     
