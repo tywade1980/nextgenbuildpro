@@ -116,14 +116,18 @@ class MeetingRecordingService(private val context: Context) {
                     _currentRecordingInfo.value = recording
                     
                     Log.i(TAG, "Recording started: ${recording.title} (${recording.id})")
-                    return@try Result.success(recording)
                 } catch (e: IOException) {
                     Log.e(TAG, "Failed to start recording", e)
                     releaseRecorder()
-                    return@try Result.failure(e)
+                    return Result.failure(e)
                 }
-            } ?: return@try Result.failure(IllegalStateException("Failed to initialize MediaRecorder"))
+            }
             
+            if (recorder == null || !isRecording) {
+                return Result.failure(IllegalStateException("Failed to initialize MediaRecorder"))
+            }
+            
+            Result.success(recording)
         } catch (e: Exception) {
             Log.e(TAG, "Error starting recording", e)
             releaseRecorder()
