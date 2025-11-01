@@ -6,13 +6,21 @@ import com.google.firebase.FirebaseApp
 import com.nextgenbuildpro.core.ApiKeyManager
 import com.nextgenbuildpro.core.FirebaseStorageInitializer
 import com.nextgenbuildpro.core.FirestoreInitializer
+import com.nextgenbuildpro.core.MainOrchestrator
 import com.nextgenbuildpro.core.api.di.ApiModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 /**
  * Application class for NextGenBuildPro
- * Initializes Firebase components and other app-wide configurations
+ * Initializes Firebase components, API services, and the main orchestration system
  */
 class NextGenBuildProApplication : Application() {
+
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private lateinit var mainOrchestrator: MainOrchestrator
 
     companion object {
         private const val TAG = "NextGenBuildProApp"
@@ -29,6 +37,9 @@ class NextGenBuildProApplication : Application() {
 
         // Initialize API Services
         initializeApiServices()
+
+        // Initialize Main Orchestrator
+        initializeMainOrchestrator()
     }
 
     /**
@@ -90,5 +101,34 @@ class NextGenBuildProApplication : Application() {
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing API Services", e)
         }
+    }
+
+    /**
+     * Initialize Main Orchestrator
+     * This initializes the AI orchestration system in the background
+     */
+    private fun initializeMainOrchestrator() {
+        applicationScope.launch {
+            try {
+                Log.d(TAG, "Initializing Main Orchestrator...")
+                mainOrchestrator = MainOrchestrator(this@NextGenBuildProApplication)
+                val result = mainOrchestrator.initialize()
+                
+                if (result.isSuccess) {
+                    Log.d(TAG, "Main Orchestrator initialized successfully")
+                } else {
+                    Log.w(TAG, "Main Orchestrator initialization failed: ${result.exceptionOrNull()?.message}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error initializing Main Orchestrator", e)
+            }
+        }
+    }
+
+    /**
+     * Get the MainOrchestrator instance
+     */
+    fun getMainOrchestrator(): MainOrchestrator? {
+        return if (::mainOrchestrator.isInitialized) mainOrchestrator else null
     }
 }
