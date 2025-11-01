@@ -196,6 +196,26 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
         Result.failure(e)
     }
     
+    /**
+     * Delegate a task to the appropriate orchestrator or agent
+     * This is used by services like MeetingRecordingManager to route tasks
+     */
+    suspend fun delegateTask(task: NextGenTask): Result<NextGenTask> = try {
+        Log.d("MainOrchestrator", "Delegating task: ${task.title} to ${task.assignedAgent}")
+        
+        // Process task through orchestrator manager
+        orchestratorManager.processTask(task).getOrThrow()
+        
+        // Add to active tasks
+        val updatedTasks = _activeTasks.value + task
+        _activeTasks.value = updatedTasks
+        
+        Result.success(task)
+    } catch (e: Exception) {
+        Log.e("MainOrchestrator", "Error delegating task", e)
+        Result.failure(e)
+    }
+    
     suspend fun getTaskStatus(taskId: String): TaskStatus? {
         return _activeTasks.value.find { it.id == taskId }?.status
     }
