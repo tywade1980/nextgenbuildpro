@@ -8,6 +8,15 @@
 [![Completion](https://img.shields.io/badge/completion-75--80%25-blue.svg)](#)
 [![License](https://img.shields.io/badge/license-proprietary-red.svg)](#license)
 
+---
+
+## 📊 Project Status Documentation
+
+**Quick Overview**: See [QUICK_STATUS.md](QUICK_STATUS.md) for a rapid assessment (5 min read)  
+**Detailed Analysis**: See [PROJECT_STATE.md](PROJECT_STATE.md) for comprehensive functionality review (15 min read)
+
+---
+
 ## What This Project Is
 
 NextGen BuildPro is an **Android construction management application** being developed to help construction professionals manage their business operations through a mobile platform.
