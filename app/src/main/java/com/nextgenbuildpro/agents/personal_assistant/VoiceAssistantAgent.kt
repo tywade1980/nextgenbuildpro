@@ -344,7 +344,7 @@ class VoiceAssistantAgent(
     suspend fun speak(text: String): Result<Unit> = suspendCancellableCoroutine { continuation ->
         try {
             if (!isTtsReady) {
-                continuation.resume(Result.failure(IllegalStateException("TTS not ready")))
+                continuation.resume(Result.failure(IllegalStateException("TTS not ready")), null)
                 return@suspendCancellableCoroutine
             }
             
@@ -367,7 +367,7 @@ class VoiceAssistantAgent(
                     CoroutineScope(Dispatchers.Main).launch {
                         _conversationState.value = ConversationState.Ready
                     }
-                    continuation.resume(Result.success(Unit))
+                    continuation.resume(Result.success(Unit), null)
                 }
                 
                 override fun onError(utteranceId: String?) {
@@ -375,17 +375,17 @@ class VoiceAssistantAgent(
                     CoroutineScope(Dispatchers.Main).launch {
                         _conversationState.value = ConversationState.Error("TTS error")
                     }
-                    continuation.resume(Result.failure(Exception("TTS error")))
+                    continuation.resume(Result.failure(Exception("TTS error")), null)
                 }
             })
             
             val result = textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, params, utteranceId)
             if (result != TextToSpeech.SUCCESS) {
-                continuation.resume(Result.failure(Exception("TTS speak failed")))
+                continuation.resume(Result.failure(Exception("TTS speak failed")), null)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error in TTS", e)
-            continuation.resume(Result.failure(e))
+            continuation.resume(Result.failure(e), null)
         }
     }
     
@@ -474,13 +474,15 @@ class VoiceAssistantAgent(
         
         val response = queryExternalLLM(dataQuery, task.parameters)
         
+        val resultMap: Map<String, Any> = mapOf(
+            "data" to response,
+            "source" to "external_llm",
+            "conversation_id" to (currentConversationId ?: "")
+        )
+        
         return Result.success(task.copy(
             status = TaskStatus.COMPLETED,
-            result = mapOf(
-                "data" to response,
-                "source" to "external_llm",
-                "conversation_id" to currentConversationId
-            ),
+            result = resultMap,
             updatedAt = LocalDateTime.now()
         ))
     }
