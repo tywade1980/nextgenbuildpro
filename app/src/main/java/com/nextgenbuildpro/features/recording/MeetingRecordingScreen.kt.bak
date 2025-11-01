@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -97,86 +98,87 @@ fun MeetingRecordingScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     // Recording status
-                    when (recordingState) {
-                        RecordingState.IDLE -> {
-                            Button(
-                                onClick = { showMeetingDialog = true },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Icon(Icons.Default.FiberManualRecord, "Start Recording")
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Start Recording")
-                            }
+                    if (recordingState == RecordingState.IDLE) {
+                        Button(
+                            onClick = { showMeetingDialog = true },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.FiberManualRecord, "Start Recording")
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Start Recording")
                         }
-                        RecordingState.RECORDING -> {
-                            // Show recording info
-                            currentRecording?.let { recording ->
-                                Text(
-                                    text = "Recording: ${recording.title}",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                
-                                Spacer(modifier = Modifier.height(8.dp))
-                                
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    }
+                    
+                    if (recordingState == RecordingState.RECORDING) {
+                        // Show recording info
+                        currentRecording?.let { recording ->
+                            Text(
+                                text = "Recording: ${recording.title}",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            
+                            Spacer(modifier = Modifier.height(8.dp))
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Button(
+                                    onClick = {
+                                        scope.launch {
+                                            meetingRecordingManager.pauseRecording()
+                                        }
+                                    },
+                                    modifier = Modifier.weight(1f)
                                 ) {
-                                    Button(
-                                        onClick = {
-                                            scope.launch {
-                                                meetingRecordingManager.pauseRecording()
+                                    Icon(Icons.Default.Pause, "Pause")
+                                }
+                                
+                                Button(
+                                    onClick = {
+                                        scope.launch {
+                                            val result = meetingRecordingManager.stopAndProcessMeeting()
+                                            if (result.isFailure) {
+                                                errorMessage = result.exceptionOrNull()?.message ?: "Unknown error"
+                                                showError = true
                                             }
-                                        },
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Icon(Icons.Default.Pause, "Pause")
-                                    }
-                                    
-                                    Button(
-                                        onClick = {
-                                            scope.launch {
-                                                val result = meetingRecordingManager.stopAndProcessMeeting()
-                                                if (result.isFailure) {
-                                                    errorMessage = result.exceptionOrNull()?.message ?: "Unknown error"
-                                                    showError = true
-                                                }
-                                            }
-                                        },
-                                        modifier = Modifier.weight(1f),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.error
-                                        )
-                                    ) {
-                                        Icon(Icons.Default.Stop, "Stop")
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Text("Stop")
-                                    }
+                                        }
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.error
+                                    )
+                                ) {
+                                    Icon(Icons.Default.Stop, "Stop")
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Stop")
                                 }
                             }
                         }
-                        RecordingState.PAUSED -> {
-                            Button(
-                                onClick = {
-                                    scope.launch {
-                                        meetingRecordingManager.resumeRecording()
-                                    }
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Icon(Icons.Default.PlayArrow, "Resume")
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Resume Recording")
-                            }
+                    }
+                    
+                    if (recordingState == RecordingState.PAUSED) {
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    meetingRecordingManager.resumeRecording()
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.PlayArrow, "Resume")
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Resume Recording")
                         }
-                        RecordingState.PROCESSING -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .padding(16.dp)
-                            )
-                        }
+                    }
+                    
+                    if (recordingState == RecordingState.PROCESSING) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(16.dp)
+                        )
                     }
                     
                     // Processing status

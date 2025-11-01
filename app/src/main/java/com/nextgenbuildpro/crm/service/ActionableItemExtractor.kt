@@ -283,15 +283,3 @@ class ActionableItemExtractor(
     }
 }
 
-/**
- * Meeting context for extraction
- */
-data class MeetingContext(
-    val meetingId: String,
-    val meetingTitle: String,
-    val meetingType: MeetingType,
-    val meetingDate: LocalDateTime,
-    val participants: List<String>,
-    val projectId: String? = null,
-    val projectName: String? = null
-)

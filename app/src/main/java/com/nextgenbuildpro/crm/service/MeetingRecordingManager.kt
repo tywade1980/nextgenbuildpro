@@ -72,7 +72,7 @@ class MeetingRecordingManager(
                 return Result.failure(recordingResult.exceptionOrNull()!!)
             }
             
-            val recording = recordingResult.getOrNull()!!
+            val recording = recordingResult.getOrThrow()
             _processingState.value = ProcessingState.TRANSCRIBING
             
             // Transcribe audio
@@ -298,19 +298,3 @@ class MeetingRecordingManager(
     }
 }
 
-/**
- * Processing state for the manager
- */
-enum class ProcessingState {
-    IDLE, TRANSCRIBING, EXTRACTING, CREATING_TASKS, COMPLETED, ERROR
-}
-
-/**
- * Processed meeting with all extracted information
- */
-data class ProcessedMeeting(
-    val recording: MeetingRecording,
-    val transcription: String,
-    val extractedTasks: List<NextGenTask>,
-    val processedAt: LocalDateTime
-)

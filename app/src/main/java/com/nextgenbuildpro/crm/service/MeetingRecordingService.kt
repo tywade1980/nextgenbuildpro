@@ -116,13 +116,13 @@ class MeetingRecordingService(private val context: Context) {
                     _currentRecordingInfo.value = recording
                     
                     Log.i(TAG, "Recording started: ${recording.title} (${recording.id})")
-                    Result.success(recording)
+                    return@try Result.success(recording)
                 } catch (e: IOException) {
                     Log.e(TAG, "Failed to start recording", e)
                     releaseRecorder()
-                    Result.failure(e)
+                    return@try Result.failure(e)
                 }
-            } ?: Result.failure(IllegalStateException("Failed to initialize MediaRecorder"))
+            } ?: return@try Result.failure(IllegalStateException("Failed to initialize MediaRecorder"))
             
         } catch (e: Exception) {
             Log.e(TAG, "Error starting recording", e)
@@ -292,40 +292,3 @@ class MeetingRecordingService(private val context: Context) {
     }
 }
 
-/**
- * Recording state enumeration
- */
-enum class RecordingState {
-    IDLE, RECORDING, PAUSED, PROCESSING
-}
-
-/**
- * Meeting type enumeration
- */
-enum class MeetingType {
-    PHONE_CALL, IN_PERSON, VIDEO_CALL
-}
-
-/**
- * Recording status enumeration
- */
-enum class RecordingStatus {
-    IN_PROGRESS, COMPLETED, FAILED, CANCELLED
-}
-
-/**
- * Meeting recording metadata
- */
-data class MeetingRecording(
-    val id: String,
-    val filePath: String,
-    val meetingType: MeetingType,
-    val title: String,
-    val participants: List<String> = emptyList(),
-    val startTime: LocalDateTime,
-    val endTime: LocalDateTime? = null,
-    val status: RecordingStatus = RecordingStatus.IN_PROGRESS,
-    val transcription: String? = null,
-    val actionableItems: List<String> = emptyList(),
-    val metadata: Map<String, Any> = emptyMap()
-)
