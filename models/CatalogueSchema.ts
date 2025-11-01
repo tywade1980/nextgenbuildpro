@@ -59,6 +59,10 @@ export interface Assembly {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  // Pricing metadata
+  pricingSource?: string;
+  pricingDate?: Date;
+  pricingConfidence?: number;
 }
 
 export interface Task {
@@ -75,6 +79,10 @@ export interface Task {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  // Pricing metadata
+  pricingSource?: string;
+  pricingDate?: Date;
+  laborRate?: number;
 }
 
 export interface Material {
@@ -92,6 +100,10 @@ export interface Material {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  // Pricing metadata
+  pricingSource?: string;
+  pricingDate?: Date;
+  pricingConfidence?: number;
 }
 
 // Additional interfaces for the complete system

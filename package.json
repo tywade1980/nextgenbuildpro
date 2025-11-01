@@ -11,7 +11,8 @@
     "seed:catalogue": "npx ts-node seeds/seedCatalogue.ts",
     "seed:run": "node seeds/runSeeder.js",
     "seed:verify": "npx ts-node seeds/verifyCatalogue.ts",
-    "seed:demo": "npx ts-node seeds/demo.ts"
+    "seed:demo": "npx ts-node seeds/demo.ts",
+    "update:pricing": "npx ts-node seeds/updateCataloguePricing.ts"
   },
   "dependencies": {
     "firebase": "^11.10.0",
