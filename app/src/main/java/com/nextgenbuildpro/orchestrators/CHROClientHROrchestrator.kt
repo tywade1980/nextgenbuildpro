@@ -86,6 +86,11 @@ class CHROClientHROrchestrator(
     private val marketingKnowledge = initializeMarketingKnowledge()
     
     override val subAgents: List<SubAgent> = emptyList()
+    // Note: ContactManagementAgent implements SpecializedAgent (not SubAgent)
+    // It will be integrated separately when we create a proper SubAgent wrapper
+    // or when we update the agent to implement the SubAgent interface
+    // Additional agents to be implemented:
+    // LeadScoringAgent(), MarketingStrategistAgent(), BrandDesignerAgent(), etc.
     
     private fun initializeMultiLLMSystem(): MultiLLMConfig {
         return MultiLLMConfig(

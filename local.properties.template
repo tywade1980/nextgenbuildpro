@@ -26,5 +26,13 @@ firebase.storage.url=gs://YOUR_FIREBASE_STORAGE_BUCKET.appspot.com
 # 3. Add credits at https://openrouter.ai/credits
 openrouter.api.key=sk-or-v1-YOUR_OPENROUTER_API_KEY
 
+# Gemini API Key (optional - for on-device and cloud AI inference)
+# Get your API key from https://aistudio.google.com/app/apikey
+# Used for:
+# - Gemini Nano on-device inference (requires AICore on device)
+# - Gemini Pro/Ultra cloud inference
+# - MLKit Generative AI features
+gemini.api.key=YOUR_GEMINI_API_KEY
+
 # Additional custom properties can be added below
 # custom.property.name=value

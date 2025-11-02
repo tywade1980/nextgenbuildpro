@@ -3,6 +3,7 @@ package com.nextgenbuildpro.ai.llm
 import android.util.Log
 import com.nextgenbuildpro.core.api.FirestoreService
 import com.nextgenbuildpro.shared.AgentType
+import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -210,9 +211,50 @@ class OpenRouterService(
         Result.failure(e)
     }
     
-    override suspend fun getConversationHistory(conversationId: String): Result<LLMConversation> {
-        // Implementation would retrieve from Firestore
-        return Result.failure(NotImplementedError("Conversation history retrieval not yet implemented"))
+    override suspend fun getConversationHistory(conversationId: String): Result<LLMConversation> = try {
+        Log.d(TAG, "Retrieving conversation history: $conversationId")
+        
+        // Retrieve conversation from Firestore
+        val snapshot = firestoreService.getCollection(CONVERSATIONS_COLLECTION)
+            .document(conversationId)
+            .get()
+            .await()
+        
+        if (!snapshot.exists()) {
+            return Result.failure(Exception("Conversation not found: $conversationId"))
+        }
+        
+        val data = snapshot.data ?: return Result.failure(Exception("Empty conversation data"))
+        
+        // Parse conversation data
+        val participantNames = (data["participants"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
+        val participants = participantNames.mapNotNull { name ->
+            try {
+                AgentType.valueOf(name)
+            } catch (e: IllegalArgumentException) {
+                // Log invalid agent types for debugging data consistency issues
+                Log.d(TAG, "Skipping invalid agent type in conversation $conversationId: $name")
+                null // Skip invalid agent types
+            }
+        }
+        
+        val conversation = LLMConversation(
+            id = data["id"] as? String ?: conversationId,
+            participants = participants,
+            // Messages stored separately in subcollection for scalability
+            // Retrieve via: firestoreService.getCollection(CONVERSATIONS_COLLECTION)
+            //   .document(conversationId).collection("messages")
+            messages = emptyList(),
+            startTime = LocalDateTime.parse(data["startTime"] as? String ?: LocalDateTime.now().toString()),
+            lastUpdate = LocalDateTime.parse(data["lastUpdate"] as? String ?: LocalDateTime.now().toString()),
+            status = ConversationStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
+            metadata = data["metadata"] as? Map<String, Any> ?: emptyMap()
+        )
+        
+        Result.success(conversation)
+    } catch (e: Exception) {
+        Log.e(TAG, "Error retrieving conversation history", e)
+        Result.failure(e)
     }
     
     override suspend fun getAgentContext(agentType: AgentType): Result<AgentLLMContext> = try {

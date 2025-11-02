@@ -81,6 +81,14 @@ object ApiKeyManager {
     }
 
     /**
+     * Get the Gemini API key for on-device and cloud inference
+     * @return The Gemini API key or null if not found
+     */
+    fun getGeminiApiKey(): String? {
+        return properties.getProperty("gemini.api.key")
+    }
+
+    /**
      * Get a property value by key
      * @param key The property key
      * @param defaultValue The default value to return if the property is not found
