@@ -2,7 +2,7 @@
 
 ## Overview
 
-The NextGen BuildPro v2.0 agent modeling framework provides a standardized, scalable architecture for building AI agents in the construction management platform. This framework ensures consistency, maintainability, and seamless integration across all AI components.
+The NextGen BuildPro v2.0 agent modeling framework provides a standardized, scalable architecture for building AI agents in the construction management platform. This framework uses a **flat C-Suite structure** for direct access and efficient task routing.
 
 ## Architecture Layers
 
@@ -13,18 +13,13 @@ The NextGen BuildPro v2.0 agent modeling framework provides a standardized, scal
 └──────────────────────┬──────────────────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────────────────┐
-│                  MainOrchestrator                                │
-│  (Central coordination, System initialization)                  │
-└──────────────────────┬──────────────────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────────────────┐
 │                 OrchestratorManager                              │
-│  (Manages 6 departmental orchestrators + 48 specialized agents) │
+│  (Routes tasks to 5 C-Suite orchestrators + sub-agents)        │
 └─────┬────────────────────────────────────────────────────┬──────┘
       │                                                     │
 ┌─────▼──────────────────┐                    ┌───────────▼────────┐
 │ DepartmentalOrchestrator│                    │  SpecializedAgent  │
-│  (6 departments)       │◄───────manages─────►│  (48 agents)       │
+│  (5 C-Suite execs)     │◄───────manages─────►│  (40+ agents)      │
 └────────────────────────┘                    └────────────────────┘
       │                                                     │
       └─────────────────┬───────────────────────────────┬──┘
@@ -104,13 +99,20 @@ interface DepartmentalOrchestrator : LearningAgent {
 - Enables inter-departmental coordination
 - Maintains shared context across the department
 
-**Six Departmental Orchestrators:**
-1. **PersonalAssistantOrchestrator** - Voice commands, hands-free operation
-2. **CRMOrchestrator** - Contact management, lead automation
-3. **ProjectManagementOrchestrator** - Scheduling, cost estimation, resource planning
-4. **AnalyticsOrchestrator** - Data analysis, reporting, predictions
-5. **DesignDepartmentOrchestrator** - 3D modeling, blueprints, design review
-6. **MarketingOrchestrator** - Proposals, campaigns, client presentations
+**Five C-Suite Executive Orchestrators:**
+1. **COOOperationsOrchestrator** - Operations, project management, field work, equipment
+2. **CFOFinancialOrchestrator** - Financial management, cost estimation, analytics
+3. **CHROClientHROrchestrator** - CRM, marketing, HR, client quality
+4. **CTODesignOrchestrator** - Design, CAD, blueprints, 3D modeling
+5. **CSOSafetyOrchestrator** - Safety, compliance, OSHA, permits
+
+**Department-Level Aliases (mapped to C-Suite):**
+- CRMOrchestrator → CHRO
+- ProjectManagementOrchestrator → COO
+- AnalyticsOrchestrator → CFO
+- DesignDepartmentOrchestrator → CTO
+- MarketingOrchestrator → CHRO
+- EstimatingDepartmentOrchestrator → CFO
 
 ### 4. SpecializedAgent (Focused Implementation)
 
@@ -136,9 +138,9 @@ interface SpecializedAgent {
 - Managed lifecycle by parent orchestrator
 
 **Example Specialized Agents:**
-- `VoiceCommandAgent` - Natural language processing
-- `ContactManagementAgent` - Smart contact creation
-- More agents per department (48 total across 6 departments)
+- `VoiceCommandAgent` - Natural language processing (under COO)
+- `ContactManagementAgent` - Smart contact creation (under CHRO)
+- More agents per department (40+ total across 5 C-Suite orchestrators)
 
 ## Core Data Models
 
@@ -479,10 +481,10 @@ fun testAgentCommunication() = runBlocking {
 The NextGen BuildPro v2.0 agent modeling framework provides:
 
 ✅ **Standardized Interfaces**: Clear contracts for all agent types  
-✅ **Hierarchical Organization**: Orchestrators → Specialized Agents  
+✅ **Flat C-Suite Organization**: 5 executive orchestrators → Specialized Agents  
 ✅ **MCP Integration**: Robust communication infrastructure  
 ✅ **Type Safety**: Kotlin coroutines + Result types  
-✅ **Scalability**: 6 departments × 8 agents = 48 specialized agents  
+✅ **Scalability**: 5 C-Suite orchestrators × 8 agents = 40+ specialized agents  
 ✅ **Maintainability**: Consistent patterns across all agents  
 ✅ **Testability**: Clear interfaces for unit and integration testing  
 

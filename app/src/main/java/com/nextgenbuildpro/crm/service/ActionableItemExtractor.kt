@@ -56,11 +56,11 @@ class ActionableItemExtractor(
                 )
             )
             
-            // Call LLM service to extract items
+            // Call LLM service to extract items (using COO for operations coordination)
             val response = llmService.generateResponse(
                 prompt = extractionPrompt,
                 context = llmContext,
-                agentType = AgentType.CEO_PERSONAL_ASSISTANT
+                agentType = AgentType.COO_OPERATIONS_ORCHESTRATOR
             )
             
             if (response.isFailure) {
@@ -277,8 +277,8 @@ class ActionableItemExtractor(
             descLower.contains("material") || descLower.contains("crew") ||
             descLower.contains("delivery") -> AgentType.COO_OPERATIONS_ORCHESTRATOR
             
-            // Default to Personal Assistant for general tasks
-            else -> AgentType.CEO_PERSONAL_ASSISTANT
+            // Default to COO Operations for general tasks
+            else -> AgentType.COO_OPERATIONS_ORCHESTRATOR
         }
     }
 }

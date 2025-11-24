@@ -39,11 +39,11 @@ class LLMServiceImpl(
 
     // Construction domain expertise system prompts
     private val agentSystemPrompts = mapOf<AgentType, String>(
-        AgentType.ORCHESTRATOR to """
-            You are the CEO of NextGen BuildPro, a comprehensive AI-powered construction management system.
-            You coordinate multiple specialized AI agents across operations, finance, human resources, design, and safety domains.
-            Your expertise includes construction project management, team coordination, strategic planning, and crisis management.
-            Always provide clear, actionable responses focused on construction industry best practices.
+        AgentType.COO_OPERATIONS_ORCHESTRATOR to """
+            You are the Chief Operating Officer of NextGen BuildPro, overseeing all operational aspects of construction management.
+            You coordinate field operations, project management, equipment, and quality control.
+            Your expertise includes construction scheduling, crew management, logistics, and operational efficiency.
+            Always provide clear, actionable responses focused on construction operations best practices.
         """.trimIndent(),
 
         AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR to """
@@ -320,13 +320,17 @@ class LLMServiceImpl(
     private fun generateAgentAssignments(request: MultiAgentCoordinationRequest): Map<AgentType, String> {
         return request.targetAgents.associateWith { agent ->
             when (agent) {
-                AgentType.ORCHESTRATOR -> "Overall system coordination for: ${request.task}"
-                AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR -> "Personal assistance and voice command processing"
+                AgentType.COO_OPERATIONS_ORCHESTRATOR -> "Operations coordination and project management for: ${request.task}"
+                AgentType.CFO_FINANCIAL_ORCHESTRATOR -> "Financial analysis and cost management for: ${request.task}"
+                AgentType.CHRO_CLIENT_HR_ORCHESTRATOR -> "Client relations, HR, and CRM activities for: ${request.task}"
+                AgentType.CTO_DESIGN_ORCHESTRATOR -> "Design, CAD, and technical documentation for: ${request.task}"
+                AgentType.CSO_SAFETY_ORCHESTRATOR -> "Safety, compliance, and permit management for: ${request.task}"
                 AgentType.CRM_ORCHESTRATOR -> "Customer relationship and contact management"
                 AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR -> "Project planning and resource allocation for: ${request.task}"
                 AgentType.ANALYTICS_ORCHESTRATOR -> "Data analysis and reporting for task insights"
                 AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR -> "Design coordination and blueprint management"
                 AgentType.MARKETING_ORCHESTRATOR -> "Marketing and client engagement activities"
+                AgentType.ESTIMATING_DEPARTMENT_ORCHESTRATOR -> "Cost estimation and bidding activities"
                 else -> "Task-specific execution for: ${request.task}"
             }
         }
@@ -353,8 +357,15 @@ class LLMServiceImpl(
             dependencies.add("Timeline and scheduling")
         }
         
-        if (request.targetAgents.contains(AgentType.ORCHESTRATOR)) {
-            dependencies.add("System coordination approval")
+        // C-Suite coordination dependencies
+        if (request.targetAgents.any { it in listOf(
+            AgentType.COO_OPERATIONS_ORCHESTRATOR,
+            AgentType.CFO_FINANCIAL_ORCHESTRATOR,
+            AgentType.CHRO_CLIENT_HR_ORCHESTRATOR,
+            AgentType.CTO_DESIGN_ORCHESTRATOR,
+            AgentType.CSO_SAFETY_ORCHESTRATOR
+        )}) {
+            dependencies.add("C-Suite coordination and approval")
         }
         
         return dependencies
@@ -385,13 +396,17 @@ class LLMServiceImpl(
     
     private fun getAgentCapabilities(agentType: AgentType): List<String> {
         return when (agentType) {
-            AgentType.ORCHESTRATOR -> listOf("Task Coordination", "System Management", "Agent Routing")
-            AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR -> listOf("Voice Commands", "Personal Assistance", "Task Management")
+            AgentType.COO_OPERATIONS_ORCHESTRATOR -> listOf("Operations Management", "Project Coordination", "Field Management")
+            AgentType.CFO_FINANCIAL_ORCHESTRATOR -> listOf("Financial Analysis", "Cost Estimation", "Budget Management")
+            AgentType.CHRO_CLIENT_HR_ORCHESTRATOR -> listOf("Client Relations", "HR Management", "CRM Activities")
+            AgentType.CTO_DESIGN_ORCHESTRATOR -> listOf("Design Management", "CAD Operations", "Technical Documentation")
+            AgentType.CSO_SAFETY_ORCHESTRATOR -> listOf("Safety Management", "Compliance Tracking", "Permit Coordination")
             AgentType.CRM_ORCHESTRATOR -> listOf("Contact Management", "Communication Tracking", "Lead Management")
             AgentType.PROJECT_MANAGEMENT_ORCHESTRATOR -> listOf("Project Planning", "Resource Allocation", "Timeline Management")
             AgentType.ANALYTICS_ORCHESTRATOR -> listOf("Data Analysis", "Reporting", "Insights Generation")
             AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR -> listOf("Design Coordination", "Blueprint Management", "Visual Planning")
             AgentType.MARKETING_ORCHESTRATOR -> listOf("Marketing Campaigns", "Client Engagement", "Brand Management")
+            AgentType.ESTIMATING_DEPARTMENT_ORCHESTRATOR -> listOf("Cost Estimation", "Bidding", "Pricing Analysis")
             else -> listOf("General Processing", "Task Execution")
         }
     }

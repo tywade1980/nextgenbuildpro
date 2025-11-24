@@ -367,8 +367,8 @@ class LivingEnv : EnvironmentMesh {
     
     private suspend fun broadcastAgentRegistration(agentType: AgentType) {
         val message = AgentMessage(
-            fromAgent = AgentType.ORCHESTRATOR,
-            toAgent = AgentType.ORCHESTRATOR, // Will be overridden for each recipient
+            fromAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR,
+            toAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR, // Will be overridden for each recipient
             messageType = MessageType.NOTIFICATION,
             content = "Agent registered: $agentType",
             metadata = mapOf("event" to "agent_registration", "agent_type" to agentType.name)
@@ -379,8 +379,8 @@ class LivingEnv : EnvironmentMesh {
     
     private suspend fun broadcastAgentUnregistration(agentType: AgentType) {
         val message = AgentMessage(
-            fromAgent = AgentType.ORCHESTRATOR,
-            toAgent = AgentType.ORCHESTRATOR, // Will be overridden for each recipient
+            fromAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR,
+            toAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR, // Will be overridden for each recipient
             messageType = MessageType.NOTIFICATION,
             content = "Agent unregistered: $agentType",
             metadata = mapOf("event" to "agent_unregistration", "agent_type" to agentType.name)

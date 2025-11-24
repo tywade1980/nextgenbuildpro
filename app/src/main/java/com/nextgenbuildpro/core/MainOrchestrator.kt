@@ -383,8 +383,8 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
     
     private suspend fun broadcastSystemReady() {
         val readyMessage = AgentMessage(
-            fromAgent = AgentType.ORCHESTRATOR,
-            toAgent = AgentType.ORCHESTRATOR, // Broadcast from orchestrator
+            fromAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR,
+            toAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR, // Broadcast from operations hub
             messageType = MessageType.NOTIFICATION,
             content = "NextGen AI OS is now ready and operational",
             metadata = mapOf("system_status" to "READY", "timestamp" to LocalDateTime.now().toString())
@@ -952,9 +952,8 @@ class MainOrchestrator(private val context: Context) : Orchestrator {
                     AgentType.CRM_ORCHESTRATOR
                 task.title.contains("design", ignoreCase = true) && AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR in availableAgents -> 
                     AgentType.DESIGN_DEPARTMENT_ORCHESTRATOR
-                task.title.contains("assistant", ignoreCase = true) && AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR in availableAgents -> 
-                    AgentType.PERSONAL_ASSISTANT_ORCHESTRATOR
-                AgentType.ORCHESTRATOR in availableAgents -> AgentType.ORCHESTRATOR
+                // Default to COO Operations for general tasks
+                AgentType.COO_OPERATIONS_ORCHESTRATOR in availableAgents -> AgentType.COO_OPERATIONS_ORCHESTRATOR
                 else -> availableAgents.first() // Return first available agent
             }
         }
