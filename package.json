@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "lint": "eslint . --ext .ts,.js,.tsx,.jsx",
+    "lint": "eslint .",
     "test": "jest",
     "seed:catalogue": "npx ts-node seeds/seedCatalogue.ts",
     "seed:run": "node seeds/runSeeder.js",

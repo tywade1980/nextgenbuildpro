@@ -150,7 +150,7 @@ export interface Invoice {
   viewedAt?: string;
   
   // Custom fields
-  customFields?: Record<string, any>;
+  customFields?: Record<string, string | number | boolean | null>;
 }
 
 /**
