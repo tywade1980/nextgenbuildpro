@@ -47,3 +47,39 @@ caroline/
 # Duplicate implementation files
 *_OLD.md
 *_old.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+.pytest_cache/
+
+# Secrets / credentials (never commit these)
+*.pem
+*.key
+secrets.json
+local.properties
+google-services.json
+
+# Large model files
+*.onnx
+*.gguf
+*.bin
+*.safetensors
+*.pt
+*.pth
+
+# Package locks (packages/ subrepos manage their own)
+packages/*/node_modules/
+packages/*/pnpm-lock.yaml
+packages/*/.next/
+packages/*/build/
+packages/*/dist/
+
+# Runpod + Docker secrets
+packages/ai-framework/infra/.env
+packages/voice-telephony/aria-voice/backend/.env

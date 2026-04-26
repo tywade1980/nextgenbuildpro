@@ -1,0 +1,10 @@
+{
+  "ranking_weights": {
+    "urgency": 5,
+    "tone": 4,
+    "intent_clarity": 3,
+    "emotional_state": 5
+  },
+  "response_style": "adaptive",
+  "fallback_if_uncertain": "Ask Tyler for confirmation"
+}
