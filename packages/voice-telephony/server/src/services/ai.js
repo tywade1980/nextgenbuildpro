@@ -183,6 +183,7 @@ class AIService extends EventEmitter {
       ];
 
       // Generate response using OpenAI with conversation-optimized parameters
+      if (!this.openai) throw new Error('OpenAI not configured — set OPENAI_API_KEY');
       const completion = await this.openai.chat.completions.create({
         model: process.env.AI_MODEL || 'gpt-4',
         messages,
@@ -357,6 +358,7 @@ class AIService extends EventEmitter {
   async analyzeText(text) {
     try {
       // Use OpenAI for text analysis
+      if (!this.openai) throw new Error('OpenAI not configured — set OPENAI_API_KEY');
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
@@ -410,6 +412,7 @@ class AIService extends EventEmitter {
 
     // Generate context-aware greeting using AI
     try {
+      if (!this.openai) throw new Error('OpenAI not configured — set OPENAI_API_KEY');
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
@@ -523,6 +526,7 @@ Key topics discussed: ${this.extractTopics(conversationContext.messages)}`;
    */
   async generateFollowUpQuestion(context, currentResponse) {
     try {
+      if (!this.openai) throw new Error('OpenAI not configured — set OPENAI_API_KEY');
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
@@ -612,6 +616,7 @@ Key topics discussed: ${this.extractTopics(conversationContext.messages)}`;
    */
   async generateConversationStarter(callId, options) {
     try {
+      if (!this.openai) throw new Error('OpenAI not configured — set OPENAI_API_KEY');
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
@@ -666,6 +671,7 @@ Key topics discussed: ${this.extractTopics(conversationContext.messages)}`;
         .map(msg => `${msg.role}: ${msg.content}`)
         .join('\n');
 
+      if (!this.openai) throw new Error('OpenAI not configured — set OPENAI_API_KEY');
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [

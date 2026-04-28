@@ -65,22 +65,11 @@ const sampleProjects: PortfolioProject[] = [
 ];
 
 export default function AdminPortfolio() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState<PortfolioProject[]>(sampleProjects);
   const [draggedProject, setDraggedProject] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    // Check if user is authenticated
-    const authStatus = localStorage.getItem('wcc_admin_auth');
-    if (authStatus !== 'true') {
-      router.push('/admin');
-    } else {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
-  }, [router]);
+  // Auth enforced by middleware (src/middleware.ts)
 
   const handleDragStart = (projectId: string) => {
     setDraggedProject(projectId);
@@ -112,18 +101,6 @@ export default function AdminPortfolio() {
         : project
     ));
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect in useEffect
-  }
 
   return (
     <div className="min-h-screen bg-gray-100">

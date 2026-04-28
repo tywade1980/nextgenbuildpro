@@ -48,23 +48,12 @@ const sampleSeoSettings: SeoSettings = {
 };
 
 export default function AdminSeo() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [seoSettings, setSeoSettings] = useState<SeoSettings>(sampleSeoSettings);
   const [newKeyword, setNewKeyword] = useState("");
   const [newCity, setNewCity] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    // Check if user is authenticated
-    const authStatus = localStorage.getItem('wcc_admin_auth');
-    if (authStatus !== 'true') {
-      router.push('/admin');
-    } else {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
-  }, [router]);
+  // Auth enforced by middleware (src/middleware.ts)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -156,18 +145,6 @@ export default function AdminSeo() {
     // In a real app, this would save to a database
     alert("SEO settings updated successfully!");
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect in useEffect
-  }
 
   return (
     <div className="min-h-screen bg-gray-100">

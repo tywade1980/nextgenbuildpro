@@ -67,22 +67,11 @@ const sampleServices: Service[] = [
 ];
 
 export default function AdminServices() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [services, setServices] = useState<Service[]>(sampleServices);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    // Check if user is authenticated
-    const authStatus = localStorage.getItem('wcc_admin_auth');
-    if (authStatus !== 'true') {
-      router.push('/admin');
-    } else {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
-  }, [router]);
+  // Auth enforced by middleware (src/middleware.ts)
 
   const toggleServiceActive = (serviceId: string) => {
     setServices(services.map(service => 
@@ -117,18 +106,6 @@ export default function AdminServices() {
       [name]: value
     });
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect in useEffect
-  }
 
   return (
     <div className="min-h-screen bg-gray-100">

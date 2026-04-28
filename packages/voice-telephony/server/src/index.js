@@ -96,6 +96,10 @@ app.get('/api/status', (req, res) => {
 // Initialize services
 async function initializeApp() {
   try {
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET environment variable must be set before starting the server')
+    }
+
     logger.info('Initializing NextGenTele application...');
 
     // Initialize database

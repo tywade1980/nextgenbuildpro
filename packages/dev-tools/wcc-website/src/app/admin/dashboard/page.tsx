@@ -1,41 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React from 'react';
 import Link from 'next/link';
 
+// Auth is enforced by middleware (src/middleware.ts) — no client-side check needed
+
+async function handleLogout() {
+  await fetch('/api/admin/logout', { method: 'POST' })
+  window.location.href = '/admin'
+}
+
 export default function AdminDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
-
-  useEffect(() => {
-    // Check if user is authenticated
-    const authStatus = localStorage.getItem('wcc_admin_auth');
-    if (authStatus !== 'true') {
-      router.push('/admin');
-    } else {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('wcc_admin_auth');
-    router.push('/admin');
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect in useEffect
-  }
 
   return (
     <div className="min-h-screen bg-gray-100">

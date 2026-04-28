@@ -77,23 +77,12 @@ const sampleLeads: Lead[] = [
 ];
 
 export default function AdminLeads() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [leads, setLeads] = useState<Lead[]>(sampleLeads);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [filter, setFilter] = useState<string>('all');
   const router = useRouter();
 
-  useEffect(() => {
-    // Check if user is authenticated
-    const authStatus = localStorage.getItem('wcc_admin_auth');
-    if (authStatus !== 'true') {
-      router.push('/admin');
-    } else {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
-  }, [router]);
+  // Auth enforced by middleware (src/middleware.ts)
 
   const filteredLeads = filter === 'all' 
     ? leads 
@@ -145,18 +134,6 @@ export default function AdminLeads() {
       minute: '2-digit'
     });
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null; // Will redirect in useEffect
-  }
 
   return (
     <div className="min-h-screen bg-gray-100">
