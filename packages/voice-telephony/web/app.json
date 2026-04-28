@@ -46,13 +46,13 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/3af4db2d-524e-49fe-a6d1-82148cfa23dc",
+      "url": "https://u.expo.dev/aeadebc0-dd63-4104-8c1a-993c5b8b3dd1",
       "enabled": true,
       "fallbackToCacheTimeout": 0
     },
     "extra": {
       "eas": {
-        "projectId": "3af4db2d-524e-49fe-a6d1-82148cfa23dc"
+        "projectId": "aeadebc0-dd63-4104-8c1a-993c5b8b3dd1"
       }
     },
     "owner": "tywade1980"
