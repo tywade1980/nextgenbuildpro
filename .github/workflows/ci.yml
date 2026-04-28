@@ -10,6 +10,32 @@ on:
     branches:
       - main
       - master
+  workflow_dispatch:
+    inputs:
+      eas_platform:
+        description: EAS build platform
+        required: false
+        default: android
+        type: choice
+        options:
+          - android
+          - ios
+          - all
+      eas_profile:
+        description: EAS build profile
+        required: false
+        default: preview
+        type: choice
+        options:
+          - development
+          - preview
+          - production
+
+permissions:
+  contents: read
+  statuses: write
+  deployments: write
+  pull-requests: write
 
 jobs:
   # ─── Expo / React Native ───────────────────────────────────────────────────
@@ -21,11 +47,173 @@ jobs:
         working-directory: packages/voice-telephony/web
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set pending status
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: pending
+          context: expo / typecheck
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+          cache-dependency-path: packages/voice-telephony/web/package.json
+
       - run: npm install
-      - run: npx tsc --noEmit
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Set final status
+        if: always()
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status == 'success' && 'success' || 'failure' }}
+          context: expo / typecheck
+
+  # ─── EAS Build (Android) ──────────────────────────────────────────────────
+  eas-build-android:
+    name: EAS Build Android
+    runs-on: ubuntu-latest
+    needs: expo-typecheck
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' &&
+        (inputs.eas_platform == 'android' || inputs.eas_platform == 'all'))
+    defaults:
+      run:
+        working-directory: packages/voice-telephony/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set pending status
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: pending
+          context: eas / android
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: EAS Build Android
+        id: eas_android
+        run: |
+          PROFILE="${{ inputs.eas_profile || 'preview' }}"
+          echo "Building Android with profile: $PROFILE"
+          eas build --platform android --profile "$PROFILE" --non-interactive --json \
+            | tee /tmp/eas_output.json
+          BUILD_URL=$(cat /tmp/eas_output.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(d[0].get('buildUrl',''))" 2>/dev/null || echo "")
+          echo "build_url=$BUILD_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Write job summary
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          BUILD_URL="${{ steps.eas_android.outputs.build_url }}"
+          echo "## EAS Android Build" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | $STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| Profile | ${{ inputs.eas_profile || 'preview' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$BUILD_URL" ]; then
+            echo "| Build URL | [$BUILD_URL]($BUILD_URL) |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Set final status
+        if: always()
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status == 'success' && 'success' || 'failure' }}
+          context: eas / android
+          targetUrl: ${{ steps.eas_android.outputs.build_url }}
+
+  # ─── EAS Build (iOS) ──────────────────────────────────────────────────────
+  eas-build-ios:
+    name: EAS Build iOS
+    runs-on: macos-latest
+    needs: expo-typecheck
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      (inputs.eas_platform == 'ios' || inputs.eas_platform == 'all')
+    defaults:
+      run:
+        working-directory: packages/voice-telephony/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set pending status
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: pending
+          context: eas / ios
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: EAS Build iOS
+        id: eas_ios
+        run: |
+          PROFILE="${{ inputs.eas_profile || 'preview' }}"
+          echo "Building iOS with profile: $PROFILE"
+          eas build --platform ios --profile "$PROFILE" --non-interactive --json \
+            | tee /tmp/eas_output.json
+          BUILD_URL=$(cat /tmp/eas_output.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(d[0].get('buildUrl',''))" 2>/dev/null || echo "")
+          echo "build_url=$BUILD_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Write job summary
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          BUILD_URL="${{ steps.eas_ios.outputs.build_url }}"
+          echo "## EAS iOS Build" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | $STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo "| Profile | ${{ inputs.eas_profile || 'preview' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$BUILD_URL" ]; then
+            echo "| Build URL | [$BUILD_URL]($BUILD_URL) |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Set final status
+        if: always()
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status == 'success' && 'success' || 'failure' }}
+          context: eas / ios
+          targetUrl: ${{ steps.eas_ios.outputs.build_url }}
 
   # ─── Voice Telephony Server (Node.js) ─────────────────────────────────────
   voice-server-lint:
@@ -36,11 +224,27 @@ jobs:
         working-directory: packages/voice-telephony/server
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set pending status
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: pending
+          context: voice-server / lint
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
       - run: npm install
       - run: npm run lint --if-present
+
+      - name: Set final status
+        if: always()
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status == 'success' && 'success' || 'failure' }}
+          context: voice-server / lint
 
   voice-server-test:
     name: Voice Server Tests
@@ -66,11 +270,27 @@ jobs:
         working-directory: packages/caroline-ai/server
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set pending status
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: pending
+          context: caroline-server / lint
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - run: pip install ruff
       - run: ruff check . --ignore E501 || true
+
+      - name: Set final status
+        if: always()
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status == 'success' && 'success' || 'failure' }}
+          context: caroline-server / lint
 
   caroline-server-test:
     name: Caroline Server Import Test
@@ -96,11 +316,27 @@ jobs:
         working-directory: packages/ai-framework/python
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set pending status
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: pending
+          context: ai-framework / syntax
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - run: pip install -r requirements.txt
       - run: python -c "import ast, pathlib; [ast.parse(f.read_text()) for f in pathlib.Path('agents').rglob('*.py')]; print('syntax check: OK')"
+
+      - name: Set final status
+        if: always()
+        uses: myrotvorets/set-commit-status-action@v2.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status == 'success' && 'success' || 'failure' }}
+          context: ai-framework / syntax
 
   # ─── Dev Tools: Next.js Chatbot ───────────────────────────────────────────
   chatbot-build:
@@ -118,14 +354,45 @@ jobs:
       - run: npx tsc --noEmit --project tsconfig.json 2>/dev/null || true
       - run: npm run build --if-present
 
-  # ─── Summary ─────────────────────────────────────────────────────────────
+  # ─── Pipeline Summary ─────────────────────────────────────────────────────
   ci-pass:
     name: All CI Checks
     runs-on: ubuntu-latest
     needs:
       - expo-typecheck
+      - eas-build-android
       - voice-server-lint
       - caroline-server-lint
       - ai-framework-test
+    if: always()
     steps:
-      - run: echo "All CI checks passed"
+      - name: Write pipeline summary
+        run: |
+          echo "# Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Expo TypeScript | ${{ needs.expo-typecheck.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| EAS Android Build | ${{ needs.eas-build-android.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Voice Server Lint | ${{ needs.voice-server-lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Caroline Server Lint | ${{ needs.caroline-server-lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| AI Framework Test | ${{ needs.ai-framework-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check all required jobs passed
+        run: |
+          FAILED=0
+          for JOB_RESULT in \
+            "${{ needs.expo-typecheck.result }}" \
+            "${{ needs.voice-server-lint.result }}" \
+            "${{ needs.caroline-server-lint.result }}" \
+            "${{ needs.ai-framework-test.result }}"; do
+            if [[ "$JOB_RESULT" != "success" && "$JOB_RESULT" != "skipped" ]]; then
+              echo "A required job did not pass (result: $JOB_RESULT)"
+              FAILED=1
+            fi
+          done
+          [ $FAILED -eq 0 ] && echo "All required checks passed" || exit 1
