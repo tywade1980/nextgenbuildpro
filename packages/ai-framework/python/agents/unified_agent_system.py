@@ -28,6 +28,7 @@ import re
 from pathlib import Path
 from typing import Any
 from openai import AsyncOpenAI
+from guardrails import guardrails as _guardrails
 
 # ─── Configuration ────────────────────────────────────────────────────────────
 
@@ -245,7 +246,23 @@ class UnifiedAgentSystem:
             "response_preview": final[:100]
         })
 
-        return {"response": final, "agents": agents, "neurorank": score}
+        # Run executive guardrails before returning
+        guard = _guardrails.validate(final, {"current_budget": self.wgs.get("current_budget")})
+        if not guard.approved:
+            final = guard.sanitized_output
+        if guard.requires_human_approval:
+            self.wgs.record_completion({"guardrail_flag": True, "violations": [v.message for v in guard.violations]})
+
+        return {
+            "response": final,
+            "agents": agents,
+            "neurorank": score,
+            "guardrails": {
+                "approved": guard.approved,
+                "requires_human_approval": guard.requires_human_approval,
+                "violations": [{"rule": v.rule, "message": v.message, "risk": v.risk} for v in guard.violations],
+            },
+        }
 
     async def create_estimate(self, scope: str, area_sqft: float = 0) -> dict:
         """Generate a construction cost estimate using the assembly taxonomy."""
