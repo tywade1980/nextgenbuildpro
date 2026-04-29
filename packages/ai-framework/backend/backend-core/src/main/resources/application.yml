@@ -1,0 +1,141 @@
+# NextGen APK Backend Configuration
+
+# Server Configuration
+server:
+  port: 8081
+  servlet:
+    context-path: /
+
+# Spring Configuration
+spring:
+  application:
+    name: nextgen-backend-core
+    
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/nextgen_db
+    username: nextgen_user
+    password: nextgen_password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 25
+          order_inserts: true
+          order_updates: true
+        
+  # Flyway Migration
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    
+  # Cache Configuration
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=10m
+      
+  # Web Configuration
+  web:
+    cors:
+      allowed-origins: "*"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      
+# Management Endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    com.nextgen: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql: TRACE
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/nextgen-backend.log
+    max-size: 10MB
+    max-history: 30
+
+# NextGen Specific Configuration
+nextgen:
+  # Voice Processing
+  voice:
+    enabled: true
+    confidence-threshold: 0.7
+    timeout-ms: 5000
+    
+  # Database Configuration
+  database:
+    vector-dimension: 1536
+    batch-size: 100
+    
+  # MCP Server Configuration
+  mcp:
+    enabled: true
+    port: 8080
+    max-connections: 100
+    
+  # Integration Hub Configuration
+  integration:
+    enabled: true
+    port: 8082
+    scan-interval-ms: 30000
+    
+  # API Configuration
+  api:
+    rate-limit:
+      enabled: true
+      requests-per-minute: 1000
+    documentation:
+      enabled: true
+      
+  # Security Configuration
+  security:
+    jwt:
+      secret: "nextgen-jwt-secret-key-change-in-production"
+      expiration-ms: 86400000 # 24 hours
+    cors:
+      allowed-origins: "*"
+      
+  # Performance Configuration
+  performance:
+    thread-pool-size: 16
+    max-concurrent-operations: 50
+    cache-size-mb: 100
+    
+# Vector Database Configuration (pgvector)
+vector:
+  database:
+    enabled: true
+    dimension: 1536
+    index-type: "hnsw"
+    distance-function: "cosine"

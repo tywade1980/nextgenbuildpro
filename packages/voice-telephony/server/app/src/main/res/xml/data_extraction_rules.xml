@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Exclude sensitive call data from backup -->
+        <exclude domain="sharedpref" path="call_logs.xml"/>
+        <exclude domain="sharedpref" path="ai_models.xml"/>
+        <exclude domain="database" path="call_recordings.db"/>
+    </cloud-backup>
+    <device-transfer>
+        <!-- Include user preferences in device transfer -->
+        <include domain="sharedpref" path="user_preferences.xml"/>
+        <include domain="sharedpref" path="ai_settings.xml"/>
+    </device-transfer>
+</data-extraction-rules>

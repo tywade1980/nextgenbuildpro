@@ -1,0 +1,213 @@
+{
+  "name": "hface-ide",
+  "displayName": "Hugging Face IDE",
+  "description": "Seamless access to Hugging Face models, datasets, and code resources",
+  "version": "0.1.0",
+  "publisher": "tywade1980",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tywade1980/Hface-IDE.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tywade1980/Hface-IDE/issues"
+  },
+  "homepage": "https://github.com/tywade1980/Hface-IDE#readme",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Machine Learning",
+    "Data Science"
+  ],
+  "keywords": [
+    "huggingface",
+    "machine learning",
+    "models",
+    "datasets",
+    "ai",
+    "transformers"
+  ],
+  "activationEvents": [
+    "onCommand:hface-ide.searchModels",
+    "onCommand:hface-ide.searchDatasets",
+    "onCommand:hface-ide.openHub",
+    "onView:hface-explorer"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "hface-explorer",
+          "name": "Hugging Face",
+          "when": "true"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "hface-ide.searchModels",
+        "title": "Search Models",
+        "category": "Hugging Face",
+        "icon": "$(search)"
+      },
+      {
+        "command": "hface-ide.searchDatasets",
+        "title": "Search Datasets",
+        "category": "Hugging Face",
+        "icon": "$(database)"
+      },
+      {
+        "command": "hface-ide.downloadModel",
+        "title": "Download Model",
+        "category": "Hugging Face",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "hface-ide.downloadDataset",
+        "title": "Download Dataset",
+        "category": "Hugging Face",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "hface-ide.openHub",
+        "title": "Open Hugging Face Hub",
+        "category": "Hugging Face",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "hface-ide.refreshExplorer",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "hface-ide.configureApi",
+        "title": "Configure API Token",
+        "category": "Hugging Face",
+        "icon": "$(key)"
+      },
+      {
+        "command": "hface-ide.insertCodeSnippet",
+        "title": "Insert Code Snippet",
+        "category": "Hugging Face",
+        "icon": "$(code)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "hface-ide.searchModels",
+        "key": "ctrl+shift+m",
+        "mac": "cmd+shift+m",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "hface-ide.searchDatasets",
+        "key": "ctrl+shift+d",
+        "mac": "cmd+shift+d",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "hface-ide.openHub",
+        "key": "ctrl+shift+h",
+        "mac": "cmd+shift+h"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "hface-ide.refreshExplorer",
+          "when": "view == hface-explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "hface-ide.configureApi",
+          "when": "view == hface-explorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "hface-ide.downloadModel",
+          "when": "view == hface-explorer && viewItem == model",
+          "group": "inline"
+        },
+        {
+          "command": "hface-ide.downloadDataset",
+          "when": "view == hface-explorer && viewItem == dataset",
+          "group": "inline"
+        },
+        {
+          "command": "hface-ide.insertCodeSnippet",
+          "when": "view == hface-explorer && viewItem == model",
+          "group": "inline"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "hface-ide.refreshExplorer",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Hugging Face IDE",
+      "properties": {
+        "hface-ide.apiToken": {
+          "type": "string",
+          "default": "",
+          "description": "Hugging Face API token for private repositories and increased rate limits",
+          "scope": "application"
+        },
+        "hface-ide.cacheDirectory": {
+          "type": "string",
+          "default": "~/.cache/huggingface",
+          "description": "Directory to cache downloaded models and datasets"
+        },
+        "hface-ide.defaultTask": {
+          "type": "string",
+          "default": "text-generation",
+          "enum": [
+            "text-generation",
+            "text-classification",
+            "token-classification",
+            "question-answering",
+            "fill-mask",
+            "summarization",
+            "translation",
+            "text2text-generation",
+            "image-classification",
+            "object-detection",
+            "image-segmentation",
+            "audio-classification",
+            "automatic-speech-recognition",
+            "text-to-speech"
+          ],
+          "description": "Default task type for model searches"
+        },
+        "hface-ide.maxResults": {
+          "type": "number",
+          "default": 20,
+          "minimum": 5,
+          "maximum": 100,
+          "description": "Maximum number of results to show in searches"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "fs-extra": "^11.0.0"
+  }
+}
