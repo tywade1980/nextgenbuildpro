@@ -1,0 +1,149 @@
+# ────────────────────────────────────────────────────────────────────────────────
+# EAS Build Pipeline — NextGen Build Pro
+# Builds run on expo.dev infrastructure. API keys live as EAS Secrets,
+# never in this file. Only EXPO_TOKEN (GitHub Secret) is needed here.
+#
+# Required GitHub Secrets (Settings → Secrets and variables → Actions):
+#   EXPO_TOKEN  — generate at expo.dev/accounts/[user]/settings/access-tokens
+#
+# Required EAS Secrets (set once via: bash scripts/setup-eas-secrets.sh):
+#   ORG_GRADLE_PROJECT_XAI_API_KEY
+#   ORG_GRADLE_PROJECT_ELEVENLABS_API_KEY
+#   ORG_GRADLE_PROJECT_OPENROUTER_API_KEY
+#   ORG_GRADLE_PROJECT_VLLM_BASE_URL
+#   ORG_GRADLE_PROJECT_FISH_SPEECH_BASE_URL
+#
+# Android signing is managed by EAS credentials.
+# Run once locally: eas credentials --platform android
+# ────────────────────────────────────────────────────────────────────────────────
+name: EAS Build
+
+on:
+  push:
+    branches:
+      - main
+      - "claude/**"
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "EAS build profile"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - development
+          - preview
+          - production
+      wait_for_build:
+        description: "Wait for build to complete before exiting"
+        required: false
+        default: "false"
+        type: choice
+        options: ["true", "false"]
+
+concurrency:
+  group: eas-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────────────
+  determine-profile:
+    name: Resolve build profile
+    runs-on: ubuntu-latest
+    outputs:
+      profile: ${{ steps.resolve.outputs.profile }}
+      should_build: ${{ steps.resolve.outputs.should_build }}
+    steps:
+      - name: Resolve profile
+        id: resolve
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            PROFILE="${{ github.event.inputs.profile }}"
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            PROFILE="production"
+          else
+            PROFILE="preview"
+          fi
+
+          # Only trigger EAS for non-draft PRs and real pushes
+          SHOULD_BUILD="true"
+          if [[ "${{ github.event.pull_request.draft }}" == "true" ]]; then
+            SHOULD_BUILD="false"
+          fi
+
+          echo "profile=$PROFILE"         >> "$GITHUB_OUTPUT"
+          echo "should_build=$SHOULD_BUILD" >> "$GITHUB_OUTPUT"
+          echo "Resolved profile: $PROFILE (should_build=$SHOULD_BUILD)"
+
+  # ──────────────────────────────────────────────────────────────────────────
+  eas-build:
+    name: EAS Build (${{ needs.determine-profile.outputs.profile }})
+    runs-on: ubuntu-latest
+    needs: determine-profile
+    if: needs.determine-profile.outputs.should_build == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Setup EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          # EXPO_TOKEN authenticates the CLI with expo.dev.
+          # API keys for the app are EAS Secrets — NOT passed from here.
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Trigger EAS Build
+        id: eas_build
+        run: |
+          PROFILE="${{ needs.determine-profile.outputs.profile }}"
+          WAIT_FLAG="--no-wait"
+          if [[ "${{ github.event.inputs.wait_for_build }}" == "true" ]]; then
+            WAIT_FLAG="--wait"
+          fi
+
+          echo "Starting EAS build (profile=$PROFILE, $WAIT_FLAG)"
+          eas build \
+            --platform android \
+            --profile "$PROFILE" \
+            --non-interactive \
+            $WAIT_FLAG \
+            2>&1 | tee eas_build_output.txt
+
+          # Extract build URL from output for the PR comment
+          BUILD_URL=$(grep -oP 'https://expo\.dev/[^\s]+' eas_build_output.txt | head -1 || true)
+          echo "build_url=$BUILD_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Comment build URL on PR
+        if: github.event_name == 'pull_request' && steps.eas_build.outputs.build_url != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `📦 **EAS Build triggered** (profile: \`${{ needs.determine-profile.outputs.profile }}\`)
+            
+            Track progress: ${{ steps.eas_build.outputs.build_url }}
+            
+            > API keys are injected from EAS Secrets — never stored in this repo.`
+            })
