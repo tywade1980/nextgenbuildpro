@@ -1,0 +1,25 @@
+# EAS Custom Build — Debug APK
+# All API keys are stored as EAS Secrets (eas secret:create --scope project).
+# Name them ORG_GRADLE_PROJECT_* and Gradle will pick them up automatically.
+build:
+  name: Android Debug APK
+  steps:
+    - eas/checkout
+    - eas/install_node_modules
+    - eas/setup_java:
+        jdk_version: "17"
+    - name: Grant Gradle execute permission
+      run: chmod +x ./gradlew
+    - name: Cache Gradle wrapper
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: gradle-${{ hashFiles('**/*.gradle.kts', 'gradle/wrapper/gradle-wrapper.properties') }}
+        restore-keys: gradle-
+    - name: Build debug APK
+      run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+    - eas/upload_artifact:
+        path: app/build/outputs/apk/debug/app-debug.apk
+        type: apk

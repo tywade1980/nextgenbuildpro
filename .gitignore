@@ -1,85 +1,37 @@
-*.iml
-.gradle
-/local.properties
-/.idea/
+# ── Build outputs ────────────────────────────────────────────────────────────
+*.apk
+*.aab
+*.ap_
+build/
+.cxx/
+
+# ── Android local config (contains SDK path — never commit) ─────────────────
+local.properties
+
+# ── Gradle ───────────────────────────────────────────────────────────────────
+.gradle/
+**/.gradle/
+
+# ── IDE ──────────────────────────────────────────────────────────────────────
 .idea/
+*.iml
+*.iws
+*.ipr
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-.kotlin/
 
-# Node.js dependencies
-node_modules/
-package-lock.json
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# TypeScript build output
-dist/
-*.tsbuildinfo
-
-# Test coverage
-coverage/
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Backup and temporary files
-*.backup
-*.old
-*.log
-*.tmp
-*.temp
-
-# Example and demo directories
-examples/
-research/
-caroline/
-
-# Duplicate implementation files
-*_OLD.md
-*_old.md
-
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-.venv/
-venv/
-*.egg-info/
-dist/
-.pytest_cache/
-
-# Secrets / credentials (never commit these)
-*.pem
-*.key
-secrets.json
-local.properties
+# ── SECRETS — never commit any of these ──────────────────────────────────────
+.env.secrets
+*.env
+!*.env.example
+*.jks
+*.keystore
+google-service-account.json
 google-services.json
 
-# Large model files
-*.onnx
-*.gguf
-*.bin
-*.safetensors
-*.pt
-*.pth
+# ── Node (EAS CLI) ───────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
 
-# Package locks (packages/ subrepos manage their own)
-packages/*/node_modules/
-packages/*/pnpm-lock.yaml
-packages/*/.next/
-packages/*/build/
-packages/*/dist/
-
-# Runpod + Docker secrets
-packages/ai-framework/infra/.env
-packages/voice-telephony/aria-voice/backend/.env
+# ── EAS build output ─────────────────────────────────────────────────────────
+.eas/
+!.eas/build/

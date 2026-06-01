@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "NextGen Build Pro",
+    "slug": "nextgenbuildpro",
+    "version": "2.0.0",
+    "platforms": ["android"],
+    "android": {
+      "package": "com.nextgenbuildpro",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0A1A"
+      }
+    },
+    "owner": "tywade1980",
+    "extra": {
+      "eas": {
+        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
+      }
+    }
+  }
+}

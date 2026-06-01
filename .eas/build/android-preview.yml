@@ -1,0 +1,35 @@
+# EAS Custom Build — Preview (signed release APK for internal distribution)
+# Signing credentials are managed by EAS (run: eas credentials --platform android).
+# EAS injects ANDROID_KEYSTORE_PATH, ANDROID_KEYSTORE_PASSWORD,
+# ANDROID_KEY_ALIAS, and ANDROID_KEY_PASSWORD into the build environment.
+build:
+  name: Android Preview APK
+  steps:
+    - eas/checkout
+    - eas/install_node_modules
+    - eas/setup_java:
+        jdk_version: "17"
+    - eas/setup_android_keystore
+    - name: Grant Gradle execute permission
+      run: chmod +x ./gradlew
+    - name: Cache Gradle
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: gradle-${{ hashFiles('**/*.gradle.kts', 'gradle/wrapper/gradle-wrapper.properties') }}
+        restore-keys: gradle-
+    - name: Build signed release APK
+      run: |
+        ./gradlew :app:assembleRelease \
+          -Pandroid.injected.signing.store.file="$ANDROID_KEYSTORE_PATH" \
+          -Pandroid.injected.signing.store.password="$ANDROID_KEYSTORE_PASSWORD" \
+          -Pandroid.injected.signing.key.alias="$ANDROID_KEY_ALIAS" \
+          -Pandroid.injected.signing.key.password="$ANDROID_KEY_PASSWORD" \
+          --no-daemon
+    - name: Cleanup keystore
+      run: shred -u "$ANDROID_KEYSTORE_PATH" || rm -f "$ANDROID_KEYSTORE_PATH"
+    - eas/upload_artifact:
+        path: app/build/outputs/apk/release/app-release.apk
+        type: apk
