@@ -81,10 +81,8 @@ class HierarchicalCatalogueRepository(
 
             if (!snapshot.isEmpty) {
                 val doc = snapshot.documents.first()
-                // Parse Firestore data into ProjectCatalogue
-                // This would be a complex mapping - for now return null to use fallback
                 Log.d(TAG, "Found catalogue in Firestore: ${doc.id}")
-                null // TODO: Implement full Firestore parsing
+                parseFirestoreCatalogue(doc.data ?: emptyMap())
             } else {
                 Log.d(TAG, "No catalogue found in Firestore, using fallback data")
                 null
@@ -96,6 +94,151 @@ class HierarchicalCatalogueRepository(
     }
 
 
+
+    /**
+     * Parse a Firestore document map into a [ProjectCatalogue].
+     * Falls back to the in-memory fallback catalogue when required fields are missing.
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun parseFirestoreCatalogue(data: Map<String, Any>): ProjectCatalogue? {
+        return try {
+            val name = data["name"] as? String ?: return null
+            val description = data["description"] as? String ?: ""
+            val version = data["version"] as? String ?: "1.0"
+            val id = data["id"] as? String ?: UUID.randomUUID().toString()
+
+            val rawProjectTypes = data["projectTypes"] as? List<Map<String, Any>> ?: emptyList()
+            val projectTypes = rawProjectTypes.mapNotNull { pt -> parseProjectType(pt) }
+
+            if (projectTypes.isEmpty()) {
+                Log.d(TAG, "Firestore catalogue has no project types — using fallback")
+                return null
+            }
+
+            ProjectCatalogue(id = id, name = name, description = description, version = version, projectTypes = projectTypes)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing Firestore catalogue, using fallback", e)
+            null
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun parseProjectType(data: Map<String, Any>): ProjectType? {
+        return try {
+            val name = data["name"] as? String ?: return null
+            val id = data["id"] as? String ?: UUID.randomUUID().toString()
+            val description = data["description"] as? String ?: ""
+            val code = data["code"] as? String ?: name.take(2).uppercase()
+
+            val contextMode = runCatching {
+                ContextMode.valueOf(data["contextMode"] as? String ?: "NEW_CONSTRUCTION")
+            }.getOrDefault(ContextMode.NEW_CONSTRUCTION)
+
+            val rawTrades = data["trades"] as? List<Map<String, Any>> ?: emptyList()
+            val trades = rawTrades.mapNotNull { t -> parseTradeIndex(t) }
+
+            ProjectType(
+                id = id,
+                name = name,
+                description = description,
+                code = code,
+                contextMode = contextMode,
+                applicablePhases = emptyList(),
+                trades = trades
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing project type", e)
+            null
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun parseTradeIndex(data: Map<String, Any>): TradeIndex? {
+        return try {
+            val tradeName = data["tradeName"] as? String ?: return null
+            val id = data["id"] as? String ?: UUID.randomUUID().toString()
+            val tradeCode = data["tradeCode"] as? String ?: tradeName.take(3).uppercase()
+            val description = data["description"] as? String ?: ""
+            val workDescription = data["workDescription"] as? String ?: ""
+            val avgLaborRate = (data["avgLaborRate"] as? Number)?.toDouble() ?: 0.0
+
+            val rawMaster = data["masterAssembly"] as? Map<String, Any> ?: emptyMap()
+            val masterAssembly = parseMasterAssembly(rawMaster, tradeCode)
+
+            TradeIndex(
+                id = id,
+                tradeName = tradeName,
+                tradeCode = tradeCode,
+                description = description,
+                workDescription = workDescription,
+                lifecyclePhase = HomeLifecyclePhase.CONSTRUCTION,
+                masterAssembly = masterAssembly,
+                avgLaborRate = avgLaborRate
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing trade index", e)
+            null
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun parseMasterAssembly(data: Map<String, Any>, tradeCode: String): MasterAssembly {
+        val id = data["id"] as? String ?: UUID.randomUUID().toString()
+        val name = data["name"] as? String ?: "$tradeCode Master Assembly"
+        val description = data["description"] as? String ?: ""
+        val totalHours = (data["totalEstimatedHours"] as? Number)?.toDouble() ?: 0.0
+        val totalCost = (data["totalEstimatedCost"] as? Number)?.toDouble() ?: 0.0
+
+        val rawAssemblies = data["assemblies"] as? List<Map<String, Any>> ?: emptyList()
+        val assemblies = rawAssemblies.mapNotNull { a -> parseDetailedAssembly(a) }
+
+        return MasterAssembly(
+            id = id,
+            name = name,
+            description = description,
+            tradeCode = tradeCode,
+            assemblies = assemblies,
+            subAssemblies = emptyList(),
+            totalEstimatedHours = totalHours,
+            totalEstimatedCost = totalCost
+        )
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun parseDetailedAssembly(data: Map<String, Any>): DetailedAssembly? {
+        return try {
+            val name = data["name"] as? String ?: return null
+            val id = data["id"] as? String ?: UUID.randomUUID().toString()
+            val category = data["category"] as? String ?: ""
+            val description = data["description"] as? String ?: ""
+            val workDescription = data["workDescription"] as? String ?: description
+
+            val unitType = runCatching {
+                UnitType.valueOf(data["defaultQuantityUnit"] as? String ?: "EA")
+            }.getOrDefault(UnitType.EA)
+
+            val lifecyclePhase = runCatching {
+                HomeLifecyclePhase.valueOf(data["lifecyclePhase"] as? String ?: "CONSTRUCTION")
+            }.getOrDefault(HomeLifecyclePhase.STRUCTURE)
+
+            DetailedAssembly(
+                id = id,
+                name = name,
+                category = category,
+                description = description,
+                workDescription = workDescription,
+                validModes = listOf(ContextMode.NEW_CONSTRUCTION, ContextMode.REMODELING),
+                defaultQuantityUnit = unitType,
+                baseQuantity = (data["baseQuantity"] as? Number)?.toDouble() ?: 1.0,
+                lifecyclePhase = lifecyclePhase,
+                tasks = emptyList(),
+                macroTasks = emptyList()
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing assembly", e)
+            null
+        }
+    }
 
     /**
      * Synchronous fallback catalogue loading for error cases
@@ -287,9 +430,8 @@ class HierarchicalCatalogueRepository(
                 val doc = snapshot.documents.first()
                 val data = doc.data
                 if (data != null) {
-                    // Parse Firestore data into TradeIndex
-                    Log.d(TAG, "Loaded Framing trade from Firestore")
-                    // TODO: Implement full Firestore parsing for TradeIndex
+                    Log.d(TAG, "Loaded Framing trade from Firestore: ${doc.id}")
+                    parseTradeIndex(data)?.let { return@try it }
                 }
             }
 
@@ -452,8 +594,7 @@ class HierarchicalCatalogueRepository(
     }
 
     /**
-     * Helper method to create an empty TradeIndex structure
-     * TODO: Replace with Firestore data loading
+     * Helper method to create an empty TradeIndex structure used as fallback.
      */
     private fun createEmptyTradeIndex(
         tradeName: String,

@@ -661,27 +661,213 @@ class LivingEnv : EnvironmentMesh {
         }
     }
     
-    // Placeholder implementations for complex methods
-    private fun handleAgentStatusChange(agentType: AgentType, status: SystemStatus) {}
-    private fun calculateSystemLoad(): Float = 0.5f
-    private fun assessNetworkQuality(): NetworkQuality = NetworkQuality.GOOD
-    private fun recordBroadcastMetrics(message: AgentMessage, recipients: Int, successCount: Int) {}
-    private fun notifyAgentsOfContextChange(context: EnvironmentContext) {}
-    private fun recordContextChange(context: EnvironmentContext) {}
-    private fun gatherEnvironmentMetrics(): Map<String, Any> = mapOf()
-    private fun identifyBottlenecks(metrics: Map<String, Any>): List<String> = listOf()
-    private fun generateOptimizations(bottlenecks: List<String>): List<String> = listOf()
-    private fun applyAdaptations(optimizations: List<String>): List<String> = listOf()
-    private fun calculatePerformanceImprovement(metrics: Map<String, Any>, adaptations: List<String>): Double = 0.1
-    private fun calculateNetworkHealthScore(latency: Double, throughput: Double, errorRate: Double, congestion: String): Double = 0.8
-    private fun generateNetworkRecommendations(health: Double, latency: Double, throughput: Double, errorRate: Double): List<String> = listOf()
-    private fun updateEnvironmentConfiguration(results: Map<String, Any>) {}
-    private fun calculateAdaptationEffectiveness(results: Map<String, Any>): Double = 0.85
-    private fun createCollaborationContext(request: AgentCollaborationRequest, agents: List<NextGenAgent>): Map<String, Any> = mapOf()
-    private fun designCommunicationPlan(context: Map<String, Any>): List<String> = listOf()
-    private fun coordinateCollaboration(agents: List<NextGenAgent>, plan: List<String>): String = "coordinated"
-    private fun predictCollaborationOutcome(coordination: String): String = "successful"
-    private fun shouldTriggerAdaptation(message: AgentMessage): Boolean = false
-    private fun calculateMessagesPerSecond(): Double = 10.0
-    private fun calculateAverageLatency(): Double = 50.0
+    private fun handleAgentStatusChange(agentType: AgentType, status: SystemStatus) {
+        Log.w("LivingEnv", "Agent status change: $agentType → $status")
+        agentStatuses[agentType] = status
+        if (status == SystemStatus.ERROR || status == SystemStatus.SHUTDOWN) {
+            registeredAgents.remove(agentType)
+            agentChannels[agentType]?.close()
+            agentChannels.remove(agentType)
+            scope.launch { updateEnvironmentContext() }
+        }
+    }
+
+    private fun calculateSystemLoad(): Float {
+        val rt = Runtime.getRuntime()
+        return ((rt.totalMemory() - rt.freeMemory()).toFloat() / rt.maxMemory().toFloat()).coerceIn(0f, 1f)
+    }
+
+    private fun assessNetworkQuality(): NetworkQuality {
+        val errorRate = networkMonitor.calculateErrorRate()
+        val latency = networkMonitor.measureAverageLatency()
+        return when {
+            errorRate > 0.1 || latency > 500 -> NetworkQuality.POOR
+            errorRate > 0.05 || latency > 200 -> NetworkQuality.FAIR
+            else -> NetworkQuality.GOOD
+        }
+    }
+
+    private fun recordBroadcastMetrics(message: AgentMessage, recipients: Int, successCount: Int) {
+        val rate = if (recipients > 0) successCount.toDouble() / recipients else 1.0
+        Log.d("LivingEnv", "Broadcast [${message.messageType}] → $successCount/$recipients (${(rate * 100).toInt()}%)")
+        val record = CommunicationRecord(
+            messageId = message.id,
+            fromAgent = message.fromAgent,
+            toAgent = message.fromAgent,
+            messageType = message.messageType,
+            success = successCount > 0,
+            timestamp = LocalDateTime.now(),
+            latency = 0.0
+        )
+        communicationHistory.add(record)
+        if (communicationHistory.size > 10_000) communicationHistory.removeAt(0)
+    }
+
+    private fun notifyAgentsOfContextChange(context: EnvironmentContext) {
+        scope.launch {
+            val notification = AgentMessage(
+                fromAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR,
+                toAgent = AgentType.COO_OPERATIONS_ORCHESTRATOR,
+                messageType = MessageType.STATUS_UPDATE,
+                content = "Environment context updated",
+                metadata = mapOf(
+                    "event" to "context_change",
+                    "environment_type" to context.environmentType.name,
+                    "active_agents" to context.activeAgents.size.toString(),
+                    "system_load" to context.systemLoad.toString(),
+                    "network_quality" to context.networkQuality.name
+                )
+            )
+            registeredAgents.keys.forEach { agentType ->
+                routeMessageToAgent(notification.copy(toAgent = agentType))
+            }
+        }
+    }
+
+    private fun recordContextChange(context: EnvironmentContext) {
+        Log.d("LivingEnv", "Context recorded — env: ${context.environmentType}, agents: ${context.activeAgents.size}, load: ${context.systemLoad}")
+        environmentMetrics.add(EnvironmentMetrics(
+            timestamp = LocalDateTime.now(),
+            activeAgents = registeredAgents.size,
+            messagesPerSecond = calculateMessagesPerSecond(),
+            averageLatency = calculateAverageLatency(),
+            systemLoad = context.systemLoad,
+            networkQuality = context.networkQuality
+        ))
+        if (environmentMetrics.size > 1_000) environmentMetrics.removeAt(0)
+    }
+
+    private fun gatherEnvironmentMetrics(): Map<String, Any> {
+        val rt = Runtime.getRuntime()
+        val usedMem = rt.totalMemory() - rt.freeMemory()
+        return mapOf(
+            "active_agents" to registeredAgents.size,
+            "history_size" to communicationHistory.size,
+            "memory_used_bytes" to usedMem,
+            "memory_max_bytes" to rt.maxMemory(),
+            "memory_pct" to (usedMem.toDouble() / rt.maxMemory() * 100).toInt(),
+            "timestamp" to LocalDateTime.now().toString()
+        )
+    }
+
+    private fun identifyBottlenecks(metrics: Map<String, Any>): List<String> {
+        val bottlenecks = mutableListOf<String>()
+        val memPct = (metrics["memory_pct"] as? Int) ?: 0
+        val histSize = (metrics["history_size"] as? Int) ?: 0
+        if (memPct > 80) bottlenecks.add("high_memory:${memPct}pct")
+        if (histSize > 8_000) bottlenecks.add("large_history:$histSize")
+        if (registeredAgents.isEmpty()) bottlenecks.add("no_active_agents")
+        return bottlenecks
+    }
+
+    private fun generateOptimizations(bottlenecks: List<String>): List<String> =
+        bottlenecks.map { b ->
+            when {
+                b.startsWith("high_memory") -> "optimize_message_queues"
+                b.startsWith("large_history") -> "prune_old_records"
+                b.startsWith("no_active_agents") -> "restart_core_agents"
+                else -> "log_and_monitor"
+            }
+        }
+
+    private fun applyAdaptations(optimizations: List<String>): List<String> {
+        val applied = mutableListOf<String>()
+        optimizations.forEach { opt ->
+            when (opt) {
+                "optimize_message_queues", "prune_old_records" -> {
+                    if (communicationHistory.size > 5_000) {
+                        communicationHistory.subList(0, communicationHistory.size / 2).clear()
+                    }
+                    applied.add(opt)
+                }
+                else -> { Log.d("LivingEnv", "Queuing adaptation for review: $opt"); applied.add(opt) }
+            }
+        }
+        return applied
+    }
+
+    private fun calculatePerformanceImprovement(metrics: Map<String, Any>, adaptations: List<String>): Double =
+        (adaptations.size * 0.05).coerceAtMost(0.5)
+
+    private fun calculateNetworkHealthScore(latency: Double, throughput: Double, errorRate: Double, congestion: String): Double {
+        val l = (1.0 - (latency / 1000.0).coerceIn(0.0, 1.0))
+        val t = (throughput / 10_000.0).coerceIn(0.0, 1.0)
+        val e = (1.0 - errorRate.coerceIn(0.0, 1.0))
+        val c = when (congestion) { "low" -> 1.0; "medium" -> 0.7; else -> 0.3 }
+        return ((l + t + e + c) / 4.0).coerceIn(0.0, 1.0)
+    }
+
+    private fun generateNetworkRecommendations(health: Double, latency: Double, throughput: Double, errorRate: Double): List<String> {
+        val recs = mutableListOf<String>()
+        if (health < 0.5) recs.add("Network health critical (${(health * 100).toInt()}%) — investigate immediately")
+        if (latency > 200) recs.add("High latency ${latency}ms — check message routing")
+        if (throughput < 100) recs.add("Low throughput ${throughput}/s — consider message batching")
+        if (errorRate > 0.05) recs.add("Error rate ${(errorRate * 100).toInt()}% — check agent availability")
+        return recs
+    }
+
+    private fun updateEnvironmentConfiguration(results: Map<String, Any>) {
+        val failures = results.values.count { it == false }
+        val successes = results.values.count { it == true }
+        Log.i("LivingEnv", "Adaptation results — success: $successes, failed: $failures")
+        results.forEach { (adaptation, result) ->
+            when (adaptation) {
+                "consolidate_resources" -> {
+                    if (environmentMetrics.size > 500)
+                        environmentMetrics.subList(0, environmentMetrics.size / 2).clear()
+                }
+                else -> Log.d("LivingEnv", "Adaptation '$adaptation': $result")
+            }
+        }
+    }
+
+    private fun calculateAdaptationEffectiveness(results: Map<String, Any>): Double {
+        if (results.isEmpty()) return 1.0
+        return (results.values.count { it == true }.toDouble() / results.size).coerceIn(0.0, 1.0)
+    }
+
+    private fun createCollaborationContext(request: AgentCollaborationRequest, agents: List<NextGenAgent>): Map<String, Any> =
+        mapOf(
+            "request_id" to request.id,
+            "objective" to request.objective,
+            "timeframe" to request.timeframe,
+            "participant_count" to agents.size,
+            "participant_types" to agents.map { it.agentType.name },
+            "constraints" to request.constraints,
+            "created_at" to LocalDateTime.now().toString()
+        )
+
+    private fun designCommunicationPlan(context: Map<String, Any>): List<String> {
+        val count = (context["participant_count"] as? Int) ?: 0
+        return when {
+            count <= 2 -> listOf("direct_messaging", "shared_context")
+            count <= 5 -> listOf("hub_spoke_routing", "shared_context", "status_broadcasts")
+            else -> listOf("hierarchical_routing", "shared_context", "batched_updates", "coordinator_agent")
+        }
+    }
+
+    private fun coordinateCollaboration(agents: List<NextGenAgent>, plan: List<String>): String =
+        if (agents.isEmpty()) "no_participants"
+        else if (plan.contains("coordinator_agent")) "hierarchical_coordination"
+        else "peer_coordination"
+
+    private fun predictCollaborationOutcome(coordination: String): String = when (coordination) {
+        "hierarchical_coordination" -> "structured_outcome_likely"
+        "peer_coordination" -> "collaborative_outcome_likely"
+        else -> "outcome_uncertain"
+    }
+
+    private fun shouldTriggerAdaptation(message: AgentMessage): Boolean =
+        communicationHistory.takeLast(10).count { !it.success } >= 3
+
+    private fun calculateMessagesPerSecond(): Double {
+        if (communicationHistory.size < 2) return 0.0
+        val recent = communicationHistory.takeLast(100)
+        if (recent.size < 2) return 0.0
+        val durationSec = java.time.Duration.between(recent.first().timestamp, recent.last().timestamp).toMillis() / 1000.0
+        return if (durationSec > 0) recent.size / durationSec else 0.0
+    }
+
+    private fun calculateAverageLatency(): Double =
+        communicationHistory.takeLast(50).map { it.latency }.average().takeIf { !it.isNaN() } ?: 0.0
 }

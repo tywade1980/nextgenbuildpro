@@ -7,9 +7,11 @@ import com.nextgenbuildpro.core.DateUtils
 import com.nextgenbuildpro.pm.data.model.Estimate
 import com.nextgenbuildpro.pm.data.model.EstimateItem
 import com.nextgenbuildpro.pm.data.model.EstimateStatus
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.tasks.await
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -20,8 +22,26 @@ import java.util.Locale
  * Repository for managing estimates in the PM module
  */
 class EstimateRepository(private val context: Context) : Repository<Estimate> {
+    private val db = FirebaseFirestore.getInstance()
+    private val estimatesCollection = db.collection("estimates")
+
     private val _estimates = MutableStateFlow<List<Estimate>>(emptyList())
     val estimates: StateFlow<List<Estimate>> = _estimates.asStateFlow()
+
+    suspend fun loadFromFirestore() {
+        try {
+            val snapshot = estimatesCollection.get().await()
+            val loaded = snapshot.documents.mapNotNull { doc ->
+                try { doc.toObject(Estimate::class.java) } catch (e: Exception) { null }
+            }
+            if (loaded.isNotEmpty()) {
+                _estimates.value = loaded
+                Log.i(TAG, "Loaded ${loaded.size} estimates from Firestore")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading estimates from Firestore: ${e.message}", e)
+        }
+    }
 
     private val _componentTree = MutableStateFlow<JSONObject?>(null)
     private val _assemblyLibrary = MutableStateFlow<JSONArray?>(null)
@@ -50,12 +70,13 @@ class EstimateRepository(private val context: Context) : Repository<Estimate> {
      * Save a new estimate
      */
     override suspend fun save(item: Estimate): Boolean {
-        try {
+        return try {
+            estimatesCollection.document(item.id).set(item).await()
             _estimates.value = _estimates.value + item
-            return true
+            true
         } catch (e: Exception) {
-            Log.e(TAG, "Error saving estimate: ${e.message}")
-            return false
+            Log.e(TAG, "Error saving estimate to Firestore: ${e.message}", e)
+            false
         }
     }
 
@@ -63,14 +84,13 @@ class EstimateRepository(private val context: Context) : Repository<Estimate> {
      * Update an existing estimate
      */
     override suspend fun update(item: Estimate): Boolean {
-        try {
-            _estimates.value = _estimates.value.map { 
-                if (it.id == item.id) item else it 
-            }
-            return true
+        return try {
+            estimatesCollection.document(item.id).set(item).await()
+            _estimates.value = _estimates.value.map { if (it.id == item.id) item else it }
+            true
         } catch (e: Exception) {
-            Log.e(TAG, "Error updating estimate: ${e.message}")
-            return false
+            Log.e(TAG, "Error updating estimate in Firestore: ${e.message}", e)
+            false
         }
     }
 
@@ -78,12 +98,13 @@ class EstimateRepository(private val context: Context) : Repository<Estimate> {
      * Delete an estimate by ID
      */
     override suspend fun delete(id: String): Boolean {
-        try {
+        return try {
+            estimatesCollection.document(id).delete().await()
             _estimates.value = _estimates.value.filter { it.id != id }
-            return true
+            true
         } catch (e: Exception) {
-            Log.e(TAG, "Error deleting estimate: ${e.message}")
-            return false
+            Log.e(TAG, "Error deleting estimate from Firestore: ${e.message}", e)
+            false
         }
     }
 

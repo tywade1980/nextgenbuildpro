@@ -50,11 +50,11 @@ class CostDatabaseRepository : BaseFirestoreRepository() {
             
             if (laborRateCount == 0) {
                 Log.i(TAG, "No existing data found, seeding with baseline data")
-                await seedBaselineData(costDataService)
+                seedBaselineData(costDataService)
             }
-            
+
             // Load data into local cache
-            await loadDataFromFirestore()
+            loadDataFromFirestore()
             
             _isInitialized.value = true
             Log.i(TAG, "Cost database initialized successfully")
