@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextGenTele - Next-Generation Telecommunication System</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="logo">
+                    <i class="fas fa-phone"></i>
+                    <h1>NextGenTele</h1>
+                </div>
+                <nav class="nav">
+                    <button id="loginBtn" class="btn btn-primary">Login</button>
+                    <button id="registerBtn" class="btn btn-secondary">Register</button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Login/Register Section -->
+            <div id="authSection" class="auth-section">
+                <div class="container">
+                    <div class="auth-container">
+                        <div class="auth-tabs">
+                            <button id="loginTab" class="tab-btn active">Login</button>
+                            <button id="registerTab" class="tab-btn">Register</button>
+                        </div>
+                        
+                        <!-- Login Form -->
+                        <div id="loginForm" class="auth-form">
+                            <h2>Login to NextGenTele</h2>
+                            <form id="loginFormData">
+                                <div class="form-group">
+                                    <label for="loginUsername">Username or Email</label>
+                                    <input type="text" id="loginUsername" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="loginPassword">Password</label>
+                                    <input type="password" id="loginPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-full">Login</button>
+                            </form>
+                        </div>
+
+                        <!-- Register Form -->
+                        <div id="registerForm" class="auth-form" style="display: none;">
+                            <h2>Register for NextGenTele</h2>
+                            <form id="registerFormData">
+                                <div class="form-group">
+                                    <label for="registerUsername">Username</label>
+                                    <input type="text" id="registerUsername" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="registerEmail">Email</label>
+                                    <input type="email" id="registerEmail" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="registerPhone">Phone Number</label>
+                                    <input type="tel" id="registerPhone">
+                                </div>
+                                <div class="form-group">
+                                    <label for="registerPassword">Password</label>
+                                    <input type="password" id="registerPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-full">Register</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dialer Interface -->
+            <div id="dialerSection" class="dialer-section" style="display: none;">
+                <div class="container">
+                    <!-- Call Status -->
+                    <div class="call-status">
+                        <div id="callStatus" class="status-indicator">
+                            <i class="fas fa-phone-slash"></i>
+                            <span>Ready to dial</span>
+                        </div>
+                    </div>
+
+                    <!-- Dialer Pad -->
+                    <div class="dialer-container">
+                        <div class="dialer-input">
+                            <input type="tel" id="dialerNumber" placeholder="Enter phone number">
+                            <div class="protocol-selector">
+                                <label for="protocolSelect">Protocol:</label>
+                                <select id="protocolSelect">
+                                    <option value="SIP">SIP</option>
+                                    <option value="WebRTC">WebRTC</option>
+                                    <option value="PSTN">PSTN</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="dialer-pad">
+                            <div class="pad-row">
+                                <button class="pad-btn" data-digit="1">1</button>
+                                <button class="pad-btn" data-digit="2">2<span>ABC</span></button>
+                                <button class="pad-btn" data-digit="3">3<span>DEF</span></button>
+                            </div>
+                            <div class="pad-row">
+                                <button class="pad-btn" data-digit="4">4<span>GHI</span></button>
+                                <button class="pad-btn" data-digit="5">5<span>JKL</span></button>
+                                <button class="pad-btn" data-digit="6">6<span>MNO</span></button>
+                            </div>
+                            <div class="pad-row">
+                                <button class="pad-btn" data-digit="7">7<span>PQRS</span></button>
+                                <button class="pad-btn" data-digit="8">8<span>TUV</span></button>
+                                <button class="pad-btn" data-digit="9">9<span>WXYZ</span></button>
+                            </div>
+                            <div class="pad-row">
+                                <button class="pad-btn" data-digit="*">*</button>
+                                <button class="pad-btn" data-digit="0">0<span>+</span></button>
+                                <button class="pad-btn" data-digit="#">#</button>
+                            </div>
+                        </div>
+
+                        <div class="call-controls">
+                            <button id="callBtn" class="btn btn-call">
+                                <i class="fas fa-phone"></i>
+                                Call
+                            </button>
+                            <button id="hangupBtn" class="btn btn-hangup" style="display: none;">
+                                <i class="fas fa-phone-slash"></i>
+                                Hang Up
+                            </button>
+                            <button id="holdBtn" class="btn btn-hold" style="display: none;">
+                                <i class="fas fa-pause"></i>
+                                Hold
+                            </button>
+                            <button id="muteBtn" class="btn btn-mute" style="display: none;">
+                                <i class="fas fa-microphone"></i>
+                                Mute
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI Assistant Controls -->
+                    <div class="ai-controls">
+                        <h3>AI Assistant</h3>
+                        <div class="ai-options">
+                            <label>
+                                <input type="checkbox" id="aiEnabled"> Enable AI Assistant
+                            </label>
+                            <select id="aiMode">
+                                <option value="assistant">Assistant Mode</option>
+                                <option value="conversation">Conversation Mode</option>
+                                <option value="screening">Call Screening</option>
+                                <option value="auto-answer">Auto Answer</option>
+                            </select>
+                        </div>
+                        <div class="ai-conversation-options" style="display: none;">
+                            <h4>Conversation Settings</h4>
+                            <label>
+                                Personality:
+                                <select id="aiPersonality">
+                                    <option value="friendly">Friendly</option>
+                                    <option value="professional">Professional</option>
+                                    <option value="casual">Casual</option>
+                                    <option value="empathetic">Empathetic</option>
+                                </select>
+                            </label>
+                            <button id="startConversationBtn" class="btn btn-primary" style="display: none;">
+                                Start Conversation
+                            </button>
+                        </div>
+                        <div id="aiStatus" class="ai-status"></div>
+                        <div id="conversationLog" class="conversation-log" style="display: none;">
+                            <h4>Live Conversation</h4>
+                            <div id="conversationMessages" class="conversation-messages"></div>
+                        </div>
+                    </div>
+
+                    <!-- Carrier & IVR Controls -->
+                    <div class="carrier-controls">
+                        <h3>Carrier & Transfer Options</h3>
+                        <div class="carrier-status" id="carrierStatus">
+                            <span class="status-indicator"></span>
+                            <span class="status-text">Checking carrier status...</span>
+                        </div>
+                        
+                        <div class="ivr-controls">
+                            <h4>Smart Transfer Options</h4>
+                            <div class="ivr-options">
+                                <button id="standardIVRBtn" class="btn btn-secondary">
+                                    Standard IVR Menu
+                                </button>
+                                <button id="customIVRBtn" class="btn btn-secondary">
+                                    Custom Transfer
+                                </button>
+                                <button id="emergencyFallbackBtn" class="btn btn-warning">
+                                    Emergency Fallback
+                                </button>
+                            </div>
+                            
+                            <div id="customIVRSettings" class="custom-ivr-settings" style="display: none;">
+                                <h5>Customize IVR Menu</h5>
+                                <div class="ivr-option-config">
+                                    <label>
+                                        Option 1: <input type="text" id="option1Text" placeholder="Press 1 for..." value="Press 1 to schedule a meeting">
+                                    </label>
+                                    <label>
+                                        Option 2: <input type="text" id="option2Text" placeholder="Press 2 for..." value="Press 2 for customer service">
+                                    </label>
+                                    <label>
+                                        Option 3: <input type="text" id="option3Text" placeholder="Press 3 for..." value="Press 3 for vendor relations">
+                                    </label>
+                                </div>
+                                <button id="saveIVRBtn" class="btn btn-primary">Save IVR Settings</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Agent Management -->
+                    <div class="agent-controls">
+                        <h3>Human Agent Support</h3>
+                        <div id="agentStatus" class="agent-status">
+                            <div class="agent-summary">
+                                <span id="availableAgents">0</span> available | 
+                                <span id="busyAgents">0</span> busy
+                            </div>
+                        </div>
+                        
+                        <div class="agent-options">
+                            <button id="enableGuidedModeBtn" class="btn btn-primary" style="display: none;">
+                                Enable Guided Mode
+                            </button>
+                            <button id="startTrainingBtn" class="btn btn-info" style="display: none;">
+                                Start AI Training
+                            </button>
+                            <button id="requestHumanBtn" class="btn btn-secondary">
+                                Request Human Agent
+                            </button>
+                        </div>
+                        
+                        <div id="guidedModePanel" class="guided-mode-panel" style="display: none;">
+                            <h4>Live Agent Guidance</h4>
+                            <div id="guidanceSuggestions" class="guidance-suggestions"></div>
+                            <div id="sentimentAnalysis" class="sentiment-analysis"></div>
+                        </div>
+                        
+                        <div id="trainingPanel" class="training-panel" style="display: none;">
+                            <h4>AI Training Mode</h4>
+                            <div class="training-status">
+                                <span id="trainingStatus">Training inactive</span>
+                            </div>
+                            <div id="learningPoints" class="learning-points"></div>
+                        </div>
+                    </div>
+
+                    <!-- Active Calls -->
+                    <div class="active-calls">
+                        <h3>Active Calls</h3>
+                        <div id="activeCallsList" class="calls-list">
+                            <p class="no-calls">No active calls</p>
+                        </div>
+                    </div>
+
+                    <!-- Call History -->
+                    <div class="call-history">
+                        <h3>Recent Calls</h3>
+                        <div id="callHistoryList" class="calls-list">
+                            <p class="loading">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NextGenTele. Next-generation telecommunication system with AI integration.</p>
+            </div>
+        </footer>
+
+        <!-- Notifications -->
+        <div id="notifications" class="notifications"></div>
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Main Application -->
+    <script src="/js/app.js"></script>
+</body>
+</html>

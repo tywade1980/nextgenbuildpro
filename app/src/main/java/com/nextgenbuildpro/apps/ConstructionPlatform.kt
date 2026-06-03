@@ -1,3 +1,7 @@
+@file:OptIn(
+    androidx.compose.material3.ExperimentalMaterial3Api::class,
+    androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class
+)
 package com.nextgenbuildpro.apps
 
 import com.nextgenbuildpro.shared.*

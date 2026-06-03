@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NextGenTele</string>
+    <string name="ai_call_handler_notification_title">AI Call Handler Active</string>
+    <string name="ai_call_handler_notification_text">Monitoring calls and providing AI assistance</string>
+    <string name="integration_service_notification_title">Integration Service Active</string>
+    <string name="integration_service_notification_text">Socket connections available for external apps</string>
+    <string name="incoming_call_notification_title">AI Handling Call</string>
+    <string name="incoming_call_notification_text">AI is processing incoming call</string>
+    <string name="permission_denied_message">Permissions are required for AI call handling to work properly</string>
+    <string name="default_dialer_message">Set NextGenTele as default dialer for full functionality</string>
+</resources>

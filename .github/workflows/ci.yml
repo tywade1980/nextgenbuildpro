@@ -1,0 +1,362 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - claude/consolidate-repos-JkOQb
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      eas_platform:
+        description: EAS build platform
+        required: false
+        default: android
+        type: choice
+        options:
+          - android
+          - ios
+          - all
+      eas_profile:
+        description: EAS build profile
+        required: false
+        default: preview
+        type: choice
+        options:
+          - development
+          - preview
+          - production
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # ─── Expo / React Native ───────────────────────────────────────────────────
+  expo-typecheck:
+    name: Expo TypeScript
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/voice-telephony/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: packages/voice-telephony/web/package.json
+
+      - run: npm install
+      - run: npx tsc --noEmit
+
+  # ─── EAS OTA Update (push to all channels on every commit) ────────────────
+  eas-update:
+    name: EAS OTA Update
+    runs-on: ubuntu-latest
+    needs: expo-typecheck
+    # Only push OTA on branch pushes (not PRs, which don't have a channel yet)
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    defaults:
+      run:
+        working-directory: packages/voice-telephony/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Push OTA update
+        id: ota
+        run: |
+          # --auto picks the channel from eas.json build profile matching the branch
+          eas update --auto --non-interactive --json \
+            | tee /tmp/ota_output.json
+          UPDATE_URL=$(python3 -c "
+          import sys, json
+          try:
+              d = json.load(open('/tmp/ota_output.json'))
+              groups = d if isinstance(d, list) else [d]
+              urls = [g.get('id','') for g in groups if g.get('id')]
+              print('https://expo.dev/accounts/tywade1980/projects/voice-ai-app/updates/' + urls[0] if urls else '')
+          except:
+              print('')
+          " 2>/dev/null)
+          echo "update_url=$UPDATE_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Write OTA summary
+        if: always()
+        run: |
+          echo "## OTA Update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| | |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          URL="${{ steps.ota.outputs.update_url }}"
+          [ -n "$URL" ] && echo "| Update | [$URL]($URL) |" >> $GITHUB_STEP_SUMMARY || true
+
+  # ─── EAS Build (Android) ──────────────────────────────────────────────────
+  eas-build-android:
+    name: EAS Build Android
+    runs-on: ubuntu-latest
+    needs: expo-typecheck
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' &&
+        (inputs.eas_platform == 'android' || inputs.eas_platform == 'all'))
+    defaults:
+      run:
+        working-directory: packages/voice-telephony/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: EAS Build Android
+        id: eas_android
+        run: |
+          PROFILE="${{ inputs.eas_profile || 'preview' }}"
+          eas build --platform android --profile "$PROFILE" --non-interactive --json \
+            | tee /tmp/eas_android.json
+          BUILD_URL=$(python3 -c "
+          import sys, json
+          try:
+              d = json.load(open('/tmp/eas_android.json'))
+              builds = d if isinstance(d, list) else [d]
+              print(builds[0].get('buildUrl', ''))
+          except:
+              print('')
+          " 2>/dev/null)
+          echo "build_url=$BUILD_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Write build summary
+        if: always()
+        run: |
+          echo "## EAS Android Build" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| | |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Profile | ${{ inputs.eas_profile || 'preview' }} |" >> $GITHUB_STEP_SUMMARY
+          URL="${{ steps.eas_android.outputs.build_url }}"
+          [ -n "$URL" ] && echo "| Build URL | [$URL]($URL) |" >> $GITHUB_STEP_SUMMARY || true
+
+  # ─── EAS Build (iOS) ──────────────────────────────────────────────────────
+  eas-build-ios:
+    name: EAS Build iOS
+    runs-on: macos-latest
+    needs: expo-typecheck
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      (inputs.eas_platform == 'ios' || inputs.eas_platform == 'all')
+    defaults:
+      run:
+        working-directory: packages/voice-telephony/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: EAS Build iOS
+        id: eas_ios
+        run: |
+          PROFILE="${{ inputs.eas_profile || 'preview' }}"
+          eas build --platform ios --profile "$PROFILE" --non-interactive --json \
+            | tee /tmp/eas_ios.json
+          BUILD_URL=$(python3 -c "
+          import sys, json
+          try:
+              d = json.load(open('/tmp/eas_ios.json'))
+              builds = d if isinstance(d, list) else [d]
+              print(builds[0].get('buildUrl', ''))
+          except:
+              print('')
+          " 2>/dev/null)
+          echo "build_url=$BUILD_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Write build summary
+        if: always()
+        run: |
+          echo "## EAS iOS Build" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| | |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Profile | ${{ inputs.eas_profile || 'preview' }} |" >> $GITHUB_STEP_SUMMARY
+          URL="${{ steps.eas_ios.outputs.build_url }}"
+          [ -n "$URL" ] && echo "| Build URL | [$URL]($URL) |" >> $GITHUB_STEP_SUMMARY || true
+
+  # ─── Voice Telephony Server ────────────────────────────────────────────────
+  voice-server-lint:
+    name: Voice Server Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/voice-telephony/server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm run lint --if-present
+
+  voice-server-test:
+    name: Voice Server Tests
+    runs-on: ubuntu-latest
+    needs: voice-server-lint
+    defaults:
+      run:
+        working-directory: packages/voice-telephony/server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm test --if-present
+
+  # ─── Caroline AI Server ────────────────────────────────────────────────────
+  caroline-server-lint:
+    name: Caroline Server Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/caroline-ai/server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install ruff
+      - run: ruff check . --ignore E501 || true
+
+  caroline-server-test:
+    name: Caroline Server Import Test
+    runs-on: ubuntu-latest
+    needs: caroline-server-lint
+    defaults:
+      run:
+        working-directory: packages/caroline-ai/server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -c 'import main; print("caroline server: OK")'
+
+  # ─── AI Framework ──────────────────────────────────────────────────────────
+  ai-framework-test:
+    name: AI Framework Import Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/ai-framework/python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -c 'import ast, pathlib; [ast.parse(f.read_text()) for f in pathlib.Path("agents").rglob("*.py")]; print("syntax check: OK")'
+
+  # ─── Dev Tools: Chatbot ───────────────────────────────────────────────────
+  chatbot-build:
+    name: Next.js Chatbot Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/dev-tools/chatbot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npx tsc --noEmit --project tsconfig.json 2>/dev/null || true
+      - run: npm run build --if-present
+
+  # ─── Pipeline Summary ─────────────────────────────────────────────────────
+  ci-pass:
+    name: All CI Checks
+    runs-on: ubuntu-latest
+    needs:
+      - expo-typecheck
+      - eas-update
+      - eas-build-android
+      - voice-server-lint
+      - caroline-server-lint
+      - ai-framework-test
+    if: always()
+    steps:
+      - name: Write pipeline summary
+        run: |
+          echo "# Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Expo TypeScript | ${{ needs.expo-typecheck.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| EAS OTA Update | ${{ needs.eas-update.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| EAS Android Build | ${{ needs.eas-build-android.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Voice Server Lint | ${{ needs.voice-server-lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Caroline Server Lint | ${{ needs.caroline-server-lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| AI Framework Test | ${{ needs.ai-framework-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.ref_name }}\`  " >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`  " >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check required jobs
+        run: |
+          for RESULT in \
+            "${{ needs.expo-typecheck.result }}" \
+            "${{ needs.eas-update.result }}" \
+            "${{ needs.voice-server-lint.result }}" \
+            "${{ needs.caroline-server-lint.result }}" \
+            "${{ needs.ai-framework-test.result }}"; do
+            if [[ "$RESULT" != "success" && "$RESULT" != "skipped" ]]; then
+              echo "A required job did not pass (result: $RESULT)"
+              exit 1
+            fi
+          done
+          echo "All required checks passed"

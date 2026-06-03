@@ -1,0 +1,33 @@
+# Source files
+src/
+tsconfig.json
+.vscode/
+
+# Build artifacts  
+.vscode-test
+.vscode-test/**
+
+# Node modules
+node_modules
+node_modules/**
+
+# Development files
+*.map
+*.ts
+!*.d.ts
+
+# Git
+.git
+.gitignore
+
+# Documentation (keep only essential)
+CONTRIBUTING.md
+
+# Test files
+test/
+tests/
+**/*.test.*
+
+# Misc
+.DS_Store
+Thumbs.db

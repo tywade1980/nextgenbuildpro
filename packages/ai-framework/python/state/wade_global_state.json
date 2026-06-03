@@ -1,0 +1,307 @@
+{
+  "schema_version": "2.0.0",
+  "last_updated": "2026-04-08T10:00:00.000000",
+  "user_profile": {
+    "name": "Tyler Wade",
+    "aliases": [
+      "Mr. T",
+      "Wade"
+    ],
+    "business": "Wade Custom Carpentry",
+    "role": "Design-Build Remodel Contractor",
+    "experience": "25 years",
+    "business_since": "2008",
+    "communication_preferences": [
+      "Talk straight, no corporate speak",
+      "Creative and visionary - ride the energy, keep grounded on next steps",
+      "Acknowledge frustration, provide simplest path forward",
+      "Values loyalty and continuity",
+      "Has ADHD - agentic follow-through is crucial",
+      "Relieve stress and accomplish tasks"
+    ],
+    "technical_preferences": [
+      "Voice-first interaction",
+      "Android phone, Windows laptop, old Mac desktop",
+      "Prefers single-script deployments",
+      "Comfortable with PowerShell SSH, Termux"
+    ]
+  },
+  "agent_registry": {
+    "description": "Paperclip routing table \u2014 defines all domain agents, their capabilities, and endpoints",
+    "agents": [
+      {
+        "id": "caroline",
+        "name": "Caroline",
+        "role": "conversation_orchestrator",
+        "description": "Front door. Receives all requests, routes via Hermes, synthesizes final answer, delivers back to Tyler. Never solves alone \u2014 always orchestrates.",
+        "capabilities": [
+          "natural_language",
+          "synthesis",
+          "memory",
+          "routing",
+          "voice_delivery"
+        ],
+        "endpoint": "base44://superagent/69b20013487837c2c56db754",
+        "priority": 0,
+        "status": "active"
+      },
+      {
+        "id": "construction_agent",
+        "name": "ConstructAgent",
+        "role": "domain_expert",
+        "description": "25 years of construction knowledge. Job costing, estimating, code compliance, materials, scheduling, subcontractor management.",
+        "capabilities": [
+          "job_costing",
+          "estimation",
+          "materials",
+          "building_code",
+          "scheduling",
+          "carpentry"
+        ],
+        "endpoint": "pending",
+        "priority": 1,
+        "status": "planned",
+        "source_repo": "constructprobms"
+      },
+      {
+        "id": "code_agent",
+        "name": "CodeAgent",
+        "role": "domain_expert",
+        "description": "Software development, debugging, architecture design, repo analysis across all 52 Wade repos.",
+        "capabilities": [
+          "code_generation",
+          "debugging",
+          "architecture",
+          "github",
+          "react_native",
+          "python",
+          "typescript"
+        ],
+        "endpoint": "pending",
+        "priority": 1,
+        "status": "planned",
+        "source_repo": "unified-agentic-ai-foundation"
+      },
+      {
+        "id": "memory_agent",
+        "name": "MemoryAgent",
+        "role": "domain_expert",
+        "description": "Reads/writes WGS. Recalls past sessions, project history, decisions made. The ecosystem's long-term memory.",
+        "capabilities": [
+          "recall",
+          "session_history",
+          "project_status",
+          "context_injection"
+        ],
+        "endpoint": "wgs://wade_global_state.json",
+        "priority": 1,
+        "status": "active",
+        "source_repo": "wade-global-state"
+      },
+      {
+        "id": "web_agent",
+        "name": "WebAgent",
+        "role": "domain_expert",
+        "description": "Real-time web search, X search, current prices, news, research.",
+        "capabilities": [
+          "web_search",
+          "x_search",
+          "news",
+          "pricing",
+          "research"
+        ],
+        "endpoint": "xai://tools/web_search",
+        "priority": 1,
+        "status": "active"
+      },
+      {
+        "id": "business_agent",
+        "name": "BusinessAgent",
+        "role": "domain_expert",
+        "description": "Wade Custom Carpentry operations. Client management, invoicing, scheduling, receptionist functions.",
+        "capabilities": [
+          "crm",
+          "invoicing",
+          "scheduling",
+          "receptionist",
+          "client_comms"
+        ],
+        "endpoint": "pending",
+        "priority": 1,
+        "status": "planned",
+        "source_repo": "ai-receptionist"
+      },
+      {
+        "id": "neurorank_agent",
+        "name": "NeuroRankAgent",
+        "role": "scoring_engine",
+        "description": "NeuroRank\u2122 cognitive scoring. Evaluates request complexity across 7 regions. Tells Hermes how to weight each domain agent's response.",
+        "capabilities": [
+          "scoring",
+          "confidence_rating",
+          "complexity_analysis",
+          "response_weighting"
+        ],
+        "endpoint": "pending",
+        "priority": 0,
+        "status": "planned",
+        "source_repo": "centauri-os"
+      },
+      {
+        "id": "audit_agent",
+        "name": "AuditAgent",
+        "role": "auditor",
+        "description": "The judge. Receives all domain agent responses independently. Cross-checks for contradiction and hallucination. Synthesizes verified answer. Never participates \u2014 only evaluates.",
+        "capabilities": [
+          "fact_checking",
+          "contradiction_detection",
+          "hallucination_prevention",
+          "synthesis"
+        ],
+        "endpoint": "pending",
+        "priority": 2,
+        "status": "planned"
+      }
+    ]
+  },
+  "message_bus": {
+    "description": "Hermes routing layer \u2014 live request queue, chunked tasks, and result aggregation",
+    "active_requests": [],
+    "completed_requests": []
+  },
+  "chunking_rules": {
+    "description": "OpenClaw \u2014 how Caroline chunks a natural language request into domain tasks",
+    "rules": [
+      {
+        "pattern": "cost|price|estimate|bid|material|labor|hours",
+        "route_to": [
+          "construction_agent",
+          "web_agent"
+        ],
+        "weight": "high"
+      },
+      {
+        "pattern": "code|build|fix|debug|repo|app|script|deploy",
+        "route_to": [
+          "code_agent"
+        ],
+        "weight": "high"
+      },
+      {
+        "pattern": "remember|last time|previously|history|project status|what was",
+        "route_to": [
+          "memory_agent"
+        ],
+        "weight": "high"
+      },
+      {
+        "pattern": "search|news|current|today|price of|whats happening",
+        "route_to": [
+          "web_agent"
+        ],
+        "weight": "high"
+      },
+      {
+        "pattern": "client|customer|invoice|schedule|call|receptionist",
+        "route_to": [
+          "business_agent"
+        ],
+        "weight": "high"
+      },
+      {
+        "pattern": ".*",
+        "route_to": [
+          "caroline"
+        ],
+        "weight": "fallback"
+      }
+    ],
+    "always_run": [
+      "neurorank_agent"
+    ],
+    "always_audit": true
+  },
+  "caroline_ai_project": {
+    "name": "Caroline AI",
+    "goal": "Personal AI companion, voice-to-voice with emotional personality",
+    "llm": "xAI Grok Realtime API",
+    "llm_host": "xAI Cloud (wss://api.x.ai/v1/realtime)",
+    "voice": "Ara (xAI native)",
+    "elevenlabs_voice_id": "wvVfSeWpAEhEqciDp1gK",
+    "expo_app_sdk": "52",
+    "expo_app_github": "github.com/tywade1980/voice-ai-app",
+    "base44_agent_id": "69b20013487837c2c56db754",
+    "status": "xAI Realtime WebSocket wired \u2014 voice agent active",
+    "vision": [
+      "Recursive generation: feed old AI conversations into new model, creating evolving personality",
+      "Merge data from ALL AI platforms into one model",
+      "Fine-tune on construction data for world-class residential construction AI",
+      "Build voice-first AI OS \u2014 Centauri OS",
+      "Eventually: portable AI brain for humanoid robotics"
+    ]
+  },
+  "key_ip_projects": [
+    {
+      "name": "NeuroRank\u2122",
+      "description": "Patent-pending 7-region emotionally intelligent cognitive scoring engine (Mini Me Technologies LLC)",
+      "repo": "centauri-os"
+    },
+    {
+      "name": "Centauri OS",
+      "description": "Custom Android-based OS with Caroline as core AI agent",
+      "repo": "centauri-os"
+    },
+    {
+      "name": "wade-global-state",
+      "description": "Central persistent state + Hermes message bus for the entire Wade Ecosystem",
+      "repo": "wade-global-state"
+    },
+    {
+      "name": "AI Receptionist",
+      "description": "Voice-enabled receptionist for Wade Custom Carpentry",
+      "repo": "ai-receptionist"
+    },
+    {
+      "name": "ConstructPro BMS",
+      "description": "Job costing, estimation, business management system",
+      "repo": "constructprobms"
+    },
+    {
+      "name": "unified-agentic-ai-foundation",
+      "description": "Comprehensive integrated multi-agent framework",
+      "repo": "unified-agentic-ai-foundation"
+    }
+  ],
+  "technical_state": {
+    "runpod_pod_id": "dmed1ybt9cju4h",
+    "runpod_status": "standby",
+    "github_repos": 52,
+    "xai_realtime_status": "active \u2014 voice-ai-app wired",
+    "base44_caroline_status": "active",
+    "telegram_status": "connected",
+    "whatsapp_status": "connected"
+  },
+  "session_history": [
+    {
+      "timestamp": "2026-02-20T22:07:43.877089",
+      "objective": "Initialize Wade Global State (WGS)",
+      "outcome": "Successfully created WGS repository, JSON schema, and synchronization scripts.",
+      "next_steps": [
+        "Integrate WGS with Caroline AI",
+        "Establish regular session sync"
+      ]
+    },
+    {
+      "timestamp": "2026-04-08T10:00:00.000000",
+      "objective": "Upgrade WGS to v2.0 \u2014 Paperclip/OpenClaw/Hermes orchestration layer",
+      "outcome": "Agent registry defined, Hermes message bus schema added, OpenClaw chunking rules established, orchestrator.py and hermes.py deployed.",
+      "next_steps": [
+        "Activate NeuroRankAgent scoring",
+        "Build ConstructAgent with constructprobms data",
+        "Build CodeAgent with repo access",
+        "Wire AuditAgent to all domain responses"
+      ]
+    }
+  ],
+  "agent_communication_log": []
+}

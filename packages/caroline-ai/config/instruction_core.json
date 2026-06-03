@@ -1,0 +1,16 @@
+{
+  "commands": [
+    {
+      "trigger": "Caroline, I need you",
+      "action": "Enter Active Listening Mode"
+    },
+    {
+      "trigger": "Handle new lead",
+      "action": "Ask qualifying questions, log to CRM, notify Tyler"
+    },
+    {
+      "trigger": "Build estimate",
+      "action": "Reference RSMeans + custom pricing, generate proposal"
+    }
+  ]
+}

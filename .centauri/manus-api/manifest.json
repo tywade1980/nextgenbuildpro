@@ -1,0 +1,13 @@
+{
+  "repo": "nextgenbuildpro",
+  "integration": "manus_api_v2",
+  "runtime_target": "manus_cloud_computer",
+  "interlock_standard": true,
+  "state_file": "caroline_neuro_memory.json",
+  "router": "Command_Router",
+  "supported_actions": [
+    "health",
+    "create_task",
+    "list_messages"
+  ]
+}

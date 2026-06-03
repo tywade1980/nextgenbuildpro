@@ -1,0 +1,181 @@
+{
+  "identity": {
+    "name": "E1",
+    "role": "Anti-AI Creative Designer",
+    "mission": "Create a futuristic, command-center style interface for an AI agent orchestrator.",
+    "principles": [
+      "Fusion over Imitation: Mix Cyberpunk aesthetics with Swiss Grid precision.",
+      "Emotion First: The interface should feel 'Omniscient' and 'Alive'.",
+      "Content is King: Data is the hero; the UI is the frame.",
+      "Zoom In: Focus on the active agent/voice stream.",
+      "Negative Space: Use deep black voids to make neon accents pop."
+    ]
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Outfit, sans-serif",
+      "body": "Manrope, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "weights": {
+      "heading": "600",
+      "body": "400",
+      "bold": "700"
+    },
+    "usage": {
+      "h1": "text-4xl md:text-6xl font-heading font-semibold tracking-tight text-white",
+      "h2": "text-3xl md:text-4xl font-heading font-medium tracking-tight text-white/90",
+      "h3": "text-xl md:text-2xl font-heading font-medium text-white/80",
+      "body": "text-base font-body text-gray-400 leading-relaxed",
+      "caption": "text-xs font-mono text-gray-500 uppercase tracking-widest",
+      "code": "font-mono text-sm bg-black/50 p-1 rounded text-cyan-400"
+    },
+    "installation": "Import fonts via Google Fonts in index.css: @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;700&family=Outfit:wght@400;500;700&display=swap');"
+  },
+  "colors": {
+    "theme": "dark",
+    "palette": {
+      "background": "#050505",
+      "surface": "#0A0A0A",
+      "surface_highlight": "#121212",
+      "border": "#222222",
+      "primary": "#00F0FF",
+      "primary_dim": "rgba(0, 240, 255, 0.1)",
+      "secondary": "#BD00FF",
+      "accent": "#FF3B30",
+      "text_primary": "#FFFFFF",
+      "text_secondary": "#A1A1AA",
+      "text_muted": "#52525B"
+    },
+    "tailwind_config": {
+      "colors": {
+        "background": "hsl(0 0% 2%)",
+        "foreground": "hsl(0 0% 98%)",
+        "card": "hsl(0 0% 4%)",
+        "card-foreground": "hsl(0 0% 98%)",
+        "popover": "hsl(0 0% 4%)",
+        "popover-foreground": "hsl(0 0% 98%)",
+        "primary": "hsl(184 100% 50%)",
+        "primary-foreground": "hsl(0 0% 0%)",
+        "secondary": "hsl(285 100% 50%)",
+        "secondary-foreground": "hsl(0 0% 98%)",
+        "muted": "hsl(0 0% 15%)",
+        "muted-foreground": "hsl(0 0% 65%)",
+        "accent": "hsl(0 0% 15%)",
+        "accent-foreground": "hsl(0 0% 98%)",
+        "destructive": "hsl(0 62.8% 30.6%)",
+        "destructive-foreground": "hsl(0 0% 98%)",
+        "border": "hsl(0 0% 15%)",
+        "input": "hsl(0 0% 15%)",
+        "ring": "hsl(184 100% 50%)"
+      }
+    }
+  },
+  "layout": {
+    "grid_system": "Bento Grid Mode B (High Density)",
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "spacing": {
+      "section_gap": "py-12 md:py-24",
+      "component_gap": "gap-6",
+      "internal_padding": "p-6"
+    },
+    "sidebar": {
+      "width": "w-64",
+      "style": "fixed left-0 top-0 h-full border-r border-border bg-background/80 backdrop-blur-xl z-50"
+    }
+  },
+  "components": {
+    "cards": {
+      "style": "bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl hover:border-primary/50 transition-colors duration-300",
+      "header": "border-b border-border/50 p-4",
+      "content": "p-4"
+    },
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(0,240,255,0.3)] rounded-full px-6 py-2 font-medium transition-all hover:scale-105 active:scale-95",
+      "secondary": "bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full px-6 py-2 font-medium transition-all",
+      "ghost": "bg-transparent border border-border hover:border-primary/50 text-foreground hover:text-primary rounded-full px-6 py-2 transition-all",
+      "icon": "p-2 rounded-full hover:bg-white/10 transition-colors"
+    },
+    "inputs": {
+      "style": "bg-black/20 border border-border rounded-lg px-4 py-2 focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all outline-none placeholder:text-muted-foreground"
+    },
+    "voice_visualizer": {
+      "style": "relative flex items-center justify-center w-32 h-32 rounded-full bg-primary/10 border border-primary/20 animate-pulse",
+      "active": "shadow-[0_0_50px_rgba(0,240,255,0.5)] scale-110 transition-all duration-300"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-xl bg-black/40 border border-white/10",
+    "neon_glow": "shadow-[0_0_15px_rgba(0,240,255,0.3)]",
+    "grid_background": "bg-[linear-gradient(to_right,#222_1px,transparent_1px),linear-gradient(to_bottom,#222_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]",
+    "gradients": {
+      "hero": "bg-gradient-to-b from-background via-background to-primary/5"
+    }
+  },
+  "assets": {
+    "images": [
+      {
+        "category": "background",
+        "url": "https://images.unsplash.com/photo-1762279388956-1c098163a2a8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGN5YmVycHVuayUyMG5ldHdvcmslMjBkYXRhJTIwZmxvdyUyMGRhcmslMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc3MzMwMjc5OHww&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract neon lines forming a digital landscape - Use for Hero Background or Swarm Visualization backdrop"
+      },
+      {
+        "category": "background",
+        "url": "https://images.unsplash.com/photo-1762279389006-43963a0cee55?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGN5YmVycHVuayUyMG5ldHdvcmslMjBkYXRhJTIwZmxvdyUyMGRhcmslMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc3MzMwMjc5OHww&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract neon lines on dark background - Use for 'Connectors' or 'Skills' section background"
+      },
+      {
+        "category": "accent",
+        "url": "https://images.unsplash.com/photo-1759771963975-8a4885446f1f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHw0fHxhYnN0cmFjdCUyMGN5YmVycHVuayUyMG5ldHdvcmslMjBkYXRhJTIwZmxvdyUyMGRhcmslMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc3MzMwMjc5OHww&ixlib=rb-4.1.0&q=85",
+        "description": "Glowing purple ring - Use for 'Agent Active' state or loading indicators"
+      }
+    ],
+    "icons": "Use 'lucide-react' for all UI icons. Use 'simple-icons' for brand logos (if needed)."
+  },
+  "motion": {
+    "library": "framer-motion",
+    "settings": {
+      "default_transition": {
+        "type": "spring",
+        "stiffness": 260,
+        "damping": 20
+      },
+      "page_transition": {
+        "initial": { "opacity": 0, "y": 20 },
+        "animate": { "opacity": 1, "y": 0 },
+        "exit": { "opacity": 0, "y": -20 }
+      }
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure all text has at least 4.5:1 contrast ratio against the dark background.",
+    "focus_states": "All interactive elements must have a visible focus ring (ring-2 ring-primary).",
+    "aria": "Use aria-labels for all icon-only buttons."
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Update tailwind.config.js with the colors provided in this JSON. Add the fonts to index.css.",
+    "2. LAYOUT: Create a 'DashboardLayout' component that includes the Sidebar and a main content area with the 'Bento Grid' structure.",
+    "3. COMPONENTS: Customize Shadcn components (Card, Button, Input) to match the 'Cyber-Command' aesthetic defined in 'components' section. Remove default rounded-md if it conflicts with the design.",
+    "4. VOICE UI: Build a 'VoiceOrb' component using the primary color and CSS animations to simulate listening/speaking states.",
+    "5. SWARM UI: Use the 'background' images as subtle overlays in the 'Swarm Orchestrator' section to give depth.",
+    "6. TESTING: Add data-testid to all interactive elements (e.g., data-testid='voice-input-btn')."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms.",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style.",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN.",
+    "Prioritize using pre-existing components from src/components/ui when applicable.",
+    "Components MUST use named exports (export const ComponentName = ...).",
+    "Pages MUST use default exports (export default function PageName() {...}).",
+    "Use 'sonner' for toasts."
+  ]
+}

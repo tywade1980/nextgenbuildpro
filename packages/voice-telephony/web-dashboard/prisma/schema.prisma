@@ -1,0 +1,155 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Construction Projects
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  status      String   @default("planning") // planning, active, completed, cancelled
+  budget      Float
+  location    String
+  clientId    String
+  client      Client   @relation(fields: [clientId], references: [id])
+  tasks       Task[]
+  laborRates  LaborRate[]
+  materials   Material[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Clients and Contacts
+model Client {
+  id       String    @id @default(cuid())
+  name     String
+  email    String    @unique
+  phone    String?
+  address  String?
+  projects Project[]
+  calls    Call[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Tasks within projects
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  status      String   @default("pending") // pending, in_progress, completed
+  priority    String   @default("medium") // low, medium, high
+  startDate   DateTime?
+  endDate     DateTime?
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  timeEntries TimeEntry[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Labor rates and time tracking
+model LaborRate {
+  id        String   @id @default(cuid())
+  role      String   // carpenter, electrician, plumber, etc.
+  hourlyRate Float
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  timeEntries TimeEntry[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Time tracking
+model TimeEntry {
+  id          String    @id @default(cuid())
+  startTime   DateTime
+  endTime     DateTime?
+  hours       Float?
+  description String?
+  taskId      String
+  task        Task      @relation(fields: [taskId], references: [id])
+  laborRateId String
+  laborRate   LaborRate @relation(fields: [laborRateId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Materials and inventory
+model Material {
+  id        String  @id @default(cuid())
+  name      String
+  quantity  Int
+  unit      String  // sq ft, linear ft, pieces, etc.
+  cost      Float
+  supplier  String?
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Call management and screening
+model Call {
+  id          String   @id @default(cuid())
+  phoneNumber String
+  clientId    String?
+  client      Client?  @relation(fields: [clientId], references: [id])
+  status      String   @default("incoming") // incoming, answered, screened, missed
+  duration    Int?     // in seconds
+  transcript  String?  // AI-generated transcript
+  summary     String?  // AI-generated summary
+  sentiment   String?  // positive, neutral, negative
+  priority    String   @default("normal") // low, normal, high, urgent
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Building codes and regulations
+model BuildingCode {
+  id          String @id @default(cuid())
+  code        String
+  description String
+  category    String // structural, electrical, plumbing, etc.
+  jurisdiction String
+  effectiveDate DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Market data and analysis
+model MarketData {
+  id        String   @id @default(cuid())
+  region    String
+  category  String   // labor, materials, permits, etc.
+  metric    String   // average_cost, availability, demand_index
+  value     Float
+  unit      String?
+  date      DateTime
+  source    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// AI Model configurations
+model AIModel {
+  id          String @id @default(cuid())
+  name        String
+  type        String // llm, vision, speech, etc.
+  provider    String // openai, huggingface, local
+  modelId     String
+  isActive    Boolean @default(false)
+  configuration Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

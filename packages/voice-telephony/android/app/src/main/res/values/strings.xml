@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AI Receptionist</string>
+    
+    <!-- Activity Titles -->
+    <string name="main_title">AI Receptionist</string>
+    <string name="call_title">Call</string>
+    <string name="settings_title">Settings</string>
+    <string name="ai_training_title">AI Training</string>
+    
+    <!-- Call States -->
+    <string name="incoming_call">Incoming Call</string>
+    <string name="outgoing_call">Outgoing Call</string>
+    <string name="call_active">Call Active</string>
+    <string name="call_ended">Call Ended</string>
+    <string name="call_on_hold">Call On Hold</string>
+    
+    <!-- Actions -->
+    <string name="answer">Answer</string>
+    <string name="decline">Decline</string>
+    <string name="end_call">End Call</string>
+    <string name="hold">Hold</string>
+    <string name="unhold">Unhold</string>
+    <string name="mute">Mute</string>
+    <string name="unmute">Unmute</string>
+    <string name="transfer">Transfer</string>
+    <string name="speaker">Speaker</string>
+    
+    <!-- Navigation -->
+    <string name="home">Home</string>
+    <string name="calls">Calls</string>
+    <string name="appointments">Appointments</string>
+    <string name="settings">Settings</string>
+    <string name="training">Training</string>
+    
+    <!-- Status Messages -->
+    <string name="agent_initializing">Initializing AI agents…</string>
+    <string name="agent_ready">AI agents ready</string>
+    <string name="agent_offline">AI agents offline</string>
+    <string name="connecting">Connecting…</string>
+    <string name="processing">Processing…</string>
+    
+    <!-- Permissions -->
+    <string name="permission_phone_required">Phone permissions are required for call handling</string>
+    <string name="permission_audio_required">Audio permissions are required for voice processing</string>
+    <string name="permission_contacts_required">Contact permissions are required for caller identification</string>
+    
+    <!-- Error Messages -->
+    <string name="error_initialization_failed">Failed to initialize AI system</string>
+    <string name="error_call_failed">Call processing failed</string>
+    <string name="error_network">Network error</string>
+    <string name="error_unknown">An unexpected error occurred</string>
+    
+    <!-- Success Messages -->
+    <string name="call_completed">Call completed successfully</string>
+    <string name="appointment_scheduled">Appointment scheduled</string>
+    <string name="message_sent">Message sent</string>
+    
+    <!-- AI Responses -->
+    <string name="ai_greeting">Hello! Thank you for calling. How can I help you today?</string>
+    <string name="ai_goodbye">Thank you for calling. Have a great day!</string>
+    <string name="ai_transfer">Let me connect you with someone who can help you better.</string>
+    <string name="ai_appointment">I\'d be happy to help you schedule an appointment.</string>
+    <string name="ai_hold">Please hold while I process your request.</string>
+    
+    <!-- Statistics -->
+    <string name="stats_total_calls">Total Calls</string>
+    <string name="stats_avg_duration">Average Duration</string>
+    <string name="stats_satisfaction">Satisfaction Score</string>
+    <string name="stats_human_transfers">Human Transfers</string>
+    <string name="stats_today">Today</string>
+    <string name="stats_this_week">This Week</string>
+    <string name="stats_this_month">This Month</string>
+    
+    <!-- Content Descriptions -->
+    <string name="cd_call_icon">Call type icon</string>
+    <string name="cd_status_icon">Status icon</string>
+    <string name="cd_agent_status">Agent status indicator</string>
+    <string name="cd_answer_call">Answer call button</string>
+    <string name="cd_end_call">End call button</string>
+    <string name="cd_new_call">Make new call</string>
+    
+    <!-- Notifications -->
+    <string name="notification_call_handling">AI handling call</string>
+    <string name="notification_ai_processing">AI processing in background</string>
+    <string name="channel_calls">Call Notifications</string>
+    <string name="channel_ai">AI Processing</string>
+    <string name="channel_general">General</string>
+</resources>
