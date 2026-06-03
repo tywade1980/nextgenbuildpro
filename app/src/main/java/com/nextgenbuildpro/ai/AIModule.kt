@@ -658,28 +658,82 @@ object AIModule {
     }
 
     private class ProjectManagerAIImpl : ProjectManagerAI {
+        private val interactionLog = mutableListOf<Pair<String, String>>()
+        private val learnedRisks = mutableSetOf<String>()
+
         override fun processCommand(command: String): String = "Processing PM command: $command"
-        override fun generateSuggestions(context: String): List<String> = listOf("PM suggestion 1", "PM suggestion 2")
-        override fun learnFromInteraction(interaction: String, outcome: String) {}
-        override fun generateProjectTimeline(requirements: String): Timeline = Timeline(listOf("Week 1: Planning", "Week 2: Design"))
+        override fun generateSuggestions(context: String): List<String> = listOf(
+            "Review current project milestones",
+            "Check subcontractor schedules",
+            "Update budget vs actuals",
+            "Generate daily progress report"
+        )
+        override fun learnFromInteraction(interaction: String, outcome: String) {
+            interactionLog.add(Pair(interaction, outcome))
+            if (outcome.contains("delay", ignoreCase = true) || outcome.contains("risk", ignoreCase = true)) {
+                val keywords = interaction.split(" ").filter { it.length > 4 }
+                learnedRisks.addAll(keywords)
+            }
+            android.util.Log.d("ProjectManagerAI", "Learned from interaction — total patterns: ${interactionLog.size}, risks: ${learnedRisks.size}")
+        }
+        override fun generateProjectTimeline(requirements: String): Timeline = Timeline(listOf("Week 1: Planning", "Week 2: Design", "Week 3-6: Construction", "Week 7: Inspection", "Week 8: Handover"))
         override fun estimateProjectCosts(scope: String): CostEstimate = CostEstimate(25000.0, mapOf("Labor" to 15000.0, "Materials" to 10000.0))
-        override fun identifyProjectRisks(projectDetails: String): List<Risk> = listOf(Risk("Weather delays", "Medium"))
+        override fun identifyProjectRisks(projectDetails: String): List<Risk> {
+            val risks = mutableListOf(Risk("Weather delays", "Medium"), Risk("Material price fluctuation", "Low"))
+            learnedRisks.forEach { keyword -> risks.add(Risk("Learned risk: $keyword", "Low")) }
+            return risks
+        }
     }
 
     private class ArchitectAIImpl : ArchitectAI {
+        private val interactionLog = mutableListOf<Pair<String, String>>()
+        private val designPreferences = mutableMapOf<String, String>()
+
         override fun processCommand(command: String): String = "Processing Architect command: $command"
-        override fun generateSuggestions(context: String): List<String> = listOf("Architect suggestion 1", "Architect suggestion 2")
-        override fun learnFromInteraction(interaction: String, outcome: String) {}
+        override fun generateSuggestions(context: String): List<String> = listOf(
+            "Review structural load calculations",
+            "Verify building code compliance",
+            "Optimize natural lighting layout",
+            "Check HVAC placement efficiency"
+        )
+        override fun learnFromInteraction(interaction: String, outcome: String) {
+            interactionLog.add(Pair(interaction, outcome))
+            if (outcome.contains("approved", ignoreCase = true) || outcome.contains("preferred", ignoreCase = true)) {
+                val style = interaction.split(" ").firstOrNull { it.length > 5 } ?: "general"
+                designPreferences[style] = outcome
+            }
+            android.util.Log.d("ArchitectAI", "Learned design preference — total: ${designPreferences.size}")
+        }
         override fun generateBuildingPlans(requirements: String): BuildingPlan = BuildingPlan("Floor plan details", listOf("Blueprint 1", "Blueprint 2"))
         override fun analyzeStructuralIntegrity(design: String): StructuralAnalysis = StructuralAnalysis("Strong", listOf("Support beam needed"))
         override fun optimizeSpaceUtilization(dimensions: String): SpaceUtilization = SpaceUtilization(85.5, listOf("Open concept recommended"))
     }
 
     private class InteriorDesignAIImpl : InteriorDesignAI {
+        private val interactionLog = mutableListOf<Pair<String, String>>()
+        private val stylePreferences = mutableMapOf<String, Int>()
+
         override fun processCommand(command: String): String = "Processing Interior Design command: $command"
-        override fun generateSuggestions(context: String): List<String> = listOf("Interior Design suggestion 1", "Interior Design suggestion 2")
-        override fun learnFromInteraction(interaction: String, outcome: String) {}
-        override fun generateDesignSuggestions(requirements: String): List<DesignConcept> = listOf(DesignConcept("Modern minimalist", "Description"))
+        override fun generateSuggestions(context: String): List<String> = listOf(
+            "Explore color palette options",
+            "Review furniture layout for flow",
+            "Consider lighting fixtures for ambiance",
+            "Check material samples for consistency"
+        )
+        override fun learnFromInteraction(interaction: String, outcome: String) {
+            interactionLog.add(Pair(interaction, outcome))
+            val styles = listOf("modern", "traditional", "minimalist", "industrial", "farmhouse", "coastal")
+            styles.forEach { style ->
+                if (interaction.contains(style, ignoreCase = true)) {
+                    stylePreferences[style] = (stylePreferences[style] ?: 0) + 1
+                }
+            }
+            android.util.Log.d("InteriorDesignAI", "Style preferences updated: $stylePreferences")
+        }
+        override fun generateDesignSuggestions(requirements: String): List<DesignConcept> {
+            val topStyle = stylePreferences.maxByOrNull { it.value }?.key ?: "modern minimalist"
+            return listOf(DesignConcept(topStyle.replaceFirstChar { it.uppercase() }, "Learned from client preferences"))
+        }
         override fun visualizeSpace(dimensions: String): String = "3D model URL"
         override fun analyzePhotosAndVideos(mediaUrls: List<String>): DesignAnalysis = DesignAnalysis(listOf("Natural light advantage", "Space constraints"))
     }

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  ScrollView, 
-  Text, 
-  StyleSheet, 
+import {
+  View,
+  ScrollView,
+  Text,
+  StyleSheet,
   TouchableOpacity,
   TextInput,
   FlatList,
@@ -11,6 +11,9 @@ import {
   ActivityIndicator,
   Alert
 } from 'react-native';
+import { collection, doc, getDoc, getDocs, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { firestore } from './firebase';
+import { CatalogueDataService } from './services/CatalogueDataService';
 
 /**
  * React Native EstimateEditor Component
@@ -513,15 +516,20 @@ const EstimateEditor = ({
   );
 };
 
-// API Functions (These would connect to your backend/services)
+// API Functions — backed by Firebase Firestore
 // These are equivalents to the Kotlin repository and service methods
 
 const fetchClients = async () => {
-  // Equivalent to client repository operations
+  // Equivalent to client repository operations — reads from 'leads' collection
   try {
-    const response = await fetch('/api/clients');
-    if (!response.ok) throw new Error('Failed to fetch clients');
-    return await response.json();
+    const snapshot = await getDocs(collection(firestore, 'leads'));
+    return snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      name: docSnap.data().name || '',
+      phone: docSnap.data().phone || '',
+      email: docSnap.data().email || '',
+      address: docSnap.data().address || '',
+    }));
   } catch (error) {
     console.error('Error fetching clients:', error);
     return [];
@@ -531,12 +539,9 @@ const fetchClients = async () => {
 const fetchEstimate = async (estimateId) => {
   // Equivalent to TemplateEstimateRepository.getById()
   try {
-    const response = await fetch(`/api/estimates/${estimateId}`);
-    if (!response.ok) {
-      if (response.status === 404) return null;
-      throw new Error('Failed to fetch estimate');
-    }
-    return await response.json();
+    const docSnap = await getDoc(doc(firestore, 'estimates', estimateId));
+    if (!docSnap.exists()) return null;
+    return { id: docSnap.id, ...docSnap.data() };
   } catch (error) {
     console.error('Error fetching estimate:', error);
     return null;
@@ -544,14 +549,11 @@ const fetchEstimate = async (estimateId) => {
 };
 
 const fetchTemplate = async (templateId) => {
-  // Equivalent to template system operations
+  // Equivalent to template system operations — templates stored in 'estimates' collection
   try {
-    const response = await fetch(`/api/templates/${templateId}`);
-    if (!response.ok) {
-      if (response.status === 404) return null;
-      throw new Error('Failed to fetch template');
-    }
-    return await response.json();
+    const docSnap = await getDoc(doc(firestore, 'estimates', templateId));
+    if (!docSnap.exists()) return null;
+    return { id: docSnap.id, ...docSnap.data() };
   } catch (error) {
     console.error('Error fetching template:', error);
     return null;
@@ -561,45 +563,72 @@ const fetchTemplate = async (templateId) => {
 const searchAssemblies = async (query) => {
   // Equivalent to AssemblyCatalogueService.searchAssemblies()
   try {
-    const response = await fetch(`/api/assemblies/search?q=${encodeURIComponent(query)}`);
-    if (!response.ok) throw new Error('Failed to search assemblies');
-    return await response.json();
+    const service = new CatalogueDataService();
+    const results = await service.searchAssemblies(query);
+    // Normalize results to a consistent shape
+    return (results || []).map((item) => ({
+      id: item.id || item.assemblyId || '',
+      name: item.name || item.title || '',
+      description: item.description || '',
+      estimatedCost: item.estimatedCost || item.totalCost || 0,
+      materialCostPerUnit: item.materialCostPerUnit || item.materialCost || 0,
+      laborHours: item.laborHours || 0,
+      laborRate: item.laborRate || 0,
+      equipmentCostPerUnit: item.equipmentCostPerUnit || item.equipmentCost || 0,
+      markupPercentage: item.markupPercentage || 0,
+      taxRate: item.taxRate || 0,
+      unit: item.unit || '',
+    }));
   } catch (error) {
     console.error('Error searching assemblies:', error);
     return [];
   }
 };
 
-const convertAssemblyToLineItem = async (assembly, quantity) => {
+const convertAssemblyToLineItem = (assembly, quantity) => {
   // Equivalent to AssemblyCatalogueService.convertTemplateToAssembly()
-  try {
-    const response = await fetch('/api/assemblies/convert-to-line-item', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ assembly, quantity }),
-    });
-    if (!response.ok) throw new Error('Failed to convert assembly to line item');
-    return await response.json();
-  } catch (error) {
-    console.error('Error converting assembly to line item:', error);
-    return null;
-  }
+  // Pure client-side transformation — no API call needed
+  const qty = quantity || 1;
+  const materialCost = (assembly.materialCostPerUnit || 0) * qty;
+  const laborCost = (assembly.laborHours || 0) * (assembly.laborRate || 0) * qty;
+  const equipmentCost = (assembly.equipmentCostPerUnit || 0) * qty;
+  const subtotal = materialCost + laborCost + equipmentCost;
+  const markupAmount = subtotal * ((assembly.markupPercentage || 0) / 100);
+  const subtotalWithMarkup = subtotal + markupAmount;
+  const taxAmount = subtotalWithMarkup * ((assembly.taxRate || 0) / 100);
+  const total = subtotalWithMarkup + taxAmount;
+
+  return {
+    id: `item-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    assemblyId: assembly.id,
+    name: assembly.name,
+    description: assembly.description || '',
+    quantity: qty,
+    unit: assembly.unit || '',
+    materialCostPerUnit: assembly.materialCostPerUnit || 0,
+    laborHours: assembly.laborHours || 0,
+    laborRate: assembly.laborRate || 0,
+    equipmentCostPerUnit: assembly.equipmentCostPerUnit || 0,
+    markupPercentage: assembly.markupPercentage || 0,
+    taxRate: assembly.taxRate || 0,
+    materialCost,
+    laborCost,
+    equipmentCost,
+    subtotal,
+    markupAmount,
+    taxAmount,
+    total,
+  };
 };
 
 const createEstimate = async (estimateData) => {
   // Equivalent to TemplateEstimateRepository.create()
   try {
-    const response = await fetch('/api/estimates', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(estimateData),
+    const docRef = await addDoc(collection(firestore, 'estimates'), {
+      ...estimateData,
+      createdAt: serverTimestamp(),
     });
-    if (!response.ok) throw new Error('Failed to create estimate');
-    return await response.json();
+    return { id: docRef.id, ...estimateData };
   } catch (error) {
     console.error('Error creating estimate:', error);
     throw error;
@@ -609,15 +638,11 @@ const createEstimate = async (estimateData) => {
 const updateEstimate = async (estimateId, estimateData) => {
   // Equivalent to TemplateEstimateRepository.update()
   try {
-    const response = await fetch(`/api/estimates/${estimateId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(estimateData),
+    await updateDoc(doc(firestore, 'estimates', estimateId), {
+      ...estimateData,
+      updatedAt: serverTimestamp(),
     });
-    if (!response.ok) throw new Error('Failed to update estimate');
-    return await response.json();
+    return { id: estimateId, ...estimateData };
   } catch (error) {
     console.error('Error updating estimate:', error);
     throw error;
@@ -627,14 +652,11 @@ const updateEstimate = async (estimateId, estimateData) => {
 const applyTaxAndMarkup = async (estimateId, taxSettings, markupSettings) => {
   // Equivalent to TemplateEstimateRepository.applyTaxAndMarkup()
   try {
-    const response = await fetch(`/api/estimates/${estimateId}/apply-tax-markup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ taxSettings, markupSettings }),
+    await updateDoc(doc(firestore, 'estimates', estimateId), {
+      taxSettings,
+      markupSettings,
+      updatedAt: serverTimestamp(),
     });
-    if (!response.ok) throw new Error('Failed to apply tax and markup');
     return true;
   } catch (error) {
     console.error('Error applying tax and markup:', error);

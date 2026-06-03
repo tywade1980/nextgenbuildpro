@@ -6,9 +6,11 @@ import com.nextgenbuildpro.core.DateUtils
 import com.nextgenbuildpro.pm.data.model.DailyLog
 import com.nextgenbuildpro.pm.data.model.Project
 import com.nextgenbuildpro.pm.data.model.ProjectStatus
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.tasks.await
 
 /**
  * Repository for managing projects in the PM module
@@ -17,9 +19,48 @@ class ProjectRepository : Repository<Project> {
     private val _projects = MutableStateFlow<List<Project>>(emptyList())
     val projects: StateFlow<List<Project>> = _projects.asStateFlow()
 
-    init {
-        // Load sample data for demonstration
-        loadSampleData()
+    private val db = FirebaseFirestore.getInstance()
+    private val projectsCollection = db.collection("projects")
+
+    /**
+     * Load all projects from Firestore and populate the in-memory StateFlow
+     */
+    suspend fun loadFromFirestore() {
+        try {
+            val snapshot = projectsCollection.get().await()
+            val loadedProjects = snapshot.documents.mapNotNull { doc ->
+                val data = doc.data ?: return@mapNotNull null
+                Project(
+                    id = doc.id,
+                    name = data["name"] as? String ?: "",
+                    clientId = data["clientId"] as? String ?: "",
+                    clientName = data["clientName"] as? String ?: "",
+                    leadId = data["leadId"] as? String ?: "",
+                    address = (data["address"] as? Map<*, *>)?.let { addr ->
+                        Address(
+                            street = addr["street"] as? String ?: "",
+                            city = addr["city"] as? String ?: "",
+                            state = addr["state"] as? String ?: "",
+                            zipCode = addr["zipCode"] as? String ?: ""
+                        )
+                    } ?: Address(),
+                    status = data["status"] as? String ?: ProjectStatus.PLANNING.displayName,
+                    startDate = data["startDate"] as? String ?: "",
+                    endDate = data["endDate"] as? String ?: "",
+                    budget = (data["budget"] as? Number)?.toDouble() ?: 0.0,
+                    actualCost = (data["actualCost"] as? Number)?.toDouble() ?: 0.0,
+                    progress = (data["progress"] as? Number)?.toInt() ?: 0,
+                    description = data["description"] as? String ?: "",
+                    notes = data["notes"] as? String ?: "",
+                    lastActivityDate = data["lastActivityDate"] as? String ?: "",
+                    createdAt = data["createdAt"] as? String ?: "",
+                    updatedAt = data["updatedAt"] as? String ?: ""
+                )
+            }
+            _projects.value = loadedProjects
+        } catch (e: Exception) {
+            // Leave cache unchanged on error
+        }
     }
 
     /**
@@ -40,11 +81,12 @@ class ProjectRepository : Repository<Project> {
      * Save a new project
      */
     override suspend fun save(item: Project): Boolean {
-        try {
+        return try {
+            projectsCollection.document(item.id).set(item.toFirestoreMap()).await()
             _projects.value = _projects.value + item
-            return true
+            true
         } catch (e: Exception) {
-            return false
+            false
         }
     }
 
@@ -52,13 +94,14 @@ class ProjectRepository : Repository<Project> {
      * Update an existing project
      */
     override suspend fun update(item: Project): Boolean {
-        try {
-            _projects.value = _projects.value.map { 
-                if (it.id == item.id) item else it 
+        return try {
+            projectsCollection.document(item.id).set(item.toFirestoreMap()).await()
+            _projects.value = _projects.value.map {
+                if (it.id == item.id) item else it
             }
-            return true
+            true
         } catch (e: Exception) {
-            return false
+            false
         }
     }
 
@@ -66,11 +109,12 @@ class ProjectRepository : Repository<Project> {
      * Delete a project by ID
      */
     override suspend fun delete(id: String): Boolean {
-        try {
+        return try {
+            projectsCollection.document(id).delete().await()
             _projects.value = _projects.value.filter { it.id != id }
-            return true
+            true
         } catch (e: Exception) {
-            return false
+            false
         }
     }
 
@@ -95,9 +139,9 @@ class ProjectRepository : Repository<Project> {
         if (query.isBlank()) return _projects.value
 
         val lowercaseQuery = query.lowercase()
-        return _projects.value.filter { 
-            it.name.lowercase().contains(lowercaseQuery) || 
-            it.description.lowercase().contains(lowercaseQuery) 
+        return _projects.value.filter {
+            it.name.lowercase().contains(lowercaseQuery) ||
+            it.description.lowercase().contains(lowercaseQuery)
         }
     }
 
@@ -106,7 +150,7 @@ class ProjectRepository : Repository<Project> {
      */
     suspend fun addProjectNote(projectId: String, note: String): Boolean {
         try {
-            _projects.value = _projects.value.map { project ->
+            val updatedList = _projects.value.map { project ->
                 if (project.id == projectId) {
                     val updatedNotes = project.notes + "\n" + DateUtils.getCurrentTimestamp() + ": " + note
                     project.copy(
@@ -117,6 +161,9 @@ class ProjectRepository : Repository<Project> {
                     project
                 }
             }
+            val updated = updatedList.find { it.id == projectId } ?: return false
+            projectsCollection.document(projectId).set(updated.toFirestoreMap()).await()
+            _projects.value = updatedList
             return true
         } catch (e: Exception) {
             return false
@@ -128,7 +175,7 @@ class ProjectRepository : Repository<Project> {
      */
     suspend fun updateProjectStatus(projectId: String, newStatus: String): Boolean {
         try {
-            _projects.value = _projects.value.map { project ->
+            val updatedList = _projects.value.map { project ->
                 if (project.id == projectId) {
                     project.copy(
                         status = newStatus,
@@ -138,6 +185,11 @@ class ProjectRepository : Repository<Project> {
                     project
                 }
             }
+            val updated = updatedList.find { it.id == projectId } ?: return false
+            projectsCollection.document(projectId).update(
+                mapOf("status" to newStatus, "updatedAt" to updated.updatedAt)
+            ).await()
+            _projects.value = updatedList
             return true
         } catch (e: Exception) {
             return false
@@ -149,7 +201,7 @@ class ProjectRepository : Repository<Project> {
      */
     suspend fun updateProjectProgress(projectId: String, progress: Int): Boolean {
         try {
-            _projects.value = _projects.value.map { project ->
+            val updatedList = _projects.value.map { project ->
                 if (project.id == projectId) {
                     project.copy(
                         progress = progress,
@@ -159,6 +211,11 @@ class ProjectRepository : Repository<Project> {
                     project
                 }
             }
+            val updated = updatedList.find { it.id == projectId } ?: return false
+            projectsCollection.document(projectId).update(
+                mapOf("progress" to progress, "updatedAt" to updated.updatedAt)
+            ).await()
+            _projects.value = updatedList
             return true
         } catch (e: Exception) {
             return false
@@ -170,7 +227,7 @@ class ProjectRepository : Repository<Project> {
      */
     suspend fun addDailyLog(dailyLog: DailyLog): Boolean {
         try {
-            _projects.value = _projects.value.map { project ->
+            val updatedList = _projects.value.map { project ->
                 if (project.id == dailyLog.projectId) {
                     project.copy(
                         dailyLogs = project.dailyLogs + dailyLog,
@@ -181,6 +238,9 @@ class ProjectRepository : Repository<Project> {
                     project
                 }
             }
+            val updated = updatedList.find { it.id == dailyLog.projectId } ?: return false
+            projectsCollection.document(dailyLog.projectId).set(updated.toFirestoreMap()).await()
+            _projects.value = updatedList
             return true
         } catch (e: Exception) {
             return false
@@ -188,84 +248,29 @@ class ProjectRepository : Repository<Project> {
     }
 
     /**
-     * Load sample data for demonstration
+     * Convert a Project to a Firestore-compatible map
      */
-    private fun loadSampleData() {
-        val sampleProjects = listOf(
-            Project(
-                id = "project_1",
-                name = "Kitchen Renovation - Smith",
-                clientId = "lead_1",
-                clientName = "John Smith",
-                leadId = "lead_1",
-                address = Address(
-                    street = "123 Main St",
-                    city = "Anytown",
-                    state = "CA",
-                    zipCode = "12345"
-                ),
-                status = ProjectStatus.PLANNING.displayName,
-                startDate = "07/01/2023",
-                endDate = "08/30/2023",
-                budget = 25000.0,
-                actualCost = 0.0,
-                progress = 0,
-                description = "Complete kitchen renovation including new cabinets, countertops, appliances, and flooring.",
-                notes = "Initial consultation completed. Client prefers modern style with white cabinets.",
-                lastActivityDate = "06/15/2023 10:30:00",
-                createdAt = "06/15/2023 10:30:00",
-                updatedAt = "06/15/2023 10:30:00"
-            ),
-            Project(
-                id = "project_2",
-                name = "Bathroom Remodel - Johnson",
-                clientId = "lead_2",
-                clientName = "Sarah Johnson",
-                leadId = "lead_2",
-                address = Address(
-                    street = "456 Oak Ave",
-                    city = "Somewhere",
-                    state = "NY",
-                    zipCode = "67890"
-                ),
-                status = ProjectStatus.IN_PROGRESS.displayName,
-                startDate = "06/20/2023",
-                endDate = "07/15/2023",
-                budget = 12000.0,
-                actualCost = 5000.0,
-                progress = 40,
-                description = "Master bathroom remodel with new shower, vanity, and tile work.",
-                notes = "Demo completed. Plumbing rough-in scheduled for next week.",
-                lastActivityDate = "06/25/2023 09:15:00",
-                createdAt = "06/10/2023 14:45:00",
-                updatedAt = "06/25/2023 09:15:00"
-            ),
-            Project(
-                id = "project_3",
-                name = "Deck Construction - Brown",
-                clientId = "lead_3",
-                clientName = "Michael Brown",
-                leadId = "lead_3",
-                address = Address(
-                    street = "789 Pine Rd",
-                    city = "Nowhere",
-                    state = "TX",
-                    zipCode = "54321"
-                ),
-                status = ProjectStatus.PLANNING.displayName,
-                startDate = "07/15/2023",
-                endDate = "08/15/2023",
-                budget = 8500.0,
-                actualCost = 0.0,
-                progress = 0,
-                description = "New 400 sq ft composite deck with railing and stairs.",
-                notes = "Permit application submitted. Awaiting approval.",
-                lastActivityDate = "06/20/2023 16:10:00",
-                createdAt = "06/05/2023 11:20:00",
-                updatedAt = "06/20/2023 16:10:00"
-            )
-        )
-
-        _projects.value = sampleProjects
-    }
+    private fun Project.toFirestoreMap(): Map<String, Any?> = mapOf(
+        "name" to name,
+        "clientId" to clientId,
+        "clientName" to clientName,
+        "leadId" to leadId,
+        "address" to mapOf(
+            "street" to address.street,
+            "city" to address.city,
+            "state" to address.state,
+            "zipCode" to address.zipCode
+        ),
+        "status" to status,
+        "startDate" to startDate,
+        "endDate" to endDate,
+        "budget" to budget,
+        "actualCost" to actualCost,
+        "progress" to progress,
+        "description" to description,
+        "notes" to notes,
+        "lastActivityDate" to lastActivityDate,
+        "createdAt" to createdAt,
+        "updatedAt" to updatedAt
+    )
 }
